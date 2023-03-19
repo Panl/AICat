@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "state" : {
+        "revision" : "78424be314842833c04bc3bef5b72e85fff99204",
+        "version" : "5.6.4"
+      }
+    },
+    {
+      "identity" : "blackbird",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/marcoarment/Blackbird",
+      "state" : {
+        "branch" : "main",
+        "revision" : "13f3cc600c37e6a4b4598cec0d64cc7d27585ab6"
+      }
+    }
+  ],
+  "version" : 2
+}
