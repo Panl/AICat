@@ -18,6 +18,11 @@
 		8E64874229C713D30029E14F /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874129C713D30029E14F /* Conversation.swift */; };
 		8E64874429C715740029E14F /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874329C715740029E14F /* ChatMessage.swift */; };
 		8E64874729C719460029E14F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874629C719460029E14F /* Date+Extension.swift */; };
+		8E64874C29C788640029E14F /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874B29C788640029E14F /* ConversationListView.swift */; };
+		8EECA00629C8097E0021A6A1 /* UerDefaults+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EECA00529C8097E0021A6A1 /* UerDefaults+Extension.swift */; };
+		8EECA00A29C82E9D0021A6A1 /* AddConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EECA00929C82E9D0021A6A1 /* AddConversationView.swift */; };
+		8EECA00C29C82ECB0021A6A1 /* AddApiKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EECA00B29C82ECB0021A6A1 /* AddApiKeyView.swift */; };
+		8EECA01129C896B20021A6A1 /* Database+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EECA01029C896B20021A6A1 /* Database+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +38,12 @@
 		8E64874629C719460029E14F /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		8E64874929C759970029E14F /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 		8E64874A29C75A1C0029E14F /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		8E64874B29C788640029E14F /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
+		8EECA00529C8097E0021A6A1 /* UerDefaults+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UerDefaults+Extension.swift"; sourceTree = "<group>"; };
+		8EECA00929C82E9D0021A6A1 /* AddConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddConversationView.swift; sourceTree = "<group>"; };
+		8EECA00B29C82ECB0021A6A1 /* AddApiKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddApiKeyView.swift; sourceTree = "<group>"; };
+		8EECA00D29C83BDB0021A6A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8EECA01029C896B20021A6A1 /* Database+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Database+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,14 +79,14 @@
 		8E64872529C6E1B00029E14F /* AICat */ = {
 			isa = PBXGroup;
 			children = (
+				8EECA00D29C83BDB0021A6A1 /* Info.plist */,
+				8EECA00829C82E410021A6A1 /* Pages */,
 				8E64874529C7192D0029E14F /* Extension */,
 				8E64873C29C701B00029E14F /* Model */,
 				8E64873929C6FDD40029E14F /* Networking */,
 				8E64872629C6E1B00029E14F /* AICatApp.swift */,
-				8E64872829C6E1B00029E14F /* ContentView.swift */,
 				8E64872A29C6E1B10029E14F /* Assets.xcassets */,
 				8E64872C29C6E1B10029E14F /* Preview Content */,
-				8E64873429C6E2660029E14F /* ConversationView.swift */,
 			);
 			path = AICat;
 			sourceTree = "<group>";
@@ -109,6 +120,8 @@
 			isa = PBXGroup;
 			children = (
 				8E64874629C719460029E14F /* Date+Extension.swift */,
+				8EECA00529C8097E0021A6A1 /* UerDefaults+Extension.swift */,
+				8EECA01029C896B20021A6A1 /* Database+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -120,6 +133,18 @@
 				8E64874929C759970029E14F /* libsqlite3.0.tbd */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8EECA00829C82E410021A6A1 /* Pages */ = {
+			isa = PBXGroup;
+			children = (
+				8E64872829C6E1B00029E14F /* ContentView.swift */,
+				8E64873429C6E2660029E14F /* ConversationView.swift */,
+				8E64874B29C788640029E14F /* ConversationListView.swift */,
+				8EECA00929C82E9D0021A6A1 /* AddConversationView.swift */,
+				8EECA00B29C82ECB0021A6A1 /* AddApiKeyView.swift */,
+			);
+			path = Pages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -201,12 +226,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E64872929C6E1B00029E14F /* ContentView.swift in Sources */,
+				8EECA00A29C82E9D0021A6A1 /* AddConversationView.swift in Sources */,
 				8E64873B29C6FF750029E14F /* CatApi.swift in Sources */,
+				8EECA00C29C82ECB0021A6A1 /* AddApiKeyView.swift in Sources */,
 				8E64872729C6E1B00029E14F /* AICatApp.swift in Sources */,
 				8E64874429C715740029E14F /* ChatMessage.swift in Sources */,
 				8E64874729C719460029E14F /* Date+Extension.swift in Sources */,
 				8E64874229C713D30029E14F /* Conversation.swift in Sources */,
+				8EECA01129C896B20021A6A1 /* Database+Extension.swift in Sources */,
 				8E64873529C6E2660029E14F /* ConversationView.swift in Sources */,
+				8EECA00629C8097E0021A6A1 /* UerDefaults+Extension.swift in Sources */,
+				8E64874C29C788640029E14F /* ConversationListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,6 +368,7 @@
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AICat/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AICat;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -345,6 +376,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -370,6 +402,7 @@
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AICat/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AICat;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -377,6 +410,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

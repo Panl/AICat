@@ -5,30 +5,75 @@
 //  Created by Lei Pan on 2023/3/19.
 //
 
+import Foundation
 import Alamofire
 
 enum CatApi {
-
-    static var apiKey = "your OpenAI Apikey"
-
-    static func complete(content: String) async -> Result<CompleteResponse, AFError>{
+    static func complete(apiKey: String? = nil, messages: [Message]) async -> Result<CompleteResponse, AFError> {
+        let key = apiKey ?? UserDefaults.openApiKey
+        guard let key else {
+            return .failure(AFError.createURLRequestFailed(error: NSError(domain: "missing OpenAI API key", code: -1)))
+        }
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
-            "Authorization": "Bearer \(apiKey)"
+            "Authorization": "Bearer \(key)"
         ]
         return await AF.request(
             "https://api.openai.com/v1/chat/completions",
             method: .post,
             parameters: CompleteParams(
                 model: "gpt-3.5-turbo",
-                messages: [Message(role: "user", content: content)]
+                messages: messages
             ),
             encoder: .json,
-            headers: headers
+            headers: headers,
+            requestModifier: { request in
+                request.timeoutInterval = 30
+            }
         )
+        .logRequest()
         .serializingDecodable(CompleteResponse.self)
         .response
+        .logResponse()
         .result
+    }
+
+    static func complete(messages: [Message], with prompt: String) async -> Result<CompleteResponse, AFError> {
+        let system = Message(role: "system", content: prompt)
+        return await complete(messages: [system] + messages)
+    }
+
+    static func validate(apiKey: String) async -> Result<CompleteResponse, AFError> {
+        await complete(apiKey: apiKey, messages: [Message(role: "user", content: "say this is a test")])
+    }
+}
+
+extension Request {
+    func logRequest() -> Self {
+        #if DEBUG
+        cURLDescription { curl in
+            debugPrint("====Request Start====")
+            debugPrint(curl)
+            debugPrint("====Request End====")
+        }
+        #endif
+        return self
+    }
+}
+
+extension DataResponse {
+    func logResponse() -> Self {
+        #if DEBUG
+        debugPrint("====Response Start====")
+        switch result {
+        case .success(let data):
+            debugPrint(data)
+        case .failure(let error):
+            debugPrint(error)
+        }
+        debugPrint("====Response End====")
+        #endif
+        return self
     }
 }
 

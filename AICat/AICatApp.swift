@@ -15,10 +15,17 @@ struct AICatApp: App {
 
     var database = try! Blackbird.Database(path: dbPath, options: .debugPrintEveryQuery)
 
+    @AppStorage("openApiKey")
+    var apiKey: String?
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.blackbirdDatabase, database)
+            if apiKey != nil {
+                ContentView()
+                    .environment(\.blackbirdDatabase, database)
+            } else {
+                AddApiKeyView(onValidateSuccess: {})
+            }
         }
     }
 }
