@@ -51,7 +51,7 @@ struct ContentView: View {
         }.sheet(
             isPresented: $showAddConversationSheet,
             onDismiss: {
-                if conversations.results.isEmpty {
+                if conversation == nil {
                     showAddConversationSheet = true
                 }
                 if conversation == nil {
@@ -61,8 +61,8 @@ struct ContentView: View {
         ) {
             AddConversationView(
                 onSave: { conversation in
-                    showAddConversationSheet = false
                     self.conversation = conversation
+                    showAddConversationSheet = false
                     chatId = conversation.id
                     withAnimation {
                         showConversation = false

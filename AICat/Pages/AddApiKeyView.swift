@@ -37,7 +37,6 @@ struct AddApiKeyView: View {
                 Text(LocalizedStringKey("[What's OpenAI API key?](https://platform.openai.com/account/api-keys)"))
                     .font(.custom("Avenir Next", size: 16))
                     .fontWeight(.medium)
-                    .tint(.teal)
                 Spacer()
                     .frame(height: 60)
                 Button(action: validateApiKey) {

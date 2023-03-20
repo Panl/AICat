@@ -25,7 +25,7 @@ struct ConversationView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
-                HStack {
+                HStack(spacing: 18) {
                     Button(action: onChatsClick) {
                         Image(systemName: "bubble.left.and.bubble.right")
                             .tint(.black)
@@ -238,7 +238,7 @@ struct ConversationView_Previews: PreviewProvider {
                 ChatMessage(role: "user", content: "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello", conversationId: ""),
                 ChatMessage(role: "other", content: "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello", conversationId: "")
             ],
-            conversation: Conversation(title: "Mini Chat", prompt: ""),
+            conversation: Conversation(title: "Mini Chat", prompt: "hello hello hello hello hello hello hello hello hello hello "),
             onChatsClick: { }
 
         )

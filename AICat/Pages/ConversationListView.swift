@@ -15,6 +15,7 @@ struct ConversationListView: View {
 
     @Environment(\.blackbirdDatabase) var db
     @State var showClearAllChatAlert = false
+    @State var showSettingsView = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -113,7 +114,7 @@ struct ConversationListView: View {
                 }
                 .padding(.vertical, 10)
             }.tint(.gray)
-            Button(action: {}) {
+            Button(action: { showSettingsView = true }) {
                 HStack {
                     Image(systemName: "gearshape")
                     Text("Settings")
@@ -128,6 +129,11 @@ struct ConversationListView: View {
         }
         .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
         .frame(width: 300)
+        .fullScreenCover(isPresented: $showSettingsView) {
+            SettingsView {
+                showSettingsView = false
+            }
+        }
         .ignoresSafeArea(.keyboard)
     }
 
