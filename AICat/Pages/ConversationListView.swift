@@ -13,8 +13,11 @@ struct ConversationListView: View {
     let onAddChat: () -> Void
     let onChatChanged: (Conversation) -> Void
 
+    @Environment(\.blackbirdDatabase) var db
+    @State var showClearAllChatAlert = false
+
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             Image(systemName: "timelapse")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -24,12 +27,13 @@ struct ConversationListView: View {
             HStack {
                 Text("Chats")
                     .font(.custom("Avenir Next", size: 18))
-                    .fontWeight(.semibold)
-                    .foregroundColor(.gray)
+                    .fontWeight(.medium)
+                    .foregroundColor(.black.opacity(0.2))
                 Spacer()
             }
             ScrollView {
                 LazyVStack {
+                    Spacer().frame(height: 10)
                     ForEach(conversations) { conversation in
                         Button(action: { onChatChanged(conversation) }) {
                             HStack {
@@ -51,8 +55,15 @@ struct ConversationListView: View {
                                         )
                                 }
                             }
-                            .padding(.vertical, 8)
-                        }.tint(.black)
+                            .padding(8)
+                        }
+                        .tint(.black)
+                        .background(.white)
+                        .contextMenu {
+                            Button(role: .destructive, action: { deleteConversation(conversation) }) {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
                     Button(action: onAddChat) {
                         HStack {
@@ -64,12 +75,13 @@ struct ConversationListView: View {
                                 .lineLimit(1)
                             Spacer()
                         }
-                        .padding(.vertical, 8)
+                        .padding(8)
+                        .background(.white)
                     }.tint(.gray)
                 }
             }
             Spacer()
-            Button(action: {}) {
+            Button(action: { showClearAllChatAlert = true }) {
                 HStack {
                     Image(systemName: "trash")
                     Text("Clean Chats")
@@ -79,7 +91,17 @@ struct ConversationListView: View {
                     Spacer()
                 }
                 .padding(.vertical, 10)
-            }.tint(.gray)
+            }
+            .tint(.gray)
+            .alert("Are you sure to clean all chats", isPresented: $showClearAllChatAlert) {
+                Button("Sure", role: .destructive) {
+                    clearAllConversation()
+                }
+                Button("Cancel", role: .cancel) {
+                    showClearAllChatAlert = false
+                }
+            }
+
             Button(action: {}) {
                 HStack {
                     Image(systemName: "questionmark.circle")
@@ -107,6 +129,23 @@ struct ConversationListView: View {
         .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
         .frame(width: 300)
         .ignoresSafeArea(.keyboard)
+    }
+
+    func deleteConversation(_ conversation: Conversation) {
+        Task {
+            var c = conversation
+            c.timeRemoved = Date.now.timeInSecond
+            await db?.upsert(model: c)
+        }
+    }
+
+    func clearAllConversation() {
+        Task {
+            for var c in conversations {
+                c.timeRemoved = Date.now.timeInSecond
+                await db?.upsert(model: c)
+            }
+        }
     }
 }
 

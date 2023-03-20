@@ -15,6 +15,8 @@ struct ConversationView: View {
     let conversation: Conversation
     @State var isSending = false
     @State var error: AFError?
+    @State var showAddConversation = false
+    @State var showClearMesssageAlert = false
 
     let onChatsClick: () -> Void
 
@@ -27,6 +29,7 @@ struct ConversationView: View {
                     Button(action: onChatsClick) {
                         Image(systemName: "bubble.left.and.bubble.right")
                             .tint(.black)
+                            .frame(width: 24, height: 24)
                     }
                     Spacer()
                     VStack(spacing: 0) {
@@ -36,12 +39,32 @@ struct ConversationView: View {
                             .lineLimit(1)
                         Text(conversation.prompt)
                             .font(.custom("Avenir Next", size: 12))
-                            .fontWeight(.medium)
+                            .fontWeight(.regular)
                             .opacity(0.2)
                             .lineLimit(1)
                     }
                     Spacer()
-                    Image(systemName: "ellipsis")
+                    Menu {
+                        Button(action: editConversation) {
+                            Label("Edit Chat", systemImage: "square.and.pencil")
+                        }
+                        Button(role: .destructive, action: { showClearMesssageAlert = true }) {
+                            Label("Clean Messages", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .frame(width: 24, height: 24)
+                            .clipShape(Rectangle())
+                    }
+                    .alert("Are you sure to clean all messages?", isPresented: $showClearMesssageAlert) {
+                        Button("Clear", role: .destructive) {
+                            cleanMessages()
+                        }
+                        Button("Cancel", role: .cancel) {
+                            showClearMesssageAlert = false
+                        }
+                    }
+                    .tint(.black)
                 }
                 .padding(.horizontal, 20)
                 .frame(height: 44)
@@ -50,11 +73,15 @@ struct ConversationView: View {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         Spacer().frame(height: 4)
                         ForEach(messages, id: \.id) { message in
-                            if message.role == "user" {
-                                MineMessageView(text: message.content)
-                            } else {
-                                AICatMessageView(text: LocalizedStringKey(stringLiteral: message.content.trimmingCharacters(in: .whitespacesAndNewlines)))
-                            }
+                            MessageView(message: message)
+                                .contextMenu {
+                                    Button(action: { UIPasteboard.general.string = message.content }) {
+                                        Label("Copy", systemImage: "doc.on.doc")
+                                    }
+                                    Button(role: .destructive, action: { deleteMessage(message) }) {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
                         }
                         if let error {
                             ErrorMessageView(errorMessage: error.localizedDescription) {
@@ -116,13 +143,41 @@ struct ConversationView: View {
             queryMessages(cid: conversation.id)
         }.onChange(of: conversation) { newValue in
             queryMessages(cid: newValue.id)
+        }.sheet(isPresented: $showAddConversation) {
+            AddConversationView(conversation: conversation) { _ in
+                showAddConversation = false
+            }
+        }
+    }
+
+    func editConversation() {
+        showAddConversation = true
+    }
+
+    func cleanMessages() {
+        let timeRemoved = Date.now.timeInSecond
+        Task {
+            for var message in messages {
+                message.timeRemoved = timeRemoved
+                await db?.upsert(model: message)
+            }
+            queryMessages(cid: conversation.id)
+        }
+    }
+
+    func deleteMessage(_ message: ChatMessage) {
+        Task {
+            var messageToRemove = message
+            messageToRemove.timeRemoved = Date.now.timeInSecond
+            await db?.upsert(model: messageToRemove)
+            queryMessages(cid: conversation.id)
         }
     }
 
     func queryMessages(cid: String) {
         Task {
             guard let db else { return }
-            messages = (try! await ChatMessage.read(from: db, matching: \.$conversationId == cid, orderBy: .ascending(\.$timeCreated)))
+            messages = (try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated)))
         }
     }
 
@@ -191,12 +246,12 @@ struct ConversationView_Previews: PreviewProvider {
 }
 
 struct MineMessageView: View {
-    let text: String
+    let message: ChatMessage
     var body: some View {
         ZStack {
             HStack {
                 Spacer(minLength: 40)
-                Text(text)
+                Text(message.content)
                     .tint(.teal)
                     .font(.custom("Avenir Next", size: 16))
                     .fontWeight(.medium)
@@ -217,17 +272,28 @@ struct MineMessageView: View {
 }
 
 struct AICatMessageView: View {
-    let text: LocalizedStringKey
+    let message: ChatMessage
     var body: some View {
         ZStack {
-            Text(text)
+            Text(LocalizedStringKey(message.content))
                 .font(.custom("Avenir Next", size: 16))
                 .fontWeight(.medium)
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-                .background(Color.gray.opacity(0.05))
+                .background(Color(red: 0.96, green: 0.96, blue: 0.98))
                 .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
                 .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
                 .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
+        }
+    }
+}
+
+struct MessageView: View {
+    let message: ChatMessage
+    var body: some View {
+        if message.role == "user" {
+            MineMessageView(message: message)
+        } else {
+            AICatMessageView(message: message)
         }
     }
 }

@@ -10,14 +10,23 @@ import SwiftUI
 struct AddConversationView: View {
     @Environment(\.blackbirdDatabase) var db
 
+    let conversation: Conversation?
     let onSave: (Conversation) -> Void
+    @State var title: String
+    @State var prompt: String
 
-    @State var title: String = ""
-    @State var prompt: String = ""
+    init(conversation: Conversation? = nil, onSave: @escaping (Conversation) -> Void) {
+        self.conversation = conversation
+        self.onSave = onSave
+        self.title = conversation?.title ?? ""
+        self.prompt = conversation?.prompt ?? ""
+    }
+
+
     var body: some View {
         ZStack {
             VStack {
-                Text("New Chat")
+                Text(conversation == nil ? "New Chat" : "Edit Chat")
                     .font(.custom("Avenir Next", size: 28))
                     .fontWeight(.bold)
                 Spacer()
@@ -65,9 +74,17 @@ struct AddConversationView: View {
 
     func saveConversation() async {
         guard !title.isEmpty else { return }
-        let conversation = Conversation(title: title, prompt: prompt)
-        await db?.upsert(model: conversation)
-        onSave(conversation)
+        if var conversation {
+            conversation.title = title
+            conversation.prompt = prompt
+            await db?.upsert(model: conversation)
+            onSave(conversation)
+        } else {
+            let conversation = Conversation(title: title, prompt: prompt)
+            await db?.upsert(model: conversation)
+            onSave(conversation)
+        }
+
     }
 }
 

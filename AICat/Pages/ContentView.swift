@@ -10,7 +10,7 @@ import Blackbird
 
 struct ContentView: View {
 
-    @BlackbirdLiveModels({ try await Conversation.read(from: $0, orderBy: .descending(\.$timeCreated)) }) var conversations
+    @BlackbirdLiveModels({ try await Conversation.read(from: $0, matching: \.$timeRemoved == 0, orderBy: .descending(\.$timeCreated)) }) var conversations
 
     @State var showConversation = false
     @State var showAddConversationSheet = false
