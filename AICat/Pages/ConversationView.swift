@@ -18,7 +18,22 @@ struct ConversationView: View {
     @State var showAddConversation = false
     @State var showClearMesssageAlert = false
     @State var isAIGenerating = false
+    @State var showCommands = false
     @AppStorage("request.context.messages") var contextCount: Int = 0
+    @State var commnadCardHeight: CGFloat = 0
+
+    @BlackbirdLiveModels({ try await Conversation.read(from: $0, matching: \.$timeRemoved == 0, orderBy: .descending(\.$timeCreated)) }) var conversations
+
+    var filterdPrompts: [Conversation] {
+        let query = inputText.trimmingCharacters(in: ["/"]).lowercased()
+        return conversations.results.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
+    }
+
+    @State var selectedPrompt: Conversation?
+
+    var promptText: String {
+        selectedPrompt?.prompt ?? conversation.prompt
+    }
 
     let onChatsClick: () -> Void
 
@@ -39,8 +54,8 @@ struct ConversationView: View {
                             .font(.custom("Avenir Next", size: 16))
                             .fontWeight(.bold)
                             .lineLimit(1)
-                        if !conversation.prompt.isEmpty {
-                            Text(conversation.prompt)
+                        if !promptText.isEmpty {
+                            Text(promptText)
                                 .font(.custom("Avenir Next", size: 12))
                                 .fontWeight(.regular)
                                 .opacity(0.2)
@@ -49,8 +64,10 @@ struct ConversationView: View {
                     }
                     Spacer()
                     Menu {
-                        Button(action: editConversation) {
-                            Label("Edit Chat", systemImage: "square.and.pencil")
+                        if conversation != mainConversation {
+                            Button(action: editConversation) {
+                                Label("Edit Chat", systemImage: "square.and.pencil")
+                            }
                         }
                         Button(role: .destructive, action: { showClearMesssageAlert = true }) {
                             Label("Clean Messages", systemImage: "trash")
@@ -111,61 +128,142 @@ struct ConversationView: View {
                     .scrollDismissesKeyboard(.immediately)
                 }
             }
-            HStack {
-                TextField(text: $inputText) {
-                    Text("Say someting")
+            VStack {
+                if showCommands, !filterdPrompts.isEmpty {
+                    ScrollView {
+                        VStack(spacing: 1) {
+                            ForEach(filterdPrompts) { prompt in
+                                Button(action: {
+                                    selectedPrompt = prompt
+                                    inputText = ""
+                                }) {
+                                    HStack {
+                                        Text(prompt.title)
+                                            .lineLimit(1)
+                                        Spacer()
+                                    }
+                                    .frame(height: 32)
+                                    .background(.white)
+                                }
+                                .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                .tint(.gray)
+                                if prompt != filterdPrompts.last {
+                                    Divider()
+                                }
+                            }
+                        }
                         .font(.custom("Avenir Next", size: 16))
                         .fontWeight(.medium)
-                }
-                .tint(.black)
-                .submitLabel(.send)
-                .onSubmit {
-                    completeMessage()
-                }
-                .font(.custom("Avenir Next", size: 16))
-                .fontWeight(.medium)
-                if isSending {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .frame(width: 28, height: 28)
-                } else {
-                    Button(
-                        action: {
-                            completeMessage()
+                        .background {
+                            GeometryReader { proxy in
+                                Color.clear.preference(key: SizeKey.self, value: proxy.size)
+                            }.onPreferenceChange(SizeKey.self) {
+                                commnadCardHeight = $0.height
+                            }
                         }
-                    ) {
-                        Image(systemName: "paperplane.circle.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 28, height: 28)
-                            .tint(
-                                LinearGradient(
-                                    colors: [.black.opacity(0.9), .black.opacity(0.6)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing)
-                            )
+
                     }
-                    .disabled(inputText.isEmpty)
+                    .scrollIndicators(.hidden)
+                    .frame(maxHeight: min(commnadCardHeight, 180))
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: Color.black.opacity(0.1), radius: 12)
+                    .padding(.horizontal, 20)
+                }
+                if let selectedPrompt {
+                    HStack {
+                        Spacer(minLength: 0)
+                        HStack(spacing: 4) {
+                            Text(selectedPrompt.title)
+                                .lineLimit(1)
+                                .font(.custom("Avenir Next", size: 14))
+                                .fontWeight(.medium)
+                                .foregroundColor(.black.opacity(0.6))
+                            Button(action: {
+                                self.selectedPrompt = nil
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                            }.tint(.black)
+                        }
+                        .padding(.init(top: 6, leading: 10, bottom: 6, trailing: 10))
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: Color.black.opacity(0.1), radius: 12)
+                    }.padding(.horizontal, 20)
                 }
 
+                HStack {
+                    TextField(text: $inputText) {
+                        Text("Say someting")
+                            .font(.custom("Avenir Next", size: 16))
+                            .fontWeight(.medium)
+                    }
+                    .tint(.black)
+                    .submitLabel(.send)
+                    .onChange(of: inputText) { newValue in
+                        if conversation == mainConversation {
+                            if newValue.starts(with: "/") {
+                                showCommands = true
+                            } else {
+                                showCommands = false
+                            }
+                        }
+                    }
+                    .onSubmit {
+                        completeMessage()
+                    }
+                    .font(.custom("Avenir Next", size: 16))
+                    .fontWeight(.medium)
+                    if isSending {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .frame(width: 28, height: 28)
+                    } else {
+                        Button(
+                            action: {
+                                completeMessage()
+                            }
+                        ) {
+                            Image(systemName: "paperplane.circle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 28, height: 28)
+                                .tint(
+                                    LinearGradient(
+                                        colors: [.black.opacity(0.9), .black.opacity(0.6)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing)
+                                )
+                        }
+                        .disabled(inputText.isEmpty)
+                    }
+
+                }
+                .frame(height: 50)
+                .padding(.leading, 20)
+                .padding(.trailing, 12)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: Color.black.opacity(0.1), radius: 8)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 12)
             }
-            .frame(height: 56)
-            .padding(.leading, 20)
-            .padding(.trailing, 12)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Color.black.opacity(0.1), radius: 8)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 16)
         }.onAppear {
             queryMessages(cid: conversation.id)
         }.onChange(of: conversation) { newValue in
+            selectedPrompt = nil
+            inputText = ""
             queryMessages(cid: newValue.id)
         }.sheet(isPresented: $showAddConversation) {
             AddConversationView(conversation: conversation) { _ in
                 showAddConversation = false
             }
-        }
+        }.font(.custom("Avenir Next", size: 16))
+    }
+
+    struct SizeKey: PreferenceKey {
+        static var defaultValue = CGSize.zero
+        static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
     }
 
     func editConversation() {
@@ -210,12 +308,17 @@ struct ConversationView: View {
         }
         let sendText = inputText
         inputText = ""
-        let messagesToSend = messages.suffix(contextCount).map({ Message(role: $0.role, content: $0.content) }) + [Message(role: "user", content: sendText)]
+        let newMessage = Message(role: "user", content: sendText)
         Task {
             let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id)
             await db?.upsert(model: chatMessage)
             queryMessages(cid: conversation.id)
-            await completeMessages(messagesToSend)
+            if let selectedPrompt {
+                await completeMessages([newMessage], prompt: selectedPrompt.prompt)
+            } else {
+                let messagesToSend = messages.suffix(contextCount).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
+                await completeMessages(messagesToSend)
+            }
         }
     }
 
@@ -230,12 +333,15 @@ struct ConversationView: View {
         }
         let messagesToSend = messages.suffix(contextCount + 1).map({ Message(role: $0.role, content: $0.content) })
         Task {
+            if let selectedPrompt {
+                await completeMessages(messagesToSend.suffix(1), prompt: selectedPrompt.prompt)
+            }
             await completeMessages(messagesToSend)
         }
     }
 
-    func completeMessages(_ messages: [Message]) async {
-        let result = await CatApi.complete(messages: messages, with: conversation.prompt)
+    func completeMessages(_ messages: [Message], prompt: String? = nil) async {
+        let result = await CatApi.complete(messages: messages, with: prompt ?? conversation.prompt)
         switch result {
         case .success(let success):
             saveMessage(response: success)
@@ -269,134 +375,5 @@ struct ConversationView_Previews: PreviewProvider {
             onChatsClick: { }
 
         )
-    }
-}
-
-struct MineMessageView: View {
-    let message: ChatMessage
-    var body: some View {
-        ZStack {
-            HStack {
-                Spacer(minLength: 40)
-                Text(message.content)
-                    .tint(.teal)
-                    .font(.custom("Avenir Next", size: 16))
-                    .fontWeight(.medium)
-                    .foregroundColor(.white)
-                    .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-                    .background(
-                        LinearGradient(
-                            colors: [.black.opacity(0.8), .black.opacity(0.5)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing)
-                    )
-                    .clipShape(CornerRadiusShape(radius: 4, corners: .topRight))
-                    .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topLeft]))
-                    .padding(.trailing, 20)
-            }
-        }
-    }
-}
-
-struct AICatMessageView: View {
-    let message: ChatMessage
-    var body: some View {
-        ZStack {
-            Text(LocalizedStringKey(message.content.trimmingCharacters(in: .whitespacesAndNewlines)))
-                .font(.custom("Avenir Next", size: 16))
-                .fontWeight(.medium)
-                .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-                .background(Color(red: 0.96, green: 0.96, blue: 0.98))
-                .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
-                .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
-                .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
-        }
-    }
-}
-
-struct MessageView: View {
-    let message: ChatMessage
-    var body: some View {
-        if message.role == "user" {
-            MineMessageView(message: message)
-        } else {
-            AICatMessageView(message: message)
-        }
-    }
-}
-
-struct CornerRadiusShape: Shape {
-    var radius = CGFloat.infinity
-    var corners = UIRectCorner.allCorners
-
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
-    }
-}
-
-struct ErrorMessageView: View {
-    let errorMessage: String
-    let retry: () -> Void
-    var body: some View {
-        ZStack {
-            HStack {
-                Text(errorMessage)
-                    .foregroundColor(.white)
-                    .font(.custom("Avenir Next", size: 16))
-                    .fontWeight(.medium)
-                    .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-                    .background(Color.red)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                Button(
-                    action: retry
-                ) {
-                        Image(systemName: "arrow.clockwise.circle.fill")
-                            .resizable()
-                            .frame(width: 28, height: 28)
-                            .tint(
-                                LinearGradient(
-                                    colors: [.black.opacity(0.9), .black.opacity(0.6)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing)
-                            )
-                    }
-            }.padding(.horizontal, 20)
-        }
-    }
-}
-
-struct InputingMessageView: View {
-    @State private var shouldAnimate = false
-
-    let circleSize: CGFloat = 6
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Circle()
-                .fill(Color.black)
-                .frame(width: circleSize, height: circleSize)
-                .scaleEffect(shouldAnimate ? 1.0 : 0.5)
-                .animation(Animation.easeInOut(duration: 0.5).repeatForever(), value: shouldAnimate)
-            Circle()
-                .fill(Color.black)
-                .frame(width: circleSize, height: circleSize)
-                .scaleEffect(shouldAnimate ? 1.0 : 0.5)
-                .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.3), value: shouldAnimate)
-            Circle()
-                .fill(Color.black)
-                .frame(width: circleSize, height: circleSize)
-                .scaleEffect(shouldAnimate ? 1.0 : 0.5)
-                .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.6), value: shouldAnimate)
-        }
-        .padding(EdgeInsets.init(top: 10, leading: 20, bottom: 10, trailing: 20))
-        .frame(height: 40)
-        .background(Color(red: 0.96, green: 0.96, blue: 0.98))
-        .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
-        .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
-        .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
-        .onAppear {
-            self.shouldAnimate = true
-        }
     }
 }

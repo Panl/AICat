@@ -61,8 +61,10 @@ struct ConversationListView: View {
                         .tint(.black)
                         .background(.white)
                         .contextMenu {
-                            Button(role: .destructive, action: { deleteConversation(conversation) }) {
-                                Label("Delete", systemImage: "trash")
+                            if conversation != mainConversation {
+                                Button(role: .destructive, action: { deleteConversation(conversation) }) {
+                                    Label("Delete", systemImage: "trash")
+                                }
                             }
                         }
                     }
@@ -102,8 +104,7 @@ struct ConversationListView: View {
                     showClearAllChatAlert = false
                 }
             }
-
-            Button(action: {}) {
+            Link(destination: URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!) {
                 HStack {
                     Image(systemName: "questionmark.circle")
                     Text("Help")

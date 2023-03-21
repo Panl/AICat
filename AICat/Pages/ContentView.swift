@@ -8,6 +8,8 @@
 import SwiftUI
 import Blackbird
 
+let mainConversation = Conversation(id: "AICat.Conversation.Main", title: "AICat Main", prompt: "")
+
 struct ContentView: View {
 
     @BlackbirdLiveModels({ try await Conversation.read(from: $0, matching: \.$timeRemoved == 0, orderBy: .descending(\.$timeCreated)) }) var conversations
@@ -18,11 +20,15 @@ struct ContentView: View {
     @AppStorage("currentChat.id") var chatId: String?
     @AppStorage("request.temperature") var temperature = 1
 
+    var allConversations: [Conversation] {
+        [mainConversation] + conversations.results
+    }
+
     var body: some View {
         ZStack(alignment: .topLeading) {
             ConversationListView(
                 selectedChat: conversation,
-                conversations: conversations.results,
+                conversations: allConversations,
                 onAddChat: {
                     showAddConversationSheet = true
                 },
@@ -76,7 +82,7 @@ struct ContentView: View {
             if newValue.results.isEmpty {
                 showAddConversationSheet = true
             }
-            conversation = newValue.results.first(where: { $0.id == chatId }) ?? conversations.results.first
+            conversation = ([mainConversation] + newValue.results).first(where: { $0.id == chatId }) ?? conversations.results.first
         }
     }
 }

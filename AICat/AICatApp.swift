@@ -24,8 +24,10 @@ struct AICatApp: App {
             if apiKey != nil {
                 ContentView()
                     .environment(\.blackbirdDatabase, database)
+                    .font(.custom("Avenir Next", size: 16))
             } else {
                 AddApiKeyView(onValidateSuccess: {})
+                    .font(.custom("Avenir Next", size: 16))
             }
         }
     }

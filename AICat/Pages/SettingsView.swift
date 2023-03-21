@@ -47,6 +47,7 @@ struct SettingsView: View {
                 Image(systemName: "ellipsis")
                     .frame(width: 24, height: 24)
                     .clipShape(Rectangle())
+                    .hidden()
             }
             .padding(.horizontal, 20)
             .frame(height: 44)
@@ -116,22 +117,23 @@ struct SettingsView: View {
                         }
                     }
                 }
-                Section("support") {
-                    Button(action: {}) {
-                        Label("Share AICat", systemImage: "square.and.arrow.up")
-                            .labelStyle(.titleAndIcon)
-                    }.tint(.black)
-                    Button(action: {}) {
-                        Label("Contact Us", systemImage: "envelope")
-                            .labelStyle(.titleAndIcon)
-                    }.tint(.black)
-                    Button(action: {}) {
-                        Label("Privacy and Policy", systemImage: "person.badge.shield.checkmark")
-                            .labelStyle(.titleAndIcon)
-                    }.tint(.black)
-                }
+//                Section("support") {
+//                    Button(action: {}) {
+//                        Label("Share AICat", systemImage: "square.and.arrow.up")
+//                            .labelStyle(.titleAndIcon)
+//                    }.tint(.black)
+//                    Button(action: {}) {
+//                        Label("Contact Us", systemImage: "envelope")
+//                            .labelStyle(.titleAndIcon)
+//                    }.tint(.black)
+//                    Button(action: {}) {
+//                        Label("Privacy and Policy", systemImage: "person.badge.shield.checkmark")
+//                            .labelStyle(.titleAndIcon)
+//                    }.tint(.black)
+//                }
             }
             .font(.custom("Avenir Next", size: 16))
+            .fontWeight(.medium)
         }
     }
 
