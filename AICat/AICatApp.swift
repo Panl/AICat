@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Blackbird
+import Foundation
 
 let dbPath = "\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])/db.sqlite"
 

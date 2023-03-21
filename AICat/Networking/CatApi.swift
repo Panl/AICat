@@ -18,12 +18,15 @@ enum CatApi {
             "Content-Type": "application/json",
             "Authorization": "Bearer \(key)"
         ]
+        let temperature = UserDefaults.temperature
         return await AF.request(
             "https://api.openai.com/v1/chat/completions",
             method: .post,
             parameters: CompleteParams(
                 model: "gpt-3.5-turbo",
-                messages: messages
+                messages: messages,
+                temperature: temperature,
+                stream: false
             ),
             encoder: .json,
             headers: headers,
@@ -39,8 +42,12 @@ enum CatApi {
     }
 
     static func complete(messages: [Message], with prompt: String) async -> Result<CompleteResponse, AFError> {
-        let system = Message(role: "system", content: prompt)
-        return await complete(messages: [system] + messages)
+        if prompt.isEmpty {
+            return await complete(messages: messages)
+        } else {
+            let system = Message(role: "system", content: prompt)
+            return await complete(messages: [system] + messages)
+        }
     }
 
     static func validate(apiKey: String) async -> Result<CompleteResponse, AFError> {
@@ -85,6 +92,8 @@ struct Message: Codable {
 struct CompleteParams: Codable {
     let model: String
     let messages: [Message]
+    let temperature: Double
+    let stream: Bool
 }
 
 struct CompleteResponse: Codable {

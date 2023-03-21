@@ -15,6 +15,16 @@ struct SettingsView: View {
     @State var isValidating = false
     @State var error: AFError?
     @State var isValidated = false
+    @AppStorage("currentChat.id") var chatId: String?
+    @AppStorage("request.temperature") var temperature: Double = 1
+    @AppStorage("request.context.messages") var messagesCount: Int = 0
+
+
+    let temperatureConfig: [Double: String] = [
+        0.2: "Divergent",
+        1.0: "Balanced",
+        1.8: "Deterministic"
+    ]
 
     let onClose: () -> Void
 
@@ -60,6 +70,49 @@ struct SettingsView: View {
                         if isValidated {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.green)
+                        }
+                    }
+                }
+                Section("Request Settings") {
+                    HStack {
+                        Text("Model")
+                        Spacer()
+                        Menu("gpt-3.5-turbo") {}
+                    }
+                    HStack {
+                        Text("Temperature")
+                        Spacer()
+                        Menu {
+                            Button("Divergent") {
+                                temperature = 0.2
+                            }
+                            Button("Balance") {
+                                temperature = 1.0
+                            }
+                            Button("Deterministic") {
+                                temperature = 1.8
+                            }
+                        } label: {
+                            HStack {
+                                Text(temperatureConfig[temperature] ?? "None")
+                                Image(systemName: "chevron.up.chevron.down")
+                            }
+                        }
+                    }
+                    HStack {
+                        Text("Context Messages")
+                        Spacer()
+                        Menu {
+                            ForEach(0...10, id: \.self) { item in
+                                Button("\(item)") {
+                                    messagesCount = item
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text("\(messagesCount)")
+                                Image(systemName: "chevron.up.chevron.down")
+                            }
                         }
                     }
                 }

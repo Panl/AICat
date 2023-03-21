@@ -18,6 +18,7 @@ struct ConversationView: View {
     @State var showAddConversation = false
     @State var showClearMesssageAlert = false
     @State var isAIGenerating = false
+    @AppStorage("request.context.messages") var contextCount: Int = 0
 
     let onChatsClick: () -> Void
 
@@ -38,11 +39,13 @@ struct ConversationView: View {
                             .font(.custom("Avenir Next", size: 16))
                             .fontWeight(.bold)
                             .lineLimit(1)
-                        Text(conversation.prompt)
-                            .font(.custom("Avenir Next", size: 12))
-                            .fontWeight(.regular)
-                            .opacity(0.2)
-                            .lineLimit(1)
+                        if !conversation.prompt.isEmpty {
+                            Text(conversation.prompt)
+                                .font(.custom("Avenir Next", size: 12))
+                                .fontWeight(.regular)
+                                .opacity(0.2)
+                                .lineLimit(1)
+                        }
                     }
                     Spacer()
                     Menu {
@@ -207,7 +210,7 @@ struct ConversationView: View {
         }
         let sendText = inputText
         inputText = ""
-        let messagesToSend = messages.suffix(4).map({ Message(role: $0.role, content: $0.content) }) + [Message(role: "user", content: sendText)]
+        let messagesToSend = messages.suffix(contextCount).map({ Message(role: $0.role, content: $0.content) }) + [Message(role: "user", content: sendText)]
         Task {
             let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id)
             await db?.upsert(model: chatMessage)
@@ -225,7 +228,7 @@ struct ConversationView: View {
                 isAIGenerating = true
             }
         }
-        let messagesToSend = messages.suffix(4).map({ Message(role: $0.role, content: $0.content) })
+        let messagesToSend = messages.suffix(contextCount + 1).map({ Message(role: $0.role, content: $0.content) })
         Task {
             await completeMessages(messagesToSend)
         }
@@ -299,7 +302,7 @@ struct AICatMessageView: View {
     let message: ChatMessage
     var body: some View {
         ZStack {
-            Text(LocalizedStringKey(message.content))
+            Text(LocalizedStringKey(message.content.trimmingCharacters(in: .whitespacesAndNewlines)))
                 .font(.custom("Avenir Next", size: 16))
                 .fontWeight(.medium)
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
@@ -366,21 +369,23 @@ struct ErrorMessageView: View {
 struct InputingMessageView: View {
     @State private var shouldAnimate = false
 
+    let circleSize: CGFloat = 6
+
     var body: some View {
         HStack(spacing: 4) {
             Circle()
                 .fill(Color.black)
-                .frame(width: 10, height: 10)
+                .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever(), value: shouldAnimate)
             Circle()
                 .fill(Color.black)
-                .frame(width: 10, height: 10)
+                .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.3), value: shouldAnimate)
             Circle()
                 .fill(Color.black)
-                .frame(width: 10, height: 10)
+                .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.6), value: shouldAnimate)
         }

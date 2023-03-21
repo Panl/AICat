@@ -16,6 +16,7 @@ struct ContentView: View {
     @State var showAddConversationSheet = false
     @State var conversation: Conversation?
     @AppStorage("currentChat.id") var chatId: String?
+    @AppStorage("request.temperature") var temperature = 1
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -42,7 +43,9 @@ struct ContentView: View {
                         }
                     }
                 )
-                .background(showConversation ? Color(red: 0.95, green: 0.95, blue: 0.95) : .white)
+                .background {
+                    showConversation ? Color(red: 0.95, green: 0.95, blue: 0.95) : Color.white
+                }
                 .scaleEffect(showConversation ? CGSize(width: 0.95, height: 0.95) : CGSize(width: 1, height: 1))
                 .offset(showConversation ? .init(width: 300, height: 0) : .init(width: 0, height: 0))
             } else {
