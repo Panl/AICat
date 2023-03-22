@@ -41,7 +41,7 @@ struct AICatMessageView: View {
                 .font(.custom("Avenir Next", size: 16))
                 .fontWeight(.medium)
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-                .background(Color(red: 0.96, green: 0.96, blue: 0.98))
+                .background(Color(red: 0.97, green: 0.97, blue: 0.98))
                 .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
                 .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
                 .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
@@ -133,6 +133,12 @@ struct InputingMessageView: View {
         .onAppear {
             self.shouldAnimate = true
         }
+    }
+}
+
+struct MessageView_Previews: PreviewProvider {
+    static var previews: some View {
+        AICatMessageView(message: ChatMessage(role: "user", content: "you are beautiful", conversationId: ""))
     }
 }
 

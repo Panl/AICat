@@ -50,7 +50,10 @@ struct ContentView: View {
                     }
                 )
                 .background {
-                    showConversation ? Color(red: 0.95, green: 0.95, blue: 0.95) : Color.white
+                    Color.white
+                        .ignoresSafeArea(.keyboard)
+                        .clipShape(RoundedRectangle(cornerRadius: showConversation ? 8 : 0))
+                        .shadow(color: showConversation ? Color.black.opacity(0.1) : .clear, radius: 4)
                 }
                 .scaleEffect(showConversation ? CGSize(width: 0.95, height: 0.95) : CGSize(width: 1, height: 1))
                 .offset(showConversation ? .init(width: 300, height: 0) : .init(width: 0, height: 0))
@@ -82,7 +85,7 @@ struct ContentView: View {
             if newValue.results.isEmpty {
                 showAddConversationSheet = true
             }
-            conversation = ([mainConversation] + newValue.results).first(where: { $0.id == chatId }) ?? conversations.results.first
+            conversation = newValue.results.first(where: { $0.id == chatId }) ?? mainConversation
         }
     }
 }

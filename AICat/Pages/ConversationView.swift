@@ -21,11 +21,12 @@ struct ConversationView: View {
     @State var showCommands = false
     @AppStorage("request.context.messages") var contextCount: Int = 0
     @State var commnadCardHeight: CGFloat = 0
+    @FocusState var isFocused: Bool
 
     @BlackbirdLiveModels({ try await Conversation.read(from: $0, matching: \.$timeRemoved == 0, orderBy: .descending(\.$timeCreated)) }) var conversations
 
     var filterdPrompts: [Conversation] {
-        let query = inputText.trimmingCharacters(in: ["/"]).lowercased()
+        let query = inputText.lowercased()//.trimmingCharacters(in: ["/"])
         return conversations.results.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
     }
 
@@ -43,7 +44,10 @@ struct ConversationView: View {
         ZStack(alignment: .bottom) {
             VStack {
                 HStack(spacing: 18) {
-                    Button(action: onChatsClick) {
+                    Button(action: {
+                        isFocused = false
+                        onChatsClick()
+                    }) {
                         Image(systemName: "bubble.left.and.bubble.right")
                             .tint(.black)
                             .frame(width: 24, height: 24)
@@ -114,7 +118,7 @@ struct ConversationView: View {
                             if isAIGenerating && isSending {
                                 InputingMessageView().id("generating")
                             }
-                            Spacer().frame(height: 80)
+                            Spacer().frame(height: 100)
                                 .id("Bottom")
                         }
                     }
@@ -194,10 +198,10 @@ struct ConversationView: View {
 
                 HStack {
                     TextField(text: $inputText) {
-                        Text("Say someting")
+                        Text("Say something" + (conversation == mainConversation ? " or enter '/'" : ""))
                             .font(.custom("Avenir Next", size: 16))
                             .fontWeight(.medium)
-                    }
+                    }.focused($isFocused)
                     .tint(.black)
                     .submitLabel(.send)
                     .onChange(of: inputText) { newValue in

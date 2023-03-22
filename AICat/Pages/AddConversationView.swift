@@ -36,25 +36,35 @@ struct AddConversationView: View {
                 }
                 .font(.custom("Avenir Next", size: 18))
                 .fontWeight(.medium)
-                .padding(.init(top: 16, leading: 20, bottom: 10, trailing: 16))
-                .overlay {
+                .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+                .frame(height: 50)
+                .background {
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(lineWidth: 1)
-                        .foregroundColor(.gray.opacity(0.5))
+                        .foregroundColor(.gray.opacity(0.1))
                 }
                 Spacer()
                     .frame(height: 20)
-                TextField(text: $prompt) {
-                    Text("Prompt")
+                ZStack(alignment: .topLeading){
+                    if prompt.isEmpty {
+                        Text("Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )")
+                            .font(.custom("Avenir Next", size: 16))
+                            .foregroundColor(.gray.opacity(0.6))
+                            .padding(.init(top: 18, leading: 24, bottom: 18, trailing: 20))
+                            .allowsTightening(false)
+                    }
+                    TextEditor(text: $prompt)
+                        .scrollContentBackground(.hidden)
+                        .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+                        .frame(height: 200)
+                        .background {
+                            RoundedRectangle(cornerRadius: 16)
+                                .foregroundColor(.gray.opacity(0.1))
+                        }
                 }
-                .font(.custom("Avenir Next", size: 19))
+                .font(.custom("Avenir Next", size: 16))
                 .fontWeight(.medium)
-                .padding(.init(top: 16, leading: 20, bottom: 10, trailing: 16))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(lineWidth: 1)
-                        .foregroundColor(.gray.opacity(0.5))
-                }
+                .foregroundColor(.black.opacity(0.6))
+
                 Spacer()
                     .frame(height: 60)
                 Button(action: { Task { await saveConversation() } }) {

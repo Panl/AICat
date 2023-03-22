@@ -29,16 +29,16 @@ struct ConversationListView: View {
                 Text("Chats")
                     .font(.custom("Avenir Next", size: 18))
                     .fontWeight(.medium)
-                    .foregroundColor(.black.opacity(0.2))
+                    .foregroundColor(.black.opacity(0.4))
                 Spacer()
-            }
+            }.padding(.leading, 20)
             ScrollView {
                 LazyVStack {
                     Spacer().frame(height: 10)
                     ForEach(conversations) { conversation in
                         Button(action: { onChatChanged(conversation) }) {
                             HStack {
-                                Image(systemName: "bubble.left")
+                                Image(systemName: conversation == mainConversation ? "command" : "bubble.left" )
                                     .aspectRatio(contentMode: .fit)
                                 Text(conversation.title)
                                     .font(.custom("Avenir Next", size: 16))
@@ -56,7 +56,8 @@ struct ConversationListView: View {
                                         )
                                 }
                             }
-                            .padding(8)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
                         }
                         .tint(.black)
                         .background(.white)
@@ -67,6 +68,8 @@ struct ConversationListView: View {
                                 }
                             }
                         }
+                        .padding(.horizontal, 20)
+
                     }
                     Button(action: onAddChat) {
                         HStack {
@@ -78,11 +81,14 @@ struct ConversationListView: View {
                                 .lineLimit(1)
                             Spacer()
                         }
-                        .padding(8)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
                         .background(.white)
-                    }.tint(.gray)
+                    }
+                    .padding(.horizontal, 20)
+                    .tint(.gray)
                 }
-            }
+            }.scrollIndicators(.hidden)
             Spacer()
             Button(action: { showClearAllChatAlert = true }) {
                 HStack {
@@ -96,6 +102,7 @@ struct ConversationListView: View {
                 .padding(.vertical, 10)
             }
             .tint(.gray)
+            .padding(.horizontal, 20)
             .alert("Are you sure to clean all chats", isPresented: $showClearAllChatAlert) {
                 Button("Sure", role: .destructive) {
                     clearAllConversation()
@@ -114,7 +121,9 @@ struct ConversationListView: View {
                     Spacer()
                 }
                 .padding(.vertical, 10)
-            }.tint(.gray)
+            }
+            .padding(.horizontal, 20)
+            .tint(.gray)
             Button(action: { showSettingsView = true }) {
                 HStack {
                     Image(systemName: "gearshape")
@@ -125,10 +134,11 @@ struct ConversationListView: View {
                     Spacer()
                 }
                 .padding(.vertical, 10)
-            }.tint(.gray)
-            Spacer().frame(height: 56)
+            }
+            .padding(.horizontal, 20)
+            .tint(.gray)
+            Spacer().frame(height: 32)
         }
-        .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
         .frame(width: 300)
         .fullScreenCover(isPresented: $showSettingsView) {
             SettingsView {
@@ -160,7 +170,7 @@ struct ConversationListView_Previews: PreviewProvider {
     static var previews: some View {
         ConversationListView(
             selectedChat: nil,
-            conversations: [Conversation(title: "How to make a gift", prompt: "")],
+            conversations: [mainConversation, Conversation(title: "How to make a gift", prompt: "")],
             onAddChat: {}, onChatChanged: { _ in }
         )
     }
