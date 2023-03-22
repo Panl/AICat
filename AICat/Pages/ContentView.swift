@@ -14,14 +14,20 @@ struct ContentView: View {
 
     @BlackbirdLiveModels({ try await Conversation.read(from: $0, matching: \.$timeRemoved == 0, orderBy: .descending(\.$timeCreated)) }) var conversations
 
-    @State var showConversation = false
+    @State var translationX: CGFloat = 0
     @State var showAddConversationSheet = false
     @State var conversation: Conversation?
     @AppStorage("currentChat.id") var chatId: String?
     @AppStorage("request.temperature") var temperature = 1
 
+    @State var lastTranslationX: CGFloat = 0
+
     var allConversations: [Conversation] {
         [mainConversation] + conversations.results
+    }
+
+    var progress: CGFloat {
+        translationX / 300
     }
 
     var body: some View {
@@ -36,7 +42,8 @@ struct ContentView: View {
                     conversation = chat
                     chatId = chat.id
                     withAnimation {
-                        showConversation = false
+                        translationX = 0
+                        lastTranslationX = 0
                     }
                 }
             )
@@ -45,18 +52,59 @@ struct ContentView: View {
                     conversation: conversation,
                     onChatsClick: {
                         withAnimation {
-                            showConversation.toggle()
+                            if lastTranslationX == 300 {
+                                translationX = 0
+                                lastTranslationX = 0
+                            } else {
+                                translationX = 300
+                                lastTranslationX = 300
+                            }
                         }
                     }
                 )
                 .background {
                     Color.white
-                        .ignoresSafeArea(.keyboard)
-                        .clipShape(RoundedRectangle(cornerRadius: showConversation ? 8 : 0))
-                        .shadow(color: showConversation ? Color.black.opacity(0.1) : .clear, radius: 4)
+                        .ignoresSafeArea()
+                        .clipShape(RoundedRectangle(cornerRadius: 12 * progress))
+                        .shadow(color: Color.black.opacity(0.1).opacity(progress), radius: 4)
                 }
-                .scaleEffect(showConversation ? CGSize(width: 0.95, height: 0.95) : CGSize(width: 1, height: 1))
-                .offset(showConversation ? .init(width: 300, height: 0) : .init(width: 0, height: 0))
+                .scaleEffect(x: 1 - progress * 0.05, y: 1 - progress * 0.05)
+                .offset(x: translationX, y: 0)
+                .simultaneousGesture(
+                    DragGesture()
+                        .onChanged { value in
+                            let translationWidth = value.translation.width
+                            translationX = max(min(lastTranslationX + translationWidth, 300), 0)
+                        }
+                        .onEnded { value in
+                            let velocityX = value.predictedEndLocation.x - value.location.x
+                            if velocityX > 50 {
+                                withAnimation(.linear(duration: (1 - progress) * 0.35)) {
+                                    translationX = 300
+                                    lastTranslationX = 300
+                                }
+                            } else if velocityX < -50{
+                                withAnimation(.linear(duration: progress * 0.35)) {
+                                    translationX = 0
+                                    lastTranslationX = 0
+                                }
+                            } else {
+                                if translationX < 150 {
+                                    withAnimation(.linear(duration: progress * 0.35)) {
+                                        translationX = 0
+                                        lastTranslationX = 0
+                                    }
+                                } else {
+                                    withAnimation(.linear(duration: (1 - progress) * 0.35)) {
+                                        translationX = 300
+                                        lastTranslationX = 300
+                                    }
+                                }
+
+                            }
+
+                        }
+                )
             } else {
                 Color.white
             }
@@ -77,7 +125,8 @@ struct ContentView: View {
                     showAddConversationSheet = false
                     chatId = conversation.id
                     withAnimation {
-                        showConversation = false
+                        lastTranslationX = 0
+                        translationX = 0
                     }
                 }
             )

@@ -39,7 +39,7 @@ struct SettingsView: View {
                 Spacer()
                 VStack(spacing: 0) {
                     Text("Settings")
-                        .font(.manrope(size: 20, weight: .bold))
+                        .font(.manrope(size: 18, weight: .bold))
                         .lineLimit(1)
                 }
                 Spacer()
