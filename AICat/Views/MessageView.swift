@@ -15,8 +15,7 @@ struct MineMessageView: View {
                 Spacer(minLength: 40)
                 Text(message.content)
                     .tint(.teal)
-                    .font(.custom("Avenir Next", size: 16))
-                    .fontWeight(.medium)
+                    .font(.manrope(size: 16, weight: .medium))
                     .foregroundColor(.white)
                     .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                     .background(
@@ -38,8 +37,7 @@ struct AICatMessageView: View {
     var body: some View {
         ZStack {
             Text(LocalizedStringKey(message.content.trimmingCharacters(in: .whitespacesAndNewlines)))
-                .font(.custom("Avenir Next", size: 16))
-                .fontWeight(.medium)
+                .font(.manrope(size: 16, weight: .medium))
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                 .background(Color(red: 0.97, green: 0.97, blue: 0.98))
                 .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
@@ -78,8 +76,7 @@ struct ErrorMessageView: View {
             HStack {
                 Text(errorMessage)
                     .foregroundColor(.white)
-                    .font(.custom("Avenir Next", size: 16))
-                    .fontWeight(.medium)
+                    .font(.manrope(size: 16, weight: .medium))
                     .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                     .background(Color.red)
                     .clipShape(RoundedRectangle(cornerRadius: 20))

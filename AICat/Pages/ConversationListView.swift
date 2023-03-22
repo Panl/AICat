@@ -27,8 +27,7 @@ struct ConversationListView: View {
             Spacer().frame(height: 32)
             HStack {
                 Text("Chats")
-                    .font(.custom("Avenir Next", size: 18))
-                    .fontWeight(.medium)
+                    .font(.manrope(size: 18, weight: .medium))
                     .foregroundColor(.black.opacity(0.4))
                 Spacer()
             }.padding(.leading, 20)
@@ -41,8 +40,6 @@ struct ConversationListView: View {
                                 Image(systemName: conversation == mainConversation ? "command" : "bubble.left" )
                                     .aspectRatio(contentMode: .fit)
                                 Text(conversation.title)
-                                    .font(.custom("Avenir Next", size: 16))
-                                    .fontWeight(.medium)
                                     .lineLimit(1)
                                 Spacer()
                                 if selectedChat?.id == conversation.id {
@@ -76,8 +73,6 @@ struct ConversationListView: View {
                             Image(systemName: "plus.circle")
                                 .aspectRatio(contentMode: .fit)
                             Text("New Chat")
-                                .font(.custom("Avenir Next", size: 16))
-                                .fontWeight(.medium)
                                 .lineLimit(1)
                             Spacer()
                         }
@@ -94,8 +89,6 @@ struct ConversationListView: View {
                 HStack {
                     Image(systemName: "trash")
                     Text("Clean Chats")
-                        .font(.custom("Avenir Next", size: 16))
-                        .fontWeight(.medium)
                         .lineLimit(1)
                     Spacer()
                 }
@@ -115,8 +108,6 @@ struct ConversationListView: View {
                 HStack {
                     Image(systemName: "questionmark.circle")
                     Text("Help")
-                        .font(.custom("Avenir Next", size: 16))
-                        .fontWeight(.medium)
                         .lineLimit(1)
                     Spacer()
                 }
@@ -128,8 +119,6 @@ struct ConversationListView: View {
                 HStack {
                     Image(systemName: "gearshape")
                     Text("Settings")
-                        .font(.custom("Avenir Next", size: 16))
-                        .fontWeight(.medium)
                         .lineLimit(1)
                     Spacer()
                 }
@@ -146,6 +135,7 @@ struct ConversationListView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
+        .font(.manrope(size: 16, weight: .medium))
     }
 
     func deleteConversation(_ conversation: Conversation) {

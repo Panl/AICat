@@ -26,7 +26,7 @@ struct ConversationView: View {
     @BlackbirdLiveModels({ try await Conversation.read(from: $0, matching: \.$timeRemoved == 0, orderBy: .descending(\.$timeCreated)) }) var conversations
 
     var filterdPrompts: [Conversation] {
-        let query = inputText.lowercased()//.trimmingCharacters(in: ["/"])
+        let query = inputText.lowercased().trimmingCharacters(in: ["/"])
         return conversations.results.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
     }
 
@@ -55,14 +55,12 @@ struct ConversationView: View {
                     Spacer()
                     VStack(spacing: 0) {
                         Text(conversation.title)
-                            .font(.custom("Avenir Next", size: 16))
-                            .fontWeight(.bold)
+                            .font(.manrope(size: 16, weight: .heavy))
                             .lineLimit(1)
                         if !promptText.isEmpty {
                             Text(promptText)
-                                .font(.custom("Avenir Next", size: 12))
-                                .fontWeight(.regular)
-                                .opacity(0.2)
+                                .font(.manrope(size: 12, weight: .medium))
+                                .opacity(0.4)
                                 .lineLimit(1)
                         }
                     }
@@ -82,7 +80,7 @@ struct ConversationView: View {
                             .clipShape(Rectangle())
                     }
                     .alert("Are you sure to clean all messages?", isPresented: $showClearMesssageAlert) {
-                        Button("Clear", role: .destructive) {
+                        Button("Sure", role: .destructive) {
                             cleanMessages()
                         }
                         Button("Cancel", role: .cancel) {
@@ -135,7 +133,8 @@ struct ConversationView: View {
             VStack {
                 if showCommands, !filterdPrompts.isEmpty {
                     ScrollView {
-                        VStack(spacing: 1) {
+                        VStack(spacing: 0) {
+                            Spacer().frame(height: 4)
                             ForEach(filterdPrompts) { prompt in
                                 Button(action: {
                                     selectedPrompt = prompt
@@ -146,18 +145,17 @@ struct ConversationView: View {
                                             .lineLimit(1)
                                         Spacer()
                                     }
-                                    .frame(height: 32)
                                     .background(.white)
                                 }
+                                .font(.manrope(size: 14, weight: .medium))
                                 .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
                                 .tint(.gray)
                                 if prompt != filterdPrompts.last {
-                                    Divider()
+                                    Divider().foregroundColor(.gray)
                                 }
                             }
+                            Spacer().frame(height: 4)
                         }
-                        .font(.custom("Avenir Next", size: 16))
-                        .fontWeight(.medium)
                         .background {
                             GeometryReader { proxy in
                                 Color.clear.preference(key: SizeKey.self, value: proxy.size)
@@ -170,7 +168,7 @@ struct ConversationView: View {
                     .scrollIndicators(.hidden)
                     .frame(maxHeight: min(commnadCardHeight, 180))
                     .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                     .shadow(color: Color.black.opacity(0.1), radius: 12)
                     .padding(.horizontal, 20)
                 }
@@ -180,16 +178,15 @@ struct ConversationView: View {
                         HStack(spacing: 4) {
                             Text(selectedPrompt.title)
                                 .lineLimit(1)
-                                .font(.custom("Avenir Next", size: 14))
-                                .fontWeight(.medium)
+                                .font(.manrope(size: 14, weight: .medium))
                                 .foregroundColor(.black.opacity(0.6))
                             Button(action: {
                                 self.selectedPrompt = nil
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                            }.tint(.black)
+                            }.tint(.black.opacity(0.8))
                         }
-                        .padding(.init(top: 6, leading: 10, bottom: 6, trailing: 10))
+                        .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 10))
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: Color.black.opacity(0.1), radius: 12)
@@ -199,10 +196,9 @@ struct ConversationView: View {
                 HStack {
                     TextField(text: $inputText) {
                         Text("Say something" + (conversation == mainConversation ? " or enter '/'" : ""))
-                            .font(.custom("Avenir Next", size: 16))
-                            .fontWeight(.medium)
-                    }.focused($isFocused)
-                    .tint(.black)
+                    }
+                    .focused($isFocused)
+                    .tint(Color.black.opacity(0.8))
                     .submitLabel(.send)
                     .onChange(of: inputText) { newValue in
                         if conversation == mainConversation {
@@ -216,8 +212,6 @@ struct ConversationView: View {
                     .onSubmit {
                         completeMessage()
                     }
-                    .font(.custom("Avenir Next", size: 16))
-                    .fontWeight(.medium)
                     if isSending {
                         ProgressView()
                             .progressViewStyle(.circular)
@@ -247,7 +241,7 @@ struct ConversationView: View {
                 .padding(.leading, 20)
                 .padding(.trailing, 12)
                 .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
                 .shadow(color: Color.black.opacity(0.1), radius: 8)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 12)
@@ -262,7 +256,7 @@ struct ConversationView: View {
             AddConversationView(conversation: conversation) { _ in
                 showAddConversation = false
             }
-        }.font(.custom("Avenir Next", size: 16))
+        }.font(.manrope(size: 16, weight: .medium))
     }
 
     struct SizeKey: PreferenceKey {

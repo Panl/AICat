@@ -27,17 +27,16 @@ struct AddConversationView: View {
         ZStack {
             VStack {
                 Text(conversation == nil ? "New Chat" : "Edit Chat")
-                    .font(.custom("Avenir Next", size: 28))
-                    .fontWeight(.bold)
+                    .font(.manrope(size: 28, weight: .bold))
                 Spacer()
                     .frame(height: 40)
                 TextField(text: $title) {
                     Text("Chat Name")
                 }
-                .font(.custom("Avenir Next", size: 18))
-                .fontWeight(.medium)
+                .font(.manrope(size: 18, weight: .medium))
                 .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
                 .frame(height: 50)
+                .foregroundColor(.black.opacity(0.8))
                 .background {
                     RoundedRectangle(cornerRadius: 16)
                         .foregroundColor(.gray.opacity(0.1))
@@ -47,7 +46,6 @@ struct AddConversationView: View {
                 ZStack(alignment: .topLeading){
                     if prompt.isEmpty {
                         Text("Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )")
-                            .font(.custom("Avenir Next", size: 16))
                             .foregroundColor(.gray.opacity(0.6))
                             .padding(.init(top: 18, leading: 24, bottom: 18, trailing: 20))
                             .allowsTightening(false)
@@ -61,9 +59,8 @@ struct AddConversationView: View {
                                 .foregroundColor(.gray.opacity(0.1))
                         }
                 }
-                .font(.custom("Avenir Next", size: 16))
-                .fontWeight(.medium)
-                .foregroundColor(.black.opacity(0.6))
+                .font(.manrope(size: 18, weight: .medium))
+                .foregroundColor(.black.opacity(0.8))
 
                 Spacer()
                     .frame(height: 60)
@@ -74,11 +71,12 @@ struct AddConversationView: View {
                         .cornerRadius(25)
                         .tint(.white)
                 }
-                .font(.custom("Avenir Next", size: 20))
-                .fontWeight(.bold)
+                .font(.manrope(size: 20, weight: .bold))
                 .disabled(title.isEmpty)
 
-            }.padding(.horizontal, 20)
+            }
+            .padding(.horizontal, 20)
+            .font(.manrope(size: 16, weight: .medium))
         }
     }
 

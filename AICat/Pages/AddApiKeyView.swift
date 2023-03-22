@@ -19,24 +19,19 @@ struct AddApiKeyView: View {
         ZStack {
             VStack {
                 Text("Add OpenAI API Key")
-                    .font(.custom("Avenir Next", size: 28))
-                    .fontWeight(.bold)
+                    .font(.manrope(size: 28, weight: .bold))
                 Spacer()
                     .frame(height: 40)
                 TextField(text: $apiKey) {
                     Text("API key")
                 }
-                .font(.custom("Avenir Next", size: 18))
-                .fontWeight(.medium)
-                .padding(.init(top: 16, leading: 20, bottom: 10, trailing: 16))
-                .overlay {
+                .font(.manrope(size: 18, weight: .medium))
+                .padding(.init(top: 12, leading: 20, bottom: 12, trailing: 20))
+                .background {
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(lineWidth: 1)
-                        .foregroundColor(.gray.opacity(0.5))
+                        .foregroundColor(.gray.opacity(0.1))
                 }
                 Text(LocalizedStringKey("[What's OpenAI API key?](https://platform.openai.com/account/api-keys)"))
-                    .font(.custom("Avenir Next", size: 16))
-                    .fontWeight(.medium)
                 Spacer()
                     .frame(height: 60)
                 Button(action: validateApiKey) {
@@ -45,32 +40,31 @@ struct AddApiKeyView: View {
                             .progressViewStyle(.circular)
                             .frame(width: 28, height: 28)
                             .frame(width: 260, height: 50)
-                            .background(apiKey.isEmpty ? .black.opacity(0.1) : .black)
+                            .background(apiKey.isEmpty ? .gray.opacity(0.1) : .black)
                             .cornerRadius(25)
                             .tint(.white)
 
                     } else {
                         Text("Validate and Save")
                             .frame(width: 260, height: 50)
-                            .background(apiKey.isEmpty ? .black.opacity(0.1) : .black)
+                            .background(apiKey.isEmpty ? .gray.opacity(0.1) : .black)
                             .cornerRadius(25)
                             .tint(.white)
                     }
 
                 }
-                .font(.custom("Avenir Next", size: 20))
-                .fontWeight(.bold)
+                .font(.manrope(size: 20, weight: .bold))
                 .disabled(apiKey.isEmpty)
 
                 if let error {
                     Text(error.localizedDescription)
-                        .font(.custom("Avenir Next", size: 16))
-                        .fontWeight(.medium)
                         .foregroundColor(.red)
                         .lineLimit(5)
                 }
 
-            }.padding(.horizontal, 20)
+            }
+            .padding(.horizontal, 20)
+            .font(.manrope(size: 16, weight: .medium))
         }
     }
 

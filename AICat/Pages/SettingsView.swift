@@ -39,8 +39,7 @@ struct SettingsView: View {
                 Spacer()
                 VStack(spacing: 0) {
                     Text("Settings")
-                        .font(.custom("Avenir Next", size: 16))
-                        .fontWeight(.bold)
+                        .font(.manrope(size: 20, weight: .bold))
                         .lineLimit(1)
                 }
                 Spacer()
@@ -132,8 +131,7 @@ struct SettingsView: View {
 //                    }.tint(.black)
 //                }
             }
-            .font(.custom("Avenir Next", size: 16))
-            .fontWeight(.medium)
+            .font(.manrope(size: 16, weight: .medium))
         }
     }
 
