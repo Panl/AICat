@@ -40,6 +40,12 @@ struct ConversationView: View {
 
     @Environment(\.blackbirdDatabase) var db
 
+    init(messages: [ChatMessage] = [], conversation: Conversation, onChatsClick: @escaping () -> Void) {
+        self.conversation = conversation
+        self.onChatsClick = onChatsClick
+        self.messages = messages
+    }
+
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
@@ -93,7 +99,7 @@ struct ConversationView: View {
                 .frame(height: 44)
                 Spacer(minLength: 0)
                 ScrollViewReader { proxy in
-                    ScrollView {
+                    ScrollView(showsIndicators: false) {
                         LazyVStack(alignment: .leading, spacing: 16) {
                             Spacer().frame(height: 4)
                                 .id("Top")
@@ -120,19 +126,20 @@ struct ConversationView: View {
                                 .id("Bottom")
                         }
                     }
-                    .scrollIndicators(.hidden)
+                    .gesture(DragGesture().onChanged { _ in
+                        self.endEditing(force: true)
+                    })
                     .onChange(of: messages) { newMessages in
                         proxy.scrollTo("Bottom")
                     }
                     .onChange(of: isAIGenerating) { _ in
                         proxy.scrollTo("Bottom")
                     }
-                    .scrollDismissesKeyboard(.immediately)
                 }
             }
             VStack {
                 if showCommands, !filterdPrompts.isEmpty {
-                    ScrollView {
+                    ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
                             Spacer().frame(height: 4)
                             ForEach(filterdPrompts) { prompt in
@@ -165,7 +172,6 @@ struct ConversationView: View {
                         }
 
                     }
-                    .scrollIndicators(.hidden)
                     .frame(maxHeight: min(commnadCardHeight, 180))
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -178,8 +184,8 @@ struct ConversationView: View {
                         HStack(spacing: 4) {
                             Text(selectedPrompt.title)
                                 .lineLimit(1)
-                                .font(.manrope(size: 14, weight: .medium))
-                                .foregroundColor(.black.opacity(0.6))
+                                .font(.manrope(size: 14, weight: .semibold))
+                                .foregroundColor(.black.opacity(0.7))
                             Button(action: {
                                 self.selectedPrompt = nil
                             }) {
@@ -222,16 +228,26 @@ struct ConversationView: View {
                                 completeMessage()
                             }
                         ) {
-                            Image(systemName: "paperplane.circle.fill")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 28, height: 28)
-                                .tint(
-                                    LinearGradient(
-                                        colors: [.black.opacity(0.9), .black.opacity(0.6)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing)
-                                )
+                            if #available(iOS 16.0, *) {
+                                Image(systemName: "paperplane.circle.fill")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 28, height: 28)
+                                    .tint(
+                                        LinearGradient(
+                                            colors: [.black.opacity(0.9), .black.opacity(0.6)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing)
+                                    )
+                            } else {
+                                Image(systemName: "paperplane.circle.fill")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 28, height: 28)
+                                    .tint(
+                                        .black.opacity(0.8)
+                                    )
+                            }
                         }
                         .disabled(inputText.isEmpty)
                     }

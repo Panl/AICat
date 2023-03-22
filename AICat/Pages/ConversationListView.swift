@@ -31,7 +31,7 @@ struct ConversationListView: View {
                     .foregroundColor(.black.opacity(0.4))
                 Spacer()
             }.padding(.leading, 20)
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 LazyVStack {
                     Spacer().frame(height: 10)
                     ForEach(conversations) { conversation in
@@ -65,7 +65,7 @@ struct ConversationListView: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 8)
 
                     }
                     Button(action: onAddChat) {
@@ -80,11 +80,11 @@ struct ConversationListView: View {
                         .padding(.horizontal, 12)
                         .background(.white)
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 8)
                     .tint(.gray)
                 }
-            }.scrollIndicators(.hidden)
-            Spacer()
+            }
+            Spacer(minLength: 20)
             Button(action: { showClearAllChatAlert = true }) {
                 HStack {
                     Image(systemName: "trash")

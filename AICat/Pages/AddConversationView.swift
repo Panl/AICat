@@ -22,62 +22,77 @@ struct AddConversationView: View {
         self.prompt = conversation?.prompt ?? ""
     }
 
-
     var body: some View {
-        ZStack {
-            VStack {
-                Text(conversation == nil ? "New Chat" : "Edit Chat")
-                    .font(.manrope(size: 28, weight: .bold))
-                Spacer()
-                    .frame(height: 40)
-                TextField(text: $title) {
-                    Text("Chat Name")
+        VStack {
+            Text(conversation == nil ? "New Chat" : "Edit Chat")
+                .font(.manrope(size: 28, weight: .bold))
+            Spacer()
+                .frame(height: 40)
+            TextField(text: $title) {
+                Text("Chat Name")
+            }
+            .tint(.black.opacity(0.8))
+            .font(.manrope(size: 18, weight: .medium))
+            .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+            .frame(height: 50)
+            .foregroundColor(.black.opacity(0.8))
+            .background {
+                RoundedRectangle(cornerRadius: 16)
+                    .foregroundColor(.gray.opacity(0.1))
+            }
+            Spacer()
+                .frame(height: 20)
+            ZStack(alignment: .topLeading){
+                if prompt.isEmpty {
+                    Text("Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )")
+                        .foregroundColor(.gray.opacity(0.6))
+                        .padding(.init(top: 18, leading: 24, bottom: 18, trailing: 20))
+                        .allowsTightening(false)
                 }
-                .font(.manrope(size: 18, weight: .medium))
-                .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
-                .frame(height: 50)
-                .foregroundColor(.black.opacity(0.8))
-                .background {
-                    RoundedRectangle(cornerRadius: 16)
-                        .foregroundColor(.gray.opacity(0.1))
-                }
-                Spacer()
-                    .frame(height: 20)
-                ZStack(alignment: .topLeading){
-                    if prompt.isEmpty {
-                        Text("Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )")
-                            .foregroundColor(.gray.opacity(0.6))
-                            .padding(.init(top: 18, leading: 24, bottom: 18, trailing: 20))
-                            .allowsTightening(false)
-                    }
+                if #available(iOS 16.0, *) {
                     TextEditor(text: $prompt)
                         .scrollContentBackground(.hidden)
+                        .tint(.black.opacity(0.8))
                         .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
                         .frame(height: 200)
                         .background {
                             RoundedRectangle(cornerRadius: 16)
                                 .foregroundColor(.gray.opacity(0.1))
                         }
+                } else {
+                    TextEditor(text: $prompt)
+                        .tint(.black.opacity(0.8))
+                        .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+                        .frame(height: 200)
+                        .background {
+                            RoundedRectangle(cornerRadius: 16)
+                                .foregroundColor(.gray.opacity(0.1))
+                        }.onAppear {
+                            UITextView.appearance().backgroundColor = .clear
+                        }
                 }
-                .font(.manrope(size: 18, weight: .medium))
-                .foregroundColor(.black.opacity(0.8))
-
-                Spacer()
-                    .frame(height: 60)
-                Button(action: { Task { await saveConversation() } }) {
-                    Text("Save")
-                        .frame(width: 260, height: 50)
-                        .background(title.isEmpty ? .black.opacity(0.1) : .black)
-                        .cornerRadius(25)
-                        .tint(.white)
-                }
-                .font(.manrope(size: 20, weight: .bold))
-                .disabled(title.isEmpty)
-
             }
-            .padding(.horizontal, 20)
-            .font(.manrope(size: 16, weight: .medium))
+            .font(.manrope(size: 18, weight: .medium))
+            .foregroundColor(.black.opacity(0.8))
+
+            Spacer()
+                .frame(height: 36)
+            Button(action: { Task { await saveConversation() } }) {
+                Text("Save")
+                    .frame(width: 260, height: 50)
+                    .background(title.isEmpty ? .black.opacity(0.1) : .black)
+                    .cornerRadius(25)
+                    .tint(.white)
+            }
+            .font(.manrope(size: 20, weight: .bold))
+            .disabled(title.isEmpty)
+
         }
+        .padding(.horizontal, 20)
+        .onTapGesture {
+            self.endEditing(force: true)
+        }
+        .font(.manrope(size: 16, weight: .medium))
     }
 
     func saveConversation() async {

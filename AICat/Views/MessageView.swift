@@ -83,6 +83,7 @@ struct ErrorMessageView: View {
                 Button(
                     action: retry
                 ) {
+                    if #available(iOS 16.0, *) {
                         Image(systemName: "arrow.clockwise.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
@@ -92,7 +93,14 @@ struct ErrorMessageView: View {
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
+                    } else {
+                        // Fallback on earlier versions
+                        Image(systemName: "arrow.clockwise.circle.fill")
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .tint(.black.opacity(0.8))
                     }
+                }
             }.padding(.horizontal, 20)
         }
     }
@@ -106,17 +114,17 @@ struct InputingMessageView: View {
     var body: some View {
         HStack(spacing: 4) {
             Circle()
-                .fill(Color.black)
+                .fill(Color.black.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever(), value: shouldAnimate)
             Circle()
-                .fill(Color.black)
+                .fill(Color.black.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.3), value: shouldAnimate)
             Circle()
-                .fill(Color.black)
+                .fill(Color.black.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.6), value: shouldAnimate)
@@ -128,7 +136,7 @@ struct InputingMessageView: View {
         .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
         .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
         .onAppear {
-            self.shouldAnimate = true
+            self.shouldAnimate.toggle()
         }
     }
 }

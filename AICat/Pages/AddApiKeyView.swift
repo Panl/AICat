@@ -25,6 +25,7 @@ struct AddApiKeyView: View {
                 TextField(text: $apiKey) {
                     Text("API key")
                 }
+                .tint(.black.opacity(0.8))
                 .font(.manrope(size: 18, weight: .medium))
                 .padding(.init(top: 12, leading: 20, bottom: 12, trailing: 20))
                 .background {

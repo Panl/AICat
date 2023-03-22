@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		8E0F0ECD29CB3AF60011B4F7 /* Manrope.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */; };
 		8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */; };
+		8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ED029CB53570011B4F7 /* View+Extension.swift */; };
 		8E64872729C6E1B00029E14F /* AICatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64872629C6E1B00029E14F /* AICatApp.swift */; };
 		8E64872929C6E1B00029E14F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64872829C6E1B00029E14F /* ContentView.swift */; };
 		8E64872B29C6E1B10029E14F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E64872A29C6E1B10029E14F /* Assets.xcassets */; };
@@ -32,6 +33,7 @@
 /* Begin PBXFileReference section */
 		8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Manrope.ttf; sourceTree = "<group>"; };
 		8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
+		8E0F0ED029CB53570011B4F7 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		8E64872329C6E1B00029E14F /* AICat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AICat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E64872629C6E1B00029E14F /* AICatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AICatApp.swift; sourceTree = "<group>"; };
 		8E64872829C6E1B00029E14F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				8EECA00529C8097E0021A6A1 /* UerDefaults+Extension.swift */,
 				8EECA01029C896B20021A6A1 /* Database+Extension.swift */,
 				8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */,
+				8E0F0ED029CB53570011B4F7 /* View+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 			files = (
 				8E64872929C6E1B00029E14F /* ContentView.swift in Sources */,
 				8EECA00A29C82E9D0021A6A1 /* AddConversationView.swift in Sources */,
+				8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */,
 				8E64873B29C6FF750029E14F /* CatApi.swift in Sources */,
 				8EECA00C29C82ECB0021A6A1 /* AddApiKeyView.swift in Sources */,
 				8E64872729C6E1B00029E14F /* AICatApp.swift in Sources */,
@@ -409,7 +413,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -443,7 +447,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
