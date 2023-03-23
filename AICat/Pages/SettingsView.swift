@@ -21,9 +21,9 @@ struct SettingsView: View {
 
 
     let temperatureConfig: [Double: String] = [
-        0.2: "Divergent",
+        0.2: "Precies",
         1.0: "Balanced",
-        1.8: "Deterministic"
+        1.8: "Creative"
     ]
 
     let onClose: () -> Void

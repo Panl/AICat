@@ -10,6 +10,11 @@
 		8E0F0ECD29CB3AF60011B4F7 /* Manrope.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */; };
 		8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */; };
 		8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ED029CB53570011B4F7 /* View+Extension.swift */; };
+		8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA229CC519D00EE0072 /* MarkdownUI */; };
+		8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */; };
+		8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA729CC6FF500EE0072 /* Splash */; };
+		8E2E5BAD29CC707B00EE0072 /* TextOutputFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */; };
+		8E2E5BAE29CC707B00EE0072 /* SplashCodeSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */; };
 		8E64872729C6E1B00029E14F /* AICatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64872629C6E1B00029E14F /* AICatApp.swift */; };
 		8E64872929C6E1B00029E14F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64872829C6E1B00029E14F /* ContentView.swift */; };
 		8E64872B29C6E1B10029E14F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E64872A29C6E1B10029E14F /* Assets.xcassets */; };
@@ -34,6 +39,9 @@
 		8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Manrope.ttf; sourceTree = "<group>"; };
 		8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
 		8E0F0ED029CB53570011B4F7 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extension.swift"; sourceTree = "<group>"; };
+		8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextOutputFormat.swift; sourceTree = "<group>"; };
+		8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashCodeSyntaxHighlighter.swift; sourceTree = "<group>"; };
 		8E64872329C6E1B00029E14F /* AICat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AICat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E64872629C6E1B00029E14F /* AICatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AICatApp.swift; sourceTree = "<group>"; };
 		8E64872829C6E1B00029E14F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -61,6 +69,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */,
+				8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */,
 				8E64873829C6FBD90029E14F /* Alamofire in Frameworks */,
 				8E64873F29C70FD00029E14F /* Blackbird in Frameworks */,
 			);
@@ -75,6 +85,23 @@
 				8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */,
 			);
 			path = Font;
+			sourceTree = "<group>";
+		};
+		8E2E5BA929CC704600EE0072 /* Markdown */ = {
+			isa = PBXGroup;
+			children = (
+				8E2E5BAA29CC707A00EE0072 /* SyntaxHighlighter */,
+			);
+			path = Markdown;
+			sourceTree = "<group>";
+		};
+		8E2E5BAA29CC707A00EE0072 /* SyntaxHighlighter */ = {
+			isa = PBXGroup;
+			children = (
+				8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */,
+				8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */,
+			);
+			path = SyntaxHighlighter;
 			sourceTree = "<group>";
 		};
 		8E64871A29C6E1B00029E14F = {
@@ -98,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				8EECA00D29C83BDB0021A6A1 /* Info.plist */,
+				8E2E5BA929CC704600EE0072 /* Markdown */,
 				8E0F0ECB29CB3AD00011B4F7 /* Font */,
 				8EECA01429CA07650021A6A1 /* Views */,
 				8EECA00829C82E410021A6A1 /* Pages */,
@@ -144,6 +172,7 @@
 				8EECA01029C896B20021A6A1 /* Database+Extension.swift */,
 				8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */,
 				8E0F0ED029CB53570011B4F7 /* View+Extension.swift */,
+				8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -197,6 +226,8 @@
 			packageProductDependencies = (
 				8E64873729C6FBD90029E14F /* Alamofire */,
 				8E64873E29C70FD00029E14F /* Blackbird */,
+				8E2E5BA229CC519D00EE0072 /* MarkdownUI */,
+				8E2E5BA729CC6FF500EE0072 /* Splash */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -229,6 +260,8 @@
 			packageReferences = (
 				8E64873629C6FBD90029E14F /* XCRemoteSwiftPackageReference "Alamofire" */,
 				8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */,
+				8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -259,11 +292,13 @@
 			files = (
 				8E64872929C6E1B00029E14F /* ContentView.swift in Sources */,
 				8EECA00A29C82E9D0021A6A1 /* AddConversationView.swift in Sources */,
+				8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */,
 				8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */,
 				8E64873B29C6FF750029E14F /* CatApi.swift in Sources */,
 				8EECA00C29C82ECB0021A6A1 /* AddApiKeyView.swift in Sources */,
 				8E64872729C6E1B00029E14F /* AICatApp.swift in Sources */,
 				8E64874429C715740029E14F /* ChatMessage.swift in Sources */,
+				8E2E5BAD29CC707B00EE0072 /* TextOutputFormat.swift in Sources */,
 				8E64874729C719460029E14F /* Date+Extension.swift in Sources */,
 				8E64874229C713D30029E14F /* Conversation.swift in Sources */,
 				8EECA01129C896B20021A6A1 /* Database+Extension.swift in Sources */,
@@ -271,6 +306,7 @@
 				8EECA00629C8097E0021A6A1 /* UerDefaults+Extension.swift in Sources */,
 				8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */,
 				8E64874C29C788640029E14F /* ConversationListView.swift in Sources */,
+				8E2E5BAE29CC707B00EE0072 /* SplashCodeSyntaxHighlighter.swift in Sources */,
 				8EECA01629CA07830021A6A1 /* MessageView.swift in Sources */,
 				8EECA01329C8BC370021A6A1 /* SettingsView.swift in Sources */,
 			);
@@ -485,6 +521,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.2;
+			};
+		};
+		8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JohnSundell/Splash.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.16.0;
+			};
+		};
 		8E64873629C6FBD90029E14F /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
@@ -504,6 +556,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8E2E5BA229CC519D00EE0072 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+		8E2E5BA729CC6FF500EE0072 /* Splash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = Splash;
+		};
 		8E64873729C6FBD90029E14F /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E64873629C6FBD90029E14F /* XCRemoteSwiftPackageReference "Alamofire" */;

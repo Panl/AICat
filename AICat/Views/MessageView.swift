@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MarkdownUI
 
 struct MineMessageView: View {
     let message: ChatMessage
@@ -14,7 +15,7 @@ struct MineMessageView: View {
             HStack {
                 Spacer(minLength: 40)
                 Text(message.content)
-                    .tint(.teal)
+                    .textSelection(.enabled)
                     .font(.manrope(size: 16, weight: .medium))
                     .foregroundColor(.white)
                     .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
@@ -35,7 +36,13 @@ struct MineMessageView: View {
 struct AICatMessageView: View {
     let message: ChatMessage
     var body: some View {
-        ZStack {
+        if containsCodeBlock(content: message.content) {
+            Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+               .textSelection(.enabled)
+               .markdownCodeSyntaxHighlighter(.splash(theme: .wwdc17(withFont: .init(size: 16))))
+               .markdownTheme(.gitHub)
+               .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+        } else {
             Text(LocalizedStringKey(message.content.trimmingCharacters(in: .whitespacesAndNewlines)))
                 .font(.manrope(size: 16, weight: .medium))
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
@@ -43,7 +50,17 @@ struct AICatMessageView: View {
                 .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
                 .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
                 .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
+
         }
+    }
+
+    func containsCodeBlock(content: String) -> Bool {
+        let regextPattern = "```[\\w\\W]*?```"
+        if let regex = try? NSRegularExpression(pattern: regextPattern) {
+            let matches = regex.matches(in: content, range: NSRange(content.startIndex..., in: content))
+            return !matches.isEmpty
+        }
+        return false
     }
 }
 

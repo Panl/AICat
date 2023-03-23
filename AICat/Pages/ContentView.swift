@@ -131,9 +131,6 @@ struct ContentView: View {
                 }
             )
         }.onChange(of: conversations) { newValue in
-            if newValue.results.isEmpty {
-                showAddConversationSheet = true
-            }
             conversation = newValue.results.first(where: { $0.id == chatId }) ?? mainConversation
         }
     }

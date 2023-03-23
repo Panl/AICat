@@ -105,6 +105,7 @@ struct ConversationView: View {
                                 .id("Top")
                             ForEach(messages, id: \.id) { message in
                                 MessageView(message: message)
+                                    .id(message.id)
                                     .contextMenu {
                                         Button(action: { UIPasteboard.general.string = message.content }) {
                                             Label("Copy", systemImage: "doc.on.doc")
@@ -260,7 +261,7 @@ struct ConversationView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .shadow(color: Color.black.opacity(0.1), radius: 8)
                 .padding(.horizontal, 20)
-                .padding(.bottom, 12)
+                .padding(.bottom, 16)
             }
         }.onAppear {
             queryMessages(cid: conversation.id)
