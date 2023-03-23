@@ -21,6 +21,7 @@ struct ContentView: View {
     @AppStorage("request.temperature") var temperature = 1
 
     @State var lastTranslationX: CGFloat = 0
+    @GestureState var dragOffset: CGSize = .zero
 
     var allConversations: [Conversation] {
         [mainConversation] + conversations.results
@@ -29,6 +30,8 @@ struct ContentView: View {
     var progress: CGFloat {
         translationX / 300
     }
+
+    let openDrawerDuration = 0.2
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -41,7 +44,7 @@ struct ContentView: View {
                 onChatChanged: { chat in
                     conversation = chat
                     chatId = chat.id
-                    withAnimation {
+                    withAnimation(.easeInOut(duration: openDrawerDuration)) {
                         translationX = 0
                         lastTranslationX = 0
                     }
@@ -51,7 +54,7 @@ struct ContentView: View {
                 ConversationView(
                     conversation: conversation,
                     onChatsClick: {
-                        withAnimation {
+                        withAnimation(.easeInOut(duration: openDrawerDuration)) {
                             if lastTranslationX == 300 {
                                 translationX = 0
                                 lastTranslationX = 0
@@ -70,32 +73,41 @@ struct ContentView: View {
                 }
                 .scaleEffect(x: 1 - progress * 0.05, y: 1 - progress * 0.05)
                 .offset(x: translationX, y: 0)
+                .onChange(of: $dragOffset.wrappedValue) { newValue in
+                    translationX = max(min(lastTranslationX + newValue.width, 300), 0)
+                }
                 .simultaneousGesture(
                     DragGesture()
-                        .onChanged { value in
-                            let translationWidth = value.translation.width
-                            translationX = max(min(lastTranslationX + translationWidth, 300), 0)
+                        /// .updateing with GesturesState automatically sets the offset to isInitial position
+                        .updating($dragOffset) { value, state, transaction in
+                            guard (value.translation.width > 0 && value.startLocation.x < 40)
+                                    || (value.translation.width < 0 && value.startLocation.x > getScreenSize().width - 300) else { return }
+                            state = value.translation
                         }
+                        /// .onEnded will not called when gesture cancelled by the scrollview
                         .onEnded { value in
+                            print("gesture end")
+                            guard (value.translation.width > 0 && value.startLocation.x < 40)
+                                    || (value.translation.width < 0 && value.startLocation.x > getScreenSize().width - 300) else { return }
                             let velocityX = value.predictedEndLocation.x - value.location.x
                             if velocityX > 50 {
-                                withAnimation(.linear(duration: (1 - progress) * 0.35)) {
+                                withAnimation(.linear(duration: (1 - progress) * openDrawerDuration)) {
                                     translationX = 300
                                     lastTranslationX = 300
                                 }
                             } else if velocityX < -50{
-                                withAnimation(.linear(duration: progress * 0.35)) {
+                                withAnimation(.linear(duration: progress * openDrawerDuration)) {
                                     translationX = 0
                                     lastTranslationX = 0
                                 }
                             } else {
                                 if translationX < 150 {
-                                    withAnimation(.linear(duration: progress * 0.35)) {
+                                    withAnimation(.linear(duration: progress * openDrawerDuration)) {
                                         translationX = 0
                                         lastTranslationX = 0
                                     }
                                 } else {
-                                    withAnimation(.linear(duration: (1 - progress) * 0.35)) {
+                                    withAnimation(.linear(duration: (1 - progress) * openDrawerDuration)) {
                                         translationX = 300
                                         lastTranslationX = 300
                                     }
@@ -124,7 +136,7 @@ struct ContentView: View {
                     self.conversation = conversation
                     showAddConversationSheet = false
                     chatId = conversation.id
-                    withAnimation {
+                    withAnimation(.easeInOut(duration: openDrawerDuration)) {
                         lastTranslationX = 0
                         translationX = 0
                     }
