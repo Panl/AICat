@@ -16,7 +16,7 @@ struct SettingsView: View {
     @State var error: AFError?
     @State var isValidated = false
     @AppStorage("currentChat.id") var chatId: String?
-    @AppStorage("request.temperature") var temperature: Double = 1
+    @AppStorage("request.temperature") var temperature: Double = 1.0
     @AppStorage("request.context.messages") var messagesCount: Int = 0
 
 
@@ -83,14 +83,10 @@ struct SettingsView: View {
                         Text("Temperature")
                         Spacer()
                         Menu {
-                            Button("Divergent") {
-                                temperature = 0.2
-                            }
-                            Button("Balance") {
-                                temperature = 1.0
-                            }
-                            Button("Deterministic") {
-                                temperature = 1.8
+                            ForEach(temperatureConfig.keys.sorted(), id: \.self) { t in
+                                Button(temperatureConfig[t] ?? "Balanced") {
+                                    temperature = t
+                                }
                             }
                         } label: {
                             HStack {
