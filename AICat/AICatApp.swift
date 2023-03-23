@@ -22,7 +22,7 @@ struct AICatApp: App {
     var body: some Scene {
         WindowGroup {
             if apiKey != nil {
-                ContentView()
+                MainView()
                     .environment(\.blackbirdDatabase, database)
             } else {
                 AddApiKeyView(onValidateSuccess: {})

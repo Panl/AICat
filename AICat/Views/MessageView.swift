@@ -39,7 +39,7 @@ struct AICatMessageView: View {
         if containsCodeBlock(content: message.content) {
             Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                .textSelection(.enabled)
-               .markdownCodeSyntaxHighlighter(.splash(theme: .wwdc17(withFont: .init(size: 16))))
+               .markdownCodeSyntaxHighlighter(.splash(theme: .sundellsColors(withFont: .init(size: 16))))
                .markdownTheme(.gitHub)
                .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
         } else {

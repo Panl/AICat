@@ -128,7 +128,6 @@ struct ConversationListView: View {
             .tint(.gray)
             Spacer().frame(height: 32)
         }
-        .frame(width: 300)
         .fullScreenCover(isPresented: $showSettingsView) {
             SettingsView {
                 showSettingsView = false
