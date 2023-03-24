@@ -106,6 +106,7 @@ struct CornerRadiusShape: Shape {
 struct ErrorMessageView: View {
     let errorMessage: String
     let retry: () -> Void
+    let clear: () -> Void
     var body: some View {
         ZStack {
             HStack {
@@ -131,6 +132,27 @@ struct ErrorMessageView: View {
                     } else {
                         // Fallback on earlier versions
                         Image(systemName: "arrow.clockwise.circle.fill")
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .tint(.black.opacity(0.8))
+                    }
+                }
+                Button(
+                    action: clear
+                ) {
+                    if #available(iOS 16.0, *) {
+                        Image(systemName: "xmark.circle.fill")
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .tint(
+                                LinearGradient(
+                                    colors: [.black.opacity(0.9), .black.opacity(0.6)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing)
+                            )
+                    } else {
+                        // Fallback on earlier versions
+                        Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
                             .tint(.black.opacity(0.8))
@@ -181,6 +203,7 @@ struct MessageView_Previews: PreviewProvider {
         VStack {
             AICatMessageView(message: ChatMessage(role: "user", content: "you are beautiful", conversationId: ""))
             MineMessageView(message: ChatMessage(role: "", content: "### title ```swift```", conversationId: ""))
+            ErrorMessageView(errorMessage: "RequestTime out", retry: {}, clear: {})
         }
     }
 }

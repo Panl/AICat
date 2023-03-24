@@ -118,7 +118,9 @@ struct ConversationView: View {
                             if let error {
                                 ErrorMessageView(errorMessage: error.localizedDescription) {
                                     retryComplete()
-                                }.id("error")
+                                } clear: {
+                                    self.error = nil
+                                }
                             }
                             if isAIGenerating && isSending {
                                 InputingMessageView().id("generating")
@@ -268,6 +270,7 @@ struct ConversationView: View {
         }.onChange(of: conversation) { newValue in
             selectedPrompt = nil
             inputText = ""
+            error = nil
             queryMessages(cid: newValue.id)
         }.sheet(isPresented: $showAddConversation) {
             AddConversationView(conversation: conversation) { _ in
@@ -313,7 +316,7 @@ struct ConversationView: View {
     }
 
     func completeMessage() {
-        guard !inputText.isEmpty else { return }
+        guard !inputText.isEmpty, !isSending else { return }
         isSending = true
         Task {
             try await Task.sleep(nanoseconds: 500_000_000)
