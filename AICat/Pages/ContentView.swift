@@ -77,14 +77,14 @@ struct ContentView: View {
                 DragGesture()
                     /// .updateing with GesturesState automatically sets the offset to isInitial position
                     .updating($dragOffset) { value, state, transaction in
-                        guard (value.translation.width > 0 && value.startLocation.x < 40)
+                        guard (value.translation.width > 0 && value.startLocation.x < 80)
                                 || (value.translation.width < 0 && value.startLocation.x > getScreenSize().width - 300) else { return }
                         state = value.translation
                     }
                     /// .onEnded will not called when gesture cancelled by the scrollview
                     .onEnded { value in
                         print("gesture end")
-                        guard (value.translation.width > 0 && value.startLocation.x < 40)
+                        guard (value.translation.width > 0 && value.startLocation.x < 80)
                                 || (value.translation.width < 0 && value.startLocation.x > getScreenSize().width - 300) else { return }
                         let velocityX = value.predictedEndLocation.x - value.location.x
                         if velocityX > 50 {

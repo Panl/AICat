@@ -32,7 +32,7 @@ struct AddConversationView: View {
                 Text("Chat Name")
             }
             .tint(.black.opacity(0.8))
-            .font(.manrope(size: 18, weight: .medium))
+            .font(.manrope(size: 16, weight: .regular))
             .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
             .frame(height: 50)
             .foregroundColor(.black.opacity(0.8))
@@ -46,14 +46,14 @@ struct AddConversationView: View {
                 if prompt.isEmpty {
                     Text("Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )")
                         .foregroundColor(.gray.opacity(0.6))
-                        .padding(.init(top: 18, leading: 24, bottom: 18, trailing: 20))
+                        .padding(.init(top: 18, leading: 20, bottom: 18, trailing: 20))
                         .allowsTightening(false)
                 }
                 if #available(iOS 16.0, *) {
                     TextEditor(text: $prompt)
                         .scrollContentBackground(.hidden)
                         .tint(.black.opacity(0.8))
-                        .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+                        .padding(.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                         .frame(height: 200)
                         .background {
                             RoundedRectangle(cornerRadius: 16)
@@ -62,7 +62,7 @@ struct AddConversationView: View {
                 } else {
                     TextEditor(text: $prompt)
                         .tint(.black.opacity(0.8))
-                        .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+                        .padding(.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                         .frame(height: 200)
                         .background {
                             RoundedRectangle(cornerRadius: 16)
@@ -72,7 +72,7 @@ struct AddConversationView: View {
                         }
                 }
             }
-            .font(.manrope(size: 18, weight: .medium))
+            .font(.manrope(size: 16, weight: .regular))
             .foregroundColor(.black.opacity(0.8))
 
             Spacer()
@@ -84,7 +84,7 @@ struct AddConversationView: View {
                     .cornerRadius(25)
                     .tint(.white)
             }
-            .font(.manrope(size: 20, weight: .bold))
+            .font(.manrope(size: 20, weight: .medium))
             .disabled(title.isEmpty)
 
         }
@@ -92,7 +92,7 @@ struct AddConversationView: View {
         .onTapGesture {
             self.endEditing(force: true)
         }
-        .font(.manrope(size: 16, weight: .medium))
+        .font(.manrope(size: 16, weight: .regular))
     }
 
     func saveConversation() async {

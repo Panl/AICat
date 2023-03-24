@@ -26,7 +26,7 @@ struct AddApiKeyView: View {
                     Text("API key")
                 }
                 .tint(.black.opacity(0.8))
-                .font(.manrope(size: 18, weight: .medium))
+                .font(.manrope(size: 18, weight: .regular))
                 .padding(.init(top: 12, leading: 20, bottom: 12, trailing: 20))
                 .background {
                     RoundedRectangle(cornerRadius: 16)
@@ -54,7 +54,7 @@ struct AddApiKeyView: View {
                     }
 
                 }
-                .font(.manrope(size: 20, weight: .bold))
+                .font(.manrope(size: 20, weight: .medium))
                 .disabled(apiKey.isEmpty)
 
                 if let error {

@@ -65,7 +65,7 @@ struct ConversationView: View {
                             .lineLimit(1)
                         if !promptText.isEmpty {
                             Text(promptText)
-                                .font(.manrope(size: 12, weight: .medium))
+                                .font(.manrope(size: 12, weight: .regular))
                                 .opacity(0.4)
                                 .lineLimit(1)
                         }
@@ -273,7 +273,7 @@ struct ConversationView: View {
             AddConversationView(conversation: conversation) { _ in
                 showAddConversation = false
             }
-        }.font(.manrope(size: 16, weight: .medium))
+        }.font(.manrope(size: 16, weight: .regular))
     }
 
     struct SizeKey: PreferenceKey {

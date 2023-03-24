@@ -39,8 +39,10 @@ struct ConversationListView: View {
                             HStack {
                                 Image(systemName: conversation == mainConversation ? "command" : "bubble.left" )
                                     .aspectRatio(contentMode: .fit)
+                                    .frame(width: 20)
                                 Text(conversation.title)
                                     .lineLimit(1)
+                                    .font(.manrope(size: 16, weight: conversation == selectedChat ? .medium : .regular))
                                 Spacer()
                                 if selectedChat?.id == conversation.id {
                                     Circle()
@@ -56,7 +58,7 @@ struct ConversationListView: View {
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
                         }
-                        .tint(.black)
+                        .tint(conversation == selectedChat ? .black : .black.opacity(0.8))
                         .background(.white)
                         .contextMenu {
                             if conversation != mainConversation {
@@ -70,8 +72,9 @@ struct ConversationListView: View {
                     }
                     Button(action: onAddChat) {
                         HStack {
-                            Image(systemName: "plus.circle")
+                            Image(systemName: "plus.bubble")
                                 .aspectRatio(contentMode: .fit)
+                                .frame(width: 20)
                             Text("New Chat")
                                 .lineLimit(1)
                             Spacer()
@@ -134,7 +137,7 @@ struct ConversationListView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
-        .font(.manrope(size: 16, weight: .medium))
+        .font(.manrope(size: 16, weight: .regular))
     }
 
     func deleteConversation(_ conversation: Conversation) {
@@ -158,7 +161,7 @@ struct ConversationListView: View {
 struct ConversationListView_Previews: PreviewProvider {
     static var previews: some View {
         ConversationListView(
-            selectedChat: nil,
+            selectedChat: mainConversation,
             conversations: [mainConversation, Conversation(title: "How to make a gift", prompt: "")],
             onAddChat: {}, onChatChanged: { _ in }
         )
