@@ -19,3 +19,6 @@
 
 ![](Screenshots/chatlist.png) | ![](Screenshots/command.png) | ![](Screenshots/conversation.png)
 ---|---|---
+
+### Download
+[Testflight](https://testflight.apple.com/join/ow799Vvb)
