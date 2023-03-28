@@ -359,25 +359,32 @@ struct ConversationView: View {
     }
 
     func completeMessages(_ messages: [Message], prompt: String? = nil) async {
-        let result = await CatApi.complete(messages: messages, with: prompt ?? conversation.prompt)
-        switch result {
-        case .success(let success):
-            saveMessage(response: success)
-        case .failure(let failure):
-            error = failure
-            print("\(failure)")
+        var chatMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
+        do {
+            let stream = try await CatApi.completeMessageStream(messages: messages, with: prompt)
+            for try await delta in stream {
+                isAIGenerating = false
+                if let role = delta.role {
+                    chatMessage.role = role
+                }
+                if let content = delta.content {
+                    chatMessage.content += content
+                }
+                saveMessage(message: chatMessage)
+            }
+            isSending = false
+        } catch {
+            self.error = AFError.sessionTaskFailed(error: error)
+            isAIGenerating = false
+            isSending = false
+            deleteMessage(chatMessage)
         }
-        isSending = false
-        isAIGenerating = false
     }
 
-    func saveMessage(response: CompleteResponse) {
-        if let message = response.choices.first?.message {
-            let chatMessage = ChatMessage(role: message.role, content: message.content, conversationId: conversation.id)
-            Task {
-                await db?.upsert(model: chatMessage)
-                queryMessages(cid: conversation.id)
-            }
+    func saveMessage(message: ChatMessage) {
+        Task {
+            await db?.upsert(model: message)
+            queryMessages(cid: conversation.id)
         }
     }
 }

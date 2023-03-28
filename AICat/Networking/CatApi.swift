@@ -8,7 +8,158 @@
 import Foundation
 import Alamofire
 
+//{
+//    "id": "chatcmpl-6yCEXASoUbnpxciRDjFSBdVCtVv7d",
+//    "object": "chat.completion.chunk",
+//    "created": 1679804725,
+//    "model": "gpt-3.5-turbo-0301",
+//    "choices": [{
+//        "delta": {
+//            "content": "As"
+//        },
+//        "index": 0,
+//        "finish_reason": null
+//    }]
+//}
+
+struct StreamResponse: Codable {
+    let id: String
+    let object: String
+    let created: Int
+    let model: String
+    let choices: [Choice]
+
+    struct Choice: Codable {
+        let delta: Delta
+        let finishReason: String?
+    }
+
+    struct Delta: Codable {
+        let role: String?
+        let content: String?
+    }
+}
+
 enum CatApi {
+
+    static func completeMessageStream(apiKey: String? = nil, messages: [Message], with prompt: String? = nil) async throws -> AsyncThrowingStream<StreamResponse.Delta, Error> {
+        let key = apiKey ?? UserDefaults.openApiKey
+        guard let key else { throw NSError(domain: "missing OpenAI API key", code: -1) }
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer \(key)"
+        ]
+        let temperature = UserDefaults.temperature
+        var messageToSend = messages
+        if let prompt {
+            let system = Message(role: "system", content: prompt)
+            messageToSend = [system] + messages
+        }
+        var request = try URLRequest(url: "https://api.openai.com/v1/chat/completions", method: .post, headers: headers)
+        let body = CompleteParams(
+            model: "gpt-3.5-turbo",
+            messages: messageToSend,
+            temperature: temperature,
+            stream: true
+        )
+        request.httpBody = try JSONEncoder().encode(body)
+        request.timeoutInterval = 60
+        let (result, response) = try await URLSession.shared.bytes(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else { throw NSError(domain: "Invalid response", code: 0) }
+        guard 200...299 ~= httpResponse.statusCode else {
+            var errorText = ""
+            for try await line in result.lines {
+                errorText += line
+            }
+            throw NSError(domain: "Bad response: \(httpResponse.statusCode), \(errorText)", code: 0)
+        }
+        return AsyncThrowingStream<StreamResponse.Delta, Error> { continuation in
+            Task {
+                do {
+                    for try await line in result.lines {
+                        if line.hasPrefix("data: "),
+                           let data = line.dropFirst(6).data(using: .utf8),
+                           let response = decodeResponse(data: data),
+                           let delta = response.choices.first?.delta {
+                            continuation.yield(delta)
+                        }
+                    }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+        }
+    }
+
+    static func decodeResponse(data: Data) -> StreamResponse? {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        do {
+            let response = try decoder.decode(StreamResponse.self, from: data)
+            return response
+        } catch {
+            print("decode error: \(error) - rawJson: \(String(decoding: data, as: UTF8.self))")
+        }
+        return nil
+    }
+
+    static func streamComplete(apiKey: String? = nil, messages: [Message], onEvent: @escaping (StreamResponse.Delta?, DataStreamRequest.Completion?) -> Void) {
+        let key = apiKey ?? UserDefaults.openApiKey
+        guard let key else { return }
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer \(key)"
+        ]
+        let temperature = UserDefaults.temperature
+        AF.streamRequest(
+            "https://api.openai.com/v1/chat/completions",
+            method: .post,
+            parameters: CompleteParams(
+                model: "gpt-3.5-turbo",
+                messages: messages,
+                temperature: temperature,
+                stream: true
+            ),
+            encoder: .json,
+            headers: headers,
+            requestModifier: { request in
+                request.timeoutInterval = 60
+            }
+        )
+        .logRequest()
+        .responseStream { stream in
+            switch stream.event {
+            case let .stream(result):
+                switch result {
+                case let .success(data):
+                    if let response = decode(data: data), let delta = response.choices.first?.delta {
+                        onEvent(delta, nil)
+                    }
+                }
+            case let .complete(completion):
+                onEvent(nil, completion)
+            }
+        }
+    }
+
+    static func decode(data: Data) -> StreamResponse? {
+        var str = String(decoding: data, as: UTF8.self)
+        print("--dataStr: \(str)")
+        if str.hasPrefix("data: ") {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            do {
+                let validData = str.dropFirst(6).data(using: .utf8)
+                let response = try decoder.decode(StreamResponse.self, from: validData!)
+                return response
+            } catch {
+                print("decode error: \(error) - rawJson: \(str)")
+            }
+        }
+        return nil
+    }
+
     static func complete(apiKey: String? = nil, messages: [Message]) async -> Result<CompleteResponse, AFError> {
         let key = apiKey ?? UserDefaults.openApiKey
         guard let key else {
@@ -31,7 +182,7 @@ enum CatApi {
             encoder: .json,
             headers: headers,
             requestModifier: { request in
-                request.timeoutInterval = 30
+                request.timeoutInterval = 60
             }
         )
         .logRequest()
@@ -59,9 +210,9 @@ extension Request {
     func logRequest() -> Self {
         #if DEBUG
         cURLDescription { curl in
-            debugPrint("====Request Start====")
-            debugPrint(curl)
-            debugPrint("====Request End====")
+            print("====Request Start====")
+            print(curl)
+            print("====Request End====")
         }
         #endif
         return self
@@ -71,14 +222,14 @@ extension Request {
 extension DataResponse {
     func logResponse() -> Self {
         #if DEBUG
-        debugPrint("====Response Start====")
+        print("====Response Start====")
         switch result {
         case .success(let data):
-            debugPrint(data)
+            print(data)
         case .failure(let error):
-            debugPrint(error)
+            print(error)
         }
-        debugPrint("====Response End====")
+        print("====Response End====")
         #endif
         return self
     }
