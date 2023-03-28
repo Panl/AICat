@@ -361,7 +361,7 @@ struct ConversationView: View {
     func completeMessages(_ messages: [Message], prompt: String? = nil) async {
         var chatMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         do {
-            let stream = try await CatApi.completeMessageStream(messages: messages, with: prompt)
+            let stream = try await CatApi.completeMessageStream(messages: messages, with: prompt ?? conversation.prompt)
             for try await delta in stream {
                 isAIGenerating = false
                 if let role = delta.role {

@@ -53,7 +53,7 @@ struct SettingsView: View {
             List {
                 Section("API Key") {
                     TextField(text: $apiKey) {
-                        Text("input api ley")
+                        Text("Enter API key")
                     }
                     HStack(spacing: 8) {
                         Button("Validate and save") {
@@ -112,20 +112,40 @@ struct SettingsView: View {
                         }
                     }
                 }
-//                Section("support") {
-//                    Button(action: {}) {
-//                        Label("Share AICat", systemImage: "square.and.arrow.up")
-//                            .labelStyle(.titleAndIcon)
-//                    }.tint(.black)
-//                    Button(action: {}) {
-//                        Label("Contact Us", systemImage: "envelope")
-//                            .labelStyle(.titleAndIcon)
-//                    }.tint(.black)
-//                    Button(action: {}) {
-//                        Label("Privacy and Policy", systemImage: "person.badge.shield.checkmark")
-//                            .labelStyle(.titleAndIcon)
-//                    }.tint(.black)
-//                }
+                Section("support") {
+                    Link(destination: URL(string: "https://github.com/Panl/AICat.git")!){
+                        Label("Source Code", systemImage: "network")
+                            .labelStyle(.titleAndIcon)
+                    }.tint(.black)
+                    Button(action: {
+                        UIApplication.shared.open(URL(string: "mailto:iplay.coder@gmail.com")!)
+                    }) {
+                        Label("Contact Us", systemImage: "envelope")
+                            .labelStyle(.titleAndIcon)
+                    }.tint(.black)
+                    Link(destination: URL(string: "https://epochpro.app/aicat_privacy")!) {
+                        Label("Privacy and Policy", systemImage: "person.badge.shield.checkmark")
+                            .labelStyle(.titleAndIcon)
+                    }.tint(.black)
+                }
+                Section("More App") {
+                    Link(destination: URL(string: "https://apps.apple.com/app/epoch-music-toolkit/id1459345397")!) {
+                        HStack(spacing: 12) {
+                            Image("icon_epoch")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 56, height: 56)
+                                .cornerRadius(8)
+                            VStack(alignment: .leading) {
+                                Text("Epoch - Guitar Tuner")
+                                Text("Guitar, Bass, Ukulele tuner, Metronome, Practice Tracker")
+                                    .font(.manrope(size: 12, weight: .regular))
+                                    .foregroundColor(.gray)
+                            }
+                        }.padding(.vertical, 6)
+                    }.tint(.black)
+
+                }
             }
             .font(.manrope(size: 16, weight: .medium))
         }

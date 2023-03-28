@@ -51,7 +51,7 @@ enum CatApi {
         ]
         let temperature = UserDefaults.temperature
         var messageToSend = messages
-        if let prompt {
+        if let prompt, !prompt.isEmpty {
             let system = Message(role: "system", content: prompt)
             messageToSend = [system] + messages
         }
@@ -64,6 +64,9 @@ enum CatApi {
         )
         request.httpBody = try JSONEncoder().encode(body)
         request.timeoutInterval = 60
+        print("=====request=====")
+        print(body)
+        print("======")
         let (result, response) = try await URLSession.shared.bytes(for: request)
         guard let httpResponse = response as? HTTPURLResponse else { throw NSError(domain: "Invalid response", code: 0) }
         guard 200...299 ~= httpResponse.statusCode else {
@@ -144,7 +147,7 @@ enum CatApi {
     }
 
     static func decode(data: Data) -> StreamResponse? {
-        var str = String(decoding: data, as: UTF8.self)
+        let str = String(decoding: data, as: UTF8.self)
         print("--dataStr: \(str)")
         if str.hasPrefix("data: ") {
             let decoder = JSONDecoder()

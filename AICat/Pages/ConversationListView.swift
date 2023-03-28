@@ -27,7 +27,7 @@ struct ConversationListView: View {
             Spacer().frame(height: 32)
             HStack {
                 Text("Chats")
-                    .font(.manrope(size: 18, weight: .medium))
+                    .font(.manrope(size: 18, weight: .semibold))
                     .foregroundColor(.black.opacity(0.4))
                 Spacer()
             }.padding(.leading, 20)
@@ -42,7 +42,8 @@ struct ConversationListView: View {
                                     .frame(width: 20)
                                 Text(conversation.title)
                                     .lineLimit(1)
-                                    .font(.manrope(size: 16, weight: conversation == selectedChat ? .medium : .regular))
+                                    .font(.manrope(size: 16, weight: conversation == selectedChat ? .semibold : .medium))
+                                    .foregroundColor(conversation == selectedChat ? .black : .black.opacity(0.7))
                                 Spacer()
                                 if selectedChat?.id == conversation.id {
                                     Circle()
@@ -58,7 +59,7 @@ struct ConversationListView: View {
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
                         }
-                        .tint(conversation == selectedChat ? .black : .black.opacity(0.8))
+                        .tint(conversation == selectedChat ? .black : .black.opacity(0.7))
                         .background(.white)
                         .contextMenu {
                             if conversation != mainConversation {
@@ -137,7 +138,7 @@ struct ConversationListView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
-        .font(.manrope(size: 16, weight: .regular))
+        .font(.manrope(size: 16, weight: .medium))
     }
 
     func deleteConversation(_ conversation: Conversation) {
