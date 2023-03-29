@@ -36,6 +36,14 @@ struct ConversationView: View {
         selectedPrompt?.prompt ?? conversation.prompt
     }
 
+    var contextMessages: Int {
+        if conversation == mainConversation {
+            return contextCount
+        } else {
+            return conversation.contextMessages
+        }
+    }
+
     let onChatsClick: () -> Void
 
     @Environment(\.blackbirdDatabase) var db
@@ -72,6 +80,15 @@ struct ConversationView: View {
                     }
                     Spacer()
                     Menu {
+                        Menu {
+                            ForEach(0...10, id: \.self) { item in
+                                Button("\(item)") {
+                                    saveContextMessages(count: item)
+                                }
+                            }
+                        } label: {
+                            Label("Context Messages: \(contextMessages)", systemImage: "list.clipboard")
+                        }
                         if conversation != mainConversation {
                             Button(action: editConversation) {
                                 Label("Edit Chat", systemImage: "square.and.pencil")
@@ -334,7 +351,7 @@ struct ConversationView: View {
             if let selectedPrompt {
                 await completeMessages([newMessage], prompt: selectedPrompt.prompt)
             } else {
-                let messagesToSend = messages.suffix(contextCount).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
+                let messagesToSend = messages.suffix(contextMessages).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
                 await completeMessages(messagesToSend)
             }
         }
@@ -349,12 +366,13 @@ struct ConversationView: View {
                 isAIGenerating = true
             }
         }
-        let messagesToSend = messages.suffix(contextCount + 1).map({ Message(role: $0.role, content: $0.content) })
+        let messagesToSend = messages.suffix(contextMessages + 1).map({ Message(role: $0.role, content: $0.content) })
         Task {
             if let selectedPrompt {
                 await completeMessages(messagesToSend.suffix(1), prompt: selectedPrompt.prompt)
+            } else {
+                await completeMessages(messagesToSend)
             }
-            await completeMessages(messagesToSend)
         }
     }
 
@@ -385,6 +403,18 @@ struct ConversationView: View {
         Task {
             await db?.upsert(model: message)
             queryMessages(cid: conversation.id)
+        }
+    }
+
+    func saveContextMessages(count: Int) {
+        if conversation == mainConversation {
+            contextCount = count
+        } else {
+            Task {
+                var c = conversation
+                c.contextMessages = count
+                await db?.upsert(model: c)
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ struct Conversation: BlackbirdModel {
     @BlackbirdColumn var id: String = UUID().uuidString
     @BlackbirdColumn var title: String
     @BlackbirdColumn var prompt: String
+    @BlackbirdColumn var contextMessages: Int = 0
     @BlackbirdColumn var timeCreated: Int = Date.now.timeInSecond
     @BlackbirdColumn var timeRemoved: Int = 0
 }

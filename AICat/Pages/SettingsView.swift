@@ -19,6 +19,13 @@ struct SettingsView: View {
     @AppStorage("request.temperature") var temperature: Double = 1.0
     @AppStorage("request.context.messages") var messagesCount: Int = 0
 
+    var appVersion: String {
+        Bundle.main.releaseVersion ?? "1.0"
+    }
+
+    var buildNumber: String {
+        Bundle.main.buildNumber ?? "1"
+    }
 
     let temperatureConfig: [Double: String] = [
         0.2: "Precies",
@@ -52,7 +59,7 @@ struct SettingsView: View {
             .frame(height: 44)
             List {
                 Section("API Key") {
-                    TextField(text: $apiKey) {
+                    SecureField(text: $apiKey) {
                         Text("Enter API key")
                     }
                     HStack(spacing: 8) {
@@ -128,7 +135,15 @@ struct SettingsView: View {
                             .labelStyle(.titleAndIcon)
                     }.tint(.black)
                 }
-                Section("More App") {
+                Section(
+                    header: Text("More App"),
+                    footer: HStack {
+                        Spacer()
+                        Text("AICat \(appVersion)(\(buildNumber))")
+                            .font(.manrope(size: 12, weight: .regular))
+                            .padding(12)
+                        Spacer()
+                    }) {
                     Link(destination: URL(string: "https://apps.apple.com/app/epoch-music-toolkit/id1459345397")!) {
                         HStack(spacing: 12) {
                             Image("icon_epoch")
@@ -146,6 +161,8 @@ struct SettingsView: View {
                     }.tint(.black)
 
                 }
+
+
             }
             .font(.manrope(size: 16, weight: .medium))
         }
