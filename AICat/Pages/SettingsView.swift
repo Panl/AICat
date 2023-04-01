@@ -40,12 +40,13 @@ struct SettingsView: View {
             HStack {
                 Button(action: onClose) {
                     Image(systemName: "xmark")
-                        .tint(.black)
+                        .tint(.primary)
                         .frame(width: 24, height: 24)
                 }
                 Spacer()
                 VStack(spacing: 0) {
                     Text("Settings")
+                        .foregroundColor(.blackText)
                         .font(.manrope(size: 18, weight: .bold))
                         .lineLimit(1)
                 }
@@ -123,17 +124,17 @@ struct SettingsView: View {
                     Link(destination: URL(string: "https://github.com/Panl/AICat.git")!){
                         Label("Source Code", systemImage: "network")
                             .labelStyle(.titleAndIcon)
-                    }.tint(.black)
+                    }.tint(.primary)
                     Button(action: {
                         UIApplication.shared.open(URL(string: "mailto:iplay.coder@gmail.com")!)
                     }) {
                         Label("Contact Us", systemImage: "envelope")
                             .labelStyle(.titleAndIcon)
-                    }.tint(.black)
+                    }.tint(.primary)
                     Link(destination: URL(string: "https://epochpro.app/aicat_privacy")!) {
                         Label("Privacy and Policy", systemImage: "person.badge.shield.checkmark")
                             .labelStyle(.titleAndIcon)
-                    }.tint(.black)
+                    }.tint(.primary)
                 }
                 Section(
                     header: Text("More App"),
@@ -157,13 +158,11 @@ struct SettingsView: View {
                                     .font(.manrope(size: 12, weight: .regular))
                                     .foregroundColor(.gray)
                             }
-                        }.padding(.vertical, 6)
-                    }.tint(.black)
-
+                        }.padding(.vertical, 4)
+                    }.tint(.primary)
                 }
-
-
             }
+            .background(Color.background)
             .font(.manrope(size: 16, weight: .medium))
         }
     }

@@ -60,7 +60,7 @@ struct ConversationView: View {
                         onChatsClick()
                     }) {
                         Image(systemName: "bubble.left.and.bubble.right")
-                            .tint(.black)
+                            .tint(.primary)
                             .frame(width: 24, height: 24)
                     }
                     Spacer()
@@ -107,7 +107,7 @@ struct ConversationView: View {
                             showClearMesssageAlert = false
                         }
                     }
-                    .tint(.black)
+                    .tint(.primary)
                 }
                 .padding(.horizontal, 20)
                 .frame(height: 44)
@@ -169,11 +169,11 @@ struct ConversationView: View {
                                             .lineLimit(1)
                                         Spacer()
                                     }
-                                    .background(.white)
+                                    .background(Color.background)
                                 }
                                 .font(.manrope(size: 14, weight: .medium))
                                 .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                .tint(.gray)
+                                .tint(.blackText.opacity(0.5))
                                 if prompt != filterdPrompts.last {
                                     Divider().foregroundColor(.gray)
                                 }
@@ -190,9 +190,9 @@ struct ConversationView: View {
 
                     }
                     .frame(maxHeight: min(commnadCardHeight, 180))
-                    .background(Color.white)
+                    .background(Color.background)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(color: Color.black.opacity(0.1), radius: 12)
+                    .shadow(color: .primary.opacity(0.1), radius: 12)
                     .padding(.horizontal, 20)
                 }
                 if let selectedPrompt {
@@ -202,17 +202,17 @@ struct ConversationView: View {
                             Text(selectedPrompt.title)
                                 .lineLimit(1)
                                 .font(.manrope(size: 14, weight: .semibold))
-                                .foregroundColor(.black.opacity(0.7))
+                                .foregroundColor(.blackText.opacity(0.7))
                             Button(action: {
                                 self.selectedPrompt = nil
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                            }.tint(.black.opacity(0.8))
+                            }.tint(.blackText.opacity(0.8))
                         }
                         .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 10))
-                        .background(Color.white)
+                        .background(Color.background)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: Color.black.opacity(0.1), radius: 12)
+                        .shadow(color: .primary.opacity(0.1), radius: 12)
                     }.padding(.horizontal, 20)
                 }
 
@@ -221,7 +221,7 @@ struct ConversationView: View {
                         Text("Say something" + (conversation == mainConversation ? " or enter '/'" : ""))
                     }
                     .focused($isFocused)
-                    .tint(Color.black.opacity(0.8))
+                    .tint(.blackText.opacity(0.8))
                     .submitLabel(.send)
                     .onChange(of: inputText) { newValue in
                         if conversation == mainConversation {
@@ -252,7 +252,7 @@ struct ConversationView: View {
                                     .frame(width: 28, height: 28)
                                     .tint(
                                         LinearGradient(
-                                            colors: [.black.opacity(0.9), .black.opacity(0.6)],
+                                            colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing)
                                     )
@@ -262,7 +262,7 @@ struct ConversationView: View {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 28, height: 28)
                                     .tint(
-                                        .black.opacity(0.8)
+                                        .primary.opacity(0.8)
                                     )
                             }
                         }
@@ -273,9 +273,9 @@ struct ConversationView: View {
                 .frame(height: 50)
                 .padding(.leading, 20)
                 .padding(.trailing, 12)
-                .background(Color.white)
+                .background(Color.background)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
-                .shadow(color: Color.black.opacity(0.1), radius: 8)
+                .shadow(color: .primary.opacity(0.1), radius: 4)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 16)
             }

@@ -28,7 +28,7 @@ struct ConversationListView: View {
             HStack {
                 Text("Chats")
                     .font(.manrope(size: 18, weight: .semibold))
-                    .foregroundColor(.black.opacity(0.4))
+                    .foregroundColor(.blackText.opacity(0.4))
                 Spacer()
             }.padding(.leading, 20)
             ScrollView(showsIndicators: false) {
@@ -43,14 +43,14 @@ struct ConversationListView: View {
                                 Text(conversation.title)
                                     .lineLimit(1)
                                     .font(.manrope(size: 16, weight: conversation == selectedChat ? .semibold : .medium))
-                                    .foregroundColor(conversation == selectedChat ? .black : .black.opacity(0.7))
+                                    .foregroundColor(conversation == selectedChat ? .blackText : .blackText.opacity(0.7))
                                 Spacer()
                                 if selectedChat?.id == conversation.id {
                                     Circle()
                                         .frame(width: 10, height: 10)
                                         .foregroundStyle(
                                             LinearGradient(
-                                                colors: [.black.opacity(0.8), .black.opacity(0.5)],
+                                                colors: [.primary.opacity(0.8), .primary.opacity(0.5)],
                                                 startPoint: .topLeading,
                                                 endPoint: .bottomTrailing)
                                         )
@@ -59,8 +59,7 @@ struct ConversationListView: View {
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
                         }
-                        .tint(conversation == selectedChat ? .black : .black.opacity(0.7))
-                        .background(.white)
+                        .tint(conversation == selectedChat ? .primary : .primary.opacity(0.7))
                         .contextMenu {
                             if conversation != mainConversation {
                                 Button(role: .destructive, action: { deleteConversation(conversation) }) {
@@ -82,10 +81,9 @@ struct ConversationListView: View {
                         }
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
-                        .background(.white)
                     }
                     .padding(.horizontal, 8)
-                    .tint(.gray)
+                    .tint(.blackText.opacity(0.5))
                 }
             }
             Spacer(minLength: 20)
@@ -98,7 +96,7 @@ struct ConversationListView: View {
                 }
                 .padding(.vertical, 10)
             }
-            .tint(.gray)
+            .tint(.blackText.opacity(0.5))
             .padding(.horizontal, 20)
             .alert("Are you sure to clean all chats", isPresented: $showClearAllChatAlert) {
                 Button("Sure", role: .destructive) {
@@ -118,7 +116,7 @@ struct ConversationListView: View {
                 .padding(.vertical, 10)
             }
             .padding(.horizontal, 20)
-            .tint(.gray)
+            .tint(.blackText.opacity(0.5))
             Button(action: { showSettingsView = true }) {
                 HStack {
                     Image(systemName: "gearshape")
@@ -129,7 +127,7 @@ struct ConversationListView: View {
                 .padding(.vertical, 10)
             }
             .padding(.horizontal, 20)
-            .tint(.gray)
+            .tint(.blackText.opacity(0.5))
             Spacer().frame(height: 32)
         }
         .fullScreenCover(isPresented: $showSettingsView) {

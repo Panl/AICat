@@ -31,11 +31,11 @@ struct AddConversationView: View {
             TextField(text: $title) {
                 Text("Chat Name")
             }
-            .tint(.black.opacity(0.8))
+            .tint(.primary.opacity(0.8))
             .font(.manrope(size: 16, weight: .regular))
             .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
             .frame(height: 50)
-            .foregroundColor(.black.opacity(0.8))
+            .foregroundColor(.blackText.opacity(0.8))
             .background {
                 RoundedRectangle(cornerRadius: 16)
                     .foregroundColor(.gray.opacity(0.1))
@@ -52,7 +52,7 @@ struct AddConversationView: View {
                 if #available(iOS 16.0, *) {
                     TextEditor(text: $prompt)
                         .scrollContentBackground(.hidden)
-                        .tint(.black.opacity(0.8))
+                        .tint(.primary.opacity(0.8))
                         .padding(.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                         .frame(height: 200)
                         .background {
@@ -61,7 +61,7 @@ struct AddConversationView: View {
                         }
                 } else {
                     TextEditor(text: $prompt)
-                        .tint(.black.opacity(0.8))
+                        .tint(.primary.opacity(0.8))
                         .padding(.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                         .frame(height: 200)
                         .background {
@@ -73,7 +73,7 @@ struct AddConversationView: View {
                 }
             }
             .font(.manrope(size: 16, weight: .regular))
-            .foregroundColor(.black.opacity(0.8))
+            .foregroundColor(.blackText.opacity(0.8))
 
             Spacer()
                 .frame(height: 36)

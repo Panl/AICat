@@ -27,13 +27,13 @@ struct MineMessageView: View {
                     } else {
                         Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                             .font(.manrope(size: 16, weight: .regular))
-                            .foregroundColor(.white)
+                            .foregroundColor(.whiteText)
                     }
                 }
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                 .background(
                     LinearGradient(
-                        colors: [.black.opacity(0.8), .black.opacity(0.5)],
+                        colors: [.primary.opacity(0.8), .primary.opacity(0.5)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing)
                 )
@@ -61,10 +61,11 @@ struct AICatMessageView: View {
                 } else {
                     Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                         .font(.manrope(size: 16, weight: .regular))
+                        .foregroundColor(.blackText)
                 }
             }
             .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-            .background(Color(red: 0.97, green: 0.97, blue: 0.98))
+            .background(Color.aiBubbleBg)
             .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
             .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
             .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
@@ -125,7 +126,7 @@ struct ErrorMessageView: View {
                             .frame(width: 28, height: 28)
                             .tint(
                                 LinearGradient(
-                                    colors: [.black.opacity(0.9), .black.opacity(0.6)],
+                                    colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
@@ -134,7 +135,7 @@ struct ErrorMessageView: View {
                         Image(systemName: "arrow.clockwise.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
-                            .tint(.black.opacity(0.8))
+                            .tint(.primary.opacity(0.8))
                     }
                 }
                 Button(
@@ -146,7 +147,7 @@ struct ErrorMessageView: View {
                             .frame(width: 28, height: 28)
                             .tint(
                                 LinearGradient(
-                                    colors: [.black.opacity(0.9), .black.opacity(0.6)],
+                                    colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
@@ -155,7 +156,7 @@ struct ErrorMessageView: View {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
-                            .tint(.black.opacity(0.8))
+                            .tint(.primary.opacity(0.8))
                     }
                 }
             }.padding(.horizontal, 20)
@@ -171,24 +172,24 @@ struct InputingMessageView: View {
     var body: some View {
         HStack(spacing: 4) {
             Circle()
-                .fill(Color.black.opacity(0.8))
+                .fill(Color.primary.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever(), value: shouldAnimate)
             Circle()
-                .fill(Color.black.opacity(0.8))
+                .fill(Color.primary.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.3), value: shouldAnimate)
             Circle()
-                .fill(Color.black.opacity(0.8))
+                .fill(Color.primary.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.6), value: shouldAnimate)
         }
         .padding(EdgeInsets.init(top: 10, leading: 20, bottom: 10, trailing: 20))
         .frame(height: 40)
-        .background(Color(red: 0.96, green: 0.96, blue: 0.98))
+        .background(Color.aiBubbleBg)
         .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
         .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
         .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))

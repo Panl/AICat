@@ -14,6 +14,7 @@ struct AICatApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
+                .background(Color.background.ignoresSafeArea())
         }
     }
 }
