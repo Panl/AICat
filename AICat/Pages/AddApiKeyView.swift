@@ -14,6 +14,7 @@ struct AddApiKeyView: View {
     @State var error: AFError?
 
     let onValidateSuccess: () -> Void
+    let onSkip: () -> Void
 
     var body: some View {
         ZStack {
@@ -32,7 +33,7 @@ struct AddApiKeyView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .foregroundColor(.gray.opacity(0.1))
                 }
-                Text(LocalizedStringKey("[What's OpenAI API key?](https://platform.openai.com/account/api-keys)"))
+                Text(LocalizedStringKey("[Where to get OpenAI API key?](https://platform.openai.com/account/api-keys)"))
                 Spacer()
                     .frame(height: 60)
                 Button(action: validateApiKey) {
@@ -56,6 +57,10 @@ struct AddApiKeyView: View {
                 }
                 .font(.manrope(size: 20, weight: .medium))
                 .disabled(apiKey.isEmpty)
+
+                Button(action: onSkip) {
+                    Text("Skip")
+                }
 
                 if let error {
                     Text(error.localizedDescription)
@@ -90,6 +95,6 @@ struct AddApiKeyView: View {
 
 struct AddApiKeyView_Previews: PreviewProvider {
     static var previews: some View {
-        AddApiKeyView(onValidateSuccess: {})
+        AddApiKeyView(onValidateSuccess: {}, onSkip: {})
     }
 }

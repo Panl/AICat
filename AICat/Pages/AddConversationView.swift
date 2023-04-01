@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct AddConversationView: View {
-    @Environment(\.blackbirdDatabase) var db
 
     let conversation: Conversation?
     let onSave: (Conversation) -> Void
     @State var title: String
     @State var prompt: String
+    @EnvironmentObject var appStateVM: AICatStateViewModel
 
     init(conversation: Conversation? = nil, onSave: @escaping (Conversation) -> Void) {
         self.conversation = conversation
@@ -100,11 +100,11 @@ struct AddConversationView: View {
         if var conversation {
             conversation.title = title
             conversation.prompt = prompt
-            await db?.upsert(model: conversation)
+            await appStateVM.saveConversation(conversation)
             onSave(conversation)
         } else {
             let conversation = Conversation(title: title, prompt: prompt)
-            await db?.upsert(model: conversation)
+            await appStateVM.saveConversation(conversation)
             onSave(conversation)
         }
 

@@ -43,8 +43,7 @@ struct StreamResponse: Codable {
 enum CatApi {
 
     static func completeMessageStream(apiKey: String? = nil, messages: [Message], with prompt: String? = nil) async throws -> AsyncThrowingStream<StreamResponse.Delta, Error> {
-        let key = apiKey ?? UserDefaults.openApiKey
-        guard let key else { throw NSError(domain: "missing OpenAI API key", code: -1) }
+        let key = apiKey ?? UserDefaults.openApiKey ?? defaultAPIKey
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer \(key)"
@@ -148,7 +147,6 @@ enum CatApi {
 
     static func decode(data: Data) -> StreamResponse? {
         let str = String(decoding: data, as: UTF8.self)
-        print("--dataStr: \(str)")
         if str.hasPrefix("data: ") {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase

@@ -10,8 +10,9 @@ import Blackbird
 import Alamofire
 
 struct ConversationView: View {
+    @EnvironmentObject var appStateVM: AICatStateViewModel
+
     @State var inputText: String = ""
-    @State var messages: [ChatMessage] = []
     let conversation: Conversation
     @State var isSending = false
     @State var error: AFError?
@@ -23,11 +24,10 @@ struct ConversationView: View {
     @State var commnadCardHeight: CGFloat = 0
     @FocusState var isFocused: Bool
 
-    @BlackbirdLiveModels({ try await Conversation.read(from: $0, matching: \.$timeRemoved == 0, orderBy: .descending(\.$timeCreated)) }) var conversations
 
     var filterdPrompts: [Conversation] {
         let query = inputText.lowercased().trimmingCharacters(in: ["/"])
-        return conversations.results.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
+        return appStateVM.conversations.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
     }
 
     @State var selectedPrompt: Conversation?
@@ -46,12 +46,9 @@ struct ConversationView: View {
 
     let onChatsClick: () -> Void
 
-    @Environment(\.blackbirdDatabase) var db
-
-    init(messages: [ChatMessage] = [], conversation: Conversation, onChatsClick: @escaping () -> Void) {
+    init(conversation: Conversation, onChatsClick: @escaping () -> Void) {
         self.conversation = conversation
         self.onChatsClick = onChatsClick
-        self.messages = messages
     }
 
     var body: some View {
@@ -120,7 +117,7 @@ struct ConversationView: View {
                         LazyVStack(alignment: .leading, spacing: 16) {
                             Spacer().frame(height: 4)
                                 .id("Top")
-                            ForEach(messages, id: \.id) { message in
+                            ForEach(appStateVM.messages, id: \.id) { message in
                                 MessageView(message: message)
                                     .id(message.id)
                                     .contextMenu {
@@ -149,7 +146,7 @@ struct ConversationView: View {
                     .gesture(DragGesture().onChanged { _ in
                         self.endEditing(force: true)
                     })
-                    .onChange(of: messages) { newMessages in
+                    .onChange(of: appStateVM.messages) { newMessages in
                         proxy.scrollTo("Bottom")
                     }
                     .onChange(of: isAIGenerating) { _ in
@@ -282,13 +279,15 @@ struct ConversationView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 16)
             }
-        }.onAppear {
-            queryMessages(cid: conversation.id)
+        }.task {
+            await appStateVM.queryMessages(cid: conversation.id)
         }.onChange(of: conversation) { newValue in
             selectedPrompt = nil
             inputText = ""
             error = nil
-            queryMessages(cid: newValue.id)
+            Task {
+                await appStateVM.queryMessages(cid: newValue.id)
+            }
         }.sheet(isPresented: $showAddConversation) {
             AddConversationView(conversation: conversation) { _ in
                 showAddConversation = false
@@ -308,11 +307,11 @@ struct ConversationView: View {
     func cleanMessages() {
         let timeRemoved = Date.now.timeInSecond
         Task {
-            for var message in messages {
+            for var message in appStateVM.messages {
                 message.timeRemoved = timeRemoved
-                await db?.upsert(model: message)
+                await appStateVM.saveMessage(message)
             }
-            queryMessages(cid: conversation.id)
+            await appStateVM.queryMessages(cid: conversation.id)
         }
     }
 
@@ -320,15 +319,8 @@ struct ConversationView: View {
         Task {
             var messageToRemove = message
             messageToRemove.timeRemoved = Date.now.timeInSecond
-            await db?.upsert(model: messageToRemove)
-            queryMessages(cid: conversation.id)
-        }
-    }
-
-    func queryMessages(cid: String) {
-        Task {
-            guard let db else { return }
-            messages = (try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated)))
+            await appStateVM.saveMessage(messageToRemove)
+            await appStateVM.queryMessages(cid: conversation.id)
         }
     }
 
@@ -346,12 +338,12 @@ struct ConversationView: View {
         let newMessage = Message(role: "user", content: sendText)
         Task {
             let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id)
-            await db?.upsert(model: chatMessage)
-            queryMessages(cid: conversation.id)
+            await appStateVM.saveMessage(chatMessage)
+            await appStateVM.queryMessages(cid: conversation.id)
             if let selectedPrompt {
                 await completeMessages([newMessage], prompt: selectedPrompt.prompt)
             } else {
-                let messagesToSend = messages.suffix(contextMessages).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
+                let messagesToSend = appStateVM.messages.suffix(contextMessages).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
                 await completeMessages(messagesToSend)
             }
         }
@@ -366,7 +358,7 @@ struct ConversationView: View {
                 isAIGenerating = true
             }
         }
-        let messagesToSend = messages.suffix(contextMessages + 1).map({ Message(role: $0.role, content: $0.content) })
+        let messagesToSend = appStateVM.messages.suffix(contextMessages + 1).map({ Message(role: $0.role, content: $0.content) })
         Task {
             if let selectedPrompt {
                 await completeMessages(messagesToSend.suffix(1), prompt: selectedPrompt.prompt)
@@ -388,7 +380,7 @@ struct ConversationView: View {
                 if let content = delta.content {
                     chatMessage.content += content
                 }
-                saveMessage(message: chatMessage)
+                await appStateVM.saveMessage(chatMessage)
             }
             isSending = false
         } catch {
@@ -399,13 +391,6 @@ struct ConversationView: View {
         }
     }
 
-    func saveMessage(message: ChatMessage) {
-        Task {
-            await db?.upsert(model: message)
-            queryMessages(cid: conversation.id)
-        }
-    }
-
     func saveContextMessages(count: Int) {
         if conversation == mainConversation {
             contextCount = count
@@ -413,7 +398,7 @@ struct ConversationView: View {
             Task {
                 var c = conversation
                 c.contextMessages = count
-                await db?.upsert(model: c)
+                await appStateVM.saveConversation(c)
             }
         }
     }
@@ -422,13 +407,8 @@ struct ConversationView: View {
 struct ConversationView_Previews: PreviewProvider {
     static var previews: some View {
         ConversationView(
-            messages: [
-                ChatMessage(role: "user", content: "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello", conversationId: ""),
-                ChatMessage(role: "other", content: "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello", conversationId: "")
-            ],
             conversation: Conversation(title: "Mini Chat", prompt: "hello hello hello hello hello hello hello hello hello hello "),
             onChatsClick: { }
-
         )
     }
 }

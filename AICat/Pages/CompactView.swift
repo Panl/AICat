@@ -8,21 +8,15 @@
 import SwiftUI
 import Blackbird
 
-struct ContentView: View {
+struct CompactView: View {
 
-    @BlackbirdLiveModels({ try await Conversation.read(from: $0, matching: \.$timeRemoved == 0, orderBy: .descending(\.$timeCreated)) }) var conversations
+    @EnvironmentObject var appStateVM: AICatStateViewModel
 
     @State var translationX: CGFloat = 0
     @State var showAddConversationSheet = false
-    @State var conversation: Conversation = mainConversation
     @AppStorage("currentChat.id") var chatId: String?
-
     @State var lastTranslationX: CGFloat = 0
     @GestureState var dragOffset: CGSize = .zero
-
-    var allConversations: [Conversation] {
-        [mainConversation] + conversations.results
-    }
 
     var progress: CGFloat {
         translationX / 300
@@ -33,13 +27,13 @@ struct ContentView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             ConversationListView(
-                selectedChat: conversation,
-                conversations: allConversations,
+                selectedChat: appStateVM.currentConversation,
+                conversations: appStateVM.allConversations,
                 onAddChat: {
                     showAddConversationSheet = true
                 },
                 onChatChanged: { chat in
-                    conversation = chat
+                    appStateVM.setCurrentConversation(chat)
                     chatId = chat.id
                     withAnimation(.easeInOut(duration: openDrawerDuration)) {
                         translationX = 0
@@ -49,7 +43,7 @@ struct ContentView: View {
             ).frame(width: 300)
 
             ConversationView(
-                conversation: conversation,
+                conversation: appStateVM.currentConversation,
                 onChatsClick: {
                     withAnimation(.easeInOut(duration: openDrawerDuration)) {
                         if lastTranslationX == 300 {
@@ -77,15 +71,10 @@ struct ContentView: View {
                 DragGesture()
                     /// .updateing with GesturesState automatically sets the offset to isInitial position
                     .updating($dragOffset) { value, state, transaction in
-                        guard (value.translation.width > 0 && value.startLocation.x < 80)
-                                || (value.translation.width < 0 && value.startLocation.x > getScreenSize().width - 300) else { return }
                         state = value.translation
                     }
                     /// .onEnded will not called when gesture cancelled by the scrollview
                     .onEnded { value in
-                        print("gesture end")
-                        guard (value.translation.width > 0 && value.startLocation.x < 80)
-                                || (value.translation.width < 0 && value.startLocation.x > getScreenSize().width - 300) else { return }
                         let velocityX = value.predictedEndLocation.x - value.location.x
                         if velocityX > 50 {
                             withAnimation(.linear(duration: (1 - progress) * openDrawerDuration)) {
@@ -120,7 +109,7 @@ struct ContentView: View {
         ) {
             AddConversationView(
                 onSave: { conversation in
-                    self.conversation = conversation
+                    appStateVM.setCurrentConversation(conversation)
                     showAddConversationSheet = false
                     chatId = conversation.id
                     withAnimation(.easeInOut(duration: openDrawerDuration)) {
@@ -129,14 +118,15 @@ struct ContentView: View {
                     }
                 }
             )
-        }.onChange(of: conversations) { newValue in
-            conversation = newValue.results.first(where: { $0.id == chatId }) ?? mainConversation
+        }.onChange(of: appStateVM.conversations) { newValue in
+            let conversation = newValue.first(where: { $0.id == chatId }) ?? mainConversation
+            appStateVM.setCurrentConversation(conversation)
         }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        CompactView()
     }
 }
