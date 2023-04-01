@@ -146,11 +146,23 @@ struct ConversationView: View {
                     .gesture(DragGesture().onChanged { _ in
                         self.endEditing(force: true)
                     })
-                    .onChange(of: appStateVM.messages) { newMessages in
-                        proxy.scrollTo("Bottom")
+                    .onChange(of: appStateVM.messages) { _ in
+                        withAnimation {
+                            proxy.scrollTo("Bottom")
+                        }
                     }
                     .onChange(of: isAIGenerating) { _ in
-                        proxy.scrollTo("Bottom")
+                        withAnimation {
+                            proxy.scrollTo("Bottom")
+                        }
+                    }
+                    .onChange(of: isFocused) { _ in
+                        Task {
+                            try await Task.sleep(nanoseconds: 300_000_000)
+                            withAnimation {
+                                proxy.scrollTo("Bottom")
+                            }
+                        }
                     }
                 }
             }
@@ -285,6 +297,7 @@ struct ConversationView: View {
             selectedPrompt = nil
             inputText = ""
             error = nil
+            appStateVM.resetMessages()
             Task {
                 await appStateVM.queryMessages(cid: newValue.id)
             }
@@ -327,12 +340,6 @@ struct ConversationView: View {
     func completeMessage() {
         guard !inputText.isEmpty, !isSending else { return }
         isSending = true
-        Task {
-            try await Task.sleep(nanoseconds: 500_000_000)
-            if isSending {
-                isAIGenerating = true
-            }
-        }
         let sendText = inputText
         inputText = ""
         let newMessage = Message(role: "user", content: sendText)
@@ -340,6 +347,10 @@ struct ConversationView: View {
             let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id)
             await appStateVM.saveMessage(chatMessage)
             await appStateVM.queryMessages(cid: conversation.id)
+            try await Task.sleep(nanoseconds: 200_000_000)
+            if isSending {
+                isAIGenerating = true
+            }
             if let selectedPrompt {
                 await completeMessages([newMessage], prompt: selectedPrompt.prompt)
             } else {
@@ -352,14 +363,12 @@ struct ConversationView: View {
     func retryComplete() {
         error = nil
         isSending = true
+        let messagesToSend = appStateVM.messages.suffix(contextMessages + 1).map({ Message(role: $0.role, content: $0.content) })
         Task {
-            try await Task.sleep(nanoseconds: 500_000_000)
+            try await Task.sleep(nanoseconds: 200_000_000)
             if isSending {
                 isAIGenerating = true
             }
-        }
-        let messagesToSend = appStateVM.messages.suffix(contextMessages + 1).map({ Message(role: $0.role, content: $0.content) })
-        Task {
             if let selectedPrompt {
                 await completeMessages(messagesToSend.suffix(1), prompt: selectedPrompt.prompt)
             } else {
@@ -373,7 +382,6 @@ struct ConversationView: View {
         do {
             let stream = try await CatApi.completeMessageStream(messages: messages, with: prompt ?? conversation.prompt)
             for try await delta in stream {
-                isAIGenerating = false
                 if let role = delta.role {
                     chatMessage.role = role
                 }
@@ -381,6 +389,7 @@ struct ConversationView: View {
                     chatMessage.content += content
                 }
                 await appStateVM.saveMessage(chatMessage)
+                isAIGenerating = false
             }
             isSending = false
         } catch {

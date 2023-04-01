@@ -45,4 +45,8 @@ let dbPath = "\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDom
     func setCurrentConversation(_ conversation: Conversation) {
         self.currentConversation = conversation
     }
+
+    func resetMessages() {
+        messages = []
+    }
 }
