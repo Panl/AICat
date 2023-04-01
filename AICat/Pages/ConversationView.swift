@@ -298,6 +298,7 @@ struct ConversationView: View {
             inputText = ""
             error = nil
             appStateVM.resetMessages()
+            showCommands = false
             Task {
                 await appStateVM.queryMessages(cid: newValue.id)
             }

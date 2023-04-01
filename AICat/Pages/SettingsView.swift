@@ -27,12 +27,6 @@ struct SettingsView: View {
         Bundle.main.buildNumber ?? "1"
     }
 
-    let temperatureConfig: [Double: String] = [
-        0.2: "Precies",
-        1.0: "Balanced",
-        1.8: "Creative"
-    ]
-
     let onClose: () -> Void
 
     var body: some View {
@@ -88,20 +82,11 @@ struct SettingsView: View {
                         Menu("gpt-3.5-turbo") {}
                     }
                     HStack {
-                        Text("Temperature")
+                        Text("Temperature: \(String(format: "%.1f", temperature))")
                         Spacer()
-                        Menu {
-                            ForEach(temperatureConfig.keys.sorted(), id: \.self) { t in
-                                Button(temperatureConfig[t] ?? "Balanced") {
-                                    temperature = t
-                                }
-                            }
-                        } label: {
-                            HStack {
-                                Text(temperatureConfig[temperature] ?? "None")
-                                Image(systemName: "chevron.up.chevron.down")
-                            }
-                        }
+                        Slider(value: $temperature, in: 0...1.0) {
+                            Text("\(temperature)")
+                        }.frame(width: 140)
                     }
                     HStack {
                         Text("Context Messages")
@@ -121,18 +106,26 @@ struct SettingsView: View {
                     }
                 }
                 Section("support") {
+                    Link(destination: URL(string: "https://learnprompting.org/")!) {
+                        Label("Learn Prompting", systemImage: "book")
+                            .labelStyle(.titleAndIcon)
+                    }.tint(.primary)
+                    Link(destination: URL(string: "https://github.com/f/awesome-chatgpt-prompts")!) {
+                        Label("Awesome chatgpt prompts", systemImage: "square.stack.3d.up")
+                            .labelStyle(.titleAndIcon)
+                    }.tint(.primary)
                     Link(destination: URL(string: "https://github.com/Panl/AICat.git")!){
-                        Label("Source Code", systemImage: "network")
+                        Label("Source Code", systemImage: "ellipsis.curlybraces")
                             .labelStyle(.titleAndIcon)
                     }.tint(.primary)
                     Button(action: {
                         UIApplication.shared.open(URL(string: "mailto:iplay.coder@gmail.com")!)
                     }) {
-                        Label("Contact Us", systemImage: "envelope")
+                        Label("Contact Us", systemImage: "envelope.open")
                             .labelStyle(.titleAndIcon)
                     }.tint(.primary)
                     Link(destination: URL(string: "https://epochpro.app/aicat_privacy")!) {
-                        Label("Privacy and Policy", systemImage: "person.badge.shield.checkmark")
+                        Label("Privacy and Policy", systemImage: "checkmark.shield")
                             .labelStyle(.titleAndIcon)
                     }.tint(.primary)
                 }
@@ -150,11 +143,12 @@ struct SettingsView: View {
                             Image("icon_epoch")
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
-                                .frame(width: 56, height: 56)
+                                .frame(width: 48, height: 48)
                                 .cornerRadius(8)
                             VStack(alignment: .leading) {
                                 Text("Epoch - Guitar Tuner")
-                                Text("Guitar, Bass, Ukulele tuner, Metronome, Practice Tracker")
+                                    .font(.manrope(size: 14, weight: .medium))
+                                Text("Guitar, Bass, Ukulele tuner, Metronome\n Practice Tracker")
                                     .font(.manrope(size: 12, weight: .regular))
                                     .foregroundColor(.gray)
                             }
