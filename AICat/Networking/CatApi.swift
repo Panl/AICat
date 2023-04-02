@@ -49,6 +49,7 @@ enum CatApi {
             "Authorization": "Bearer \(key)"
         ]
         let temperature = UserDefaults.temperature
+        let model = UserDefaults.model
         var messageToSend = messages
         if let prompt, !prompt.isEmpty {
             let system = Message(role: "system", content: prompt)
@@ -56,7 +57,7 @@ enum CatApi {
         }
         var request = try URLRequest(url: "https://api.openai.com/v1/chat/completions", method: .post, headers: headers)
         let body = CompleteParams(
-            model: "gpt-3.5-turbo",
+            model: model,
             messages: messageToSend,
             temperature: temperature,
             stream: true
@@ -106,44 +107,44 @@ enum CatApi {
         return nil
     }
 
-    static func streamComplete(apiKey: String? = nil, messages: [Message], onEvent: @escaping (StreamResponse.Delta?, DataStreamRequest.Completion?) -> Void) {
-        let key = apiKey ?? UserDefaults.openApiKey
-        guard let key else { return }
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer \(key)"
-        ]
-        let temperature = UserDefaults.temperature
-        AF.streamRequest(
-            "https://api.openai.com/v1/chat/completions",
-            method: .post,
-            parameters: CompleteParams(
-                model: "gpt-3.5-turbo",
-                messages: messages,
-                temperature: temperature,
-                stream: true
-            ),
-            encoder: .json,
-            headers: headers,
-            requestModifier: { request in
-                request.timeoutInterval = 60
-            }
-        )
-        .logRequest()
-        .responseStream { stream in
-            switch stream.event {
-            case let .stream(result):
-                switch result {
-                case let .success(data):
-                    if let response = decode(data: data), let delta = response.choices.first?.delta {
-                        onEvent(delta, nil)
-                    }
-                }
-            case let .complete(completion):
-                onEvent(nil, completion)
-            }
-        }
-    }
+//    static func streamComplete(apiKey: String? = nil, messages: [Message], onEvent: @escaping (StreamResponse.Delta?, DataStreamRequest.Completion?) -> Void) {
+//        let key = apiKey ?? UserDefaults.openApiKey
+//        guard let key else { return }
+//        let headers: HTTPHeaders = [
+//            "Content-Type": "application/json",
+//            "Authorization": "Bearer \(key)"
+//        ]
+//        let temperature = UserDefaults.temperature
+//        AF.streamRequest(
+//            "https://api.openai.com/v1/chat/completions",
+//            method: .post,
+//            parameters: CompleteParams(
+//                model: "gpt-3.5-turbo",
+//                messages: messages,
+//                temperature: temperature,
+//                stream: true
+//            ),
+//            encoder: .json,
+//            headers: headers,
+//            requestModifier: { request in
+//                request.timeoutInterval = 60
+//            }
+//        )
+//        .logRequest()
+//        .responseStream { stream in
+//            switch stream.event {
+//            case let .stream(result):
+//                switch result {
+//                case let .success(data):
+//                    if let response = decode(data: data), let delta = response.choices.first?.delta {
+//                        onEvent(delta, nil)
+//                    }
+//                }
+//            case let .complete(completion):
+//                onEvent(nil, completion)
+//            }
+//        }
+//    }
 
     static func decode(data: Data) -> StreamResponse? {
         let str = String(decoding: data, as: UTF8.self)
@@ -171,11 +172,12 @@ enum CatApi {
             "Authorization": "Bearer \(key)"
         ]
         let temperature = UserDefaults.temperature
+        let model = UserDefaults.model
         return await AF.request(
             "https://api.openai.com/v1/chat/completions",
             method: .post,
             parameters: CompleteParams(
-                model: "gpt-3.5-turbo",
+                model: model,
                 messages: messages,
                 temperature: temperature,
                 stream: false

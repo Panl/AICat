@@ -26,12 +26,16 @@ extension UserDefaults {
             defaults.set(newValue, forKey: "request.temperature")
         }
         get {
-            let value = defaults.double(forKey: "request.temperature")
-            if value == 0 {
-                return 1
-            } else {
-                return value
-            }
+            defaults.double(forKey: "request.temperature")
+        }
+    }
+
+    static var model: String {
+        set {
+            defaults.set(newValue, forKey: "request.model")
+        }
+        get {
+            defaults.string(forKey: "request.model") ?? "gpt-3.5-turbo"
         }
     }
 

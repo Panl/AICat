@@ -21,6 +21,7 @@ struct ConversationView: View {
     @State var isAIGenerating = false
     @State var showCommands = false
     @AppStorage("request.context.messages") var contextCount: Int = 0
+    @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
     @State var commnadCardHeight: CGFloat = 0
     @FocusState var isFocused: Bool
 
@@ -77,6 +78,11 @@ struct ConversationView: View {
                     }
                     Spacer()
                     Menu {
+                        if conversation != mainConversation {
+                            Button(action: editConversation) {
+                                Label("Edit Chat", systemImage: "square.and.pencil")
+                            }
+                        }
                         Menu {
                             ForEach(0...10, id: \.self) { item in
                                 Button("\(item)") {
@@ -86,11 +92,13 @@ struct ConversationView: View {
                         } label: {
                             Label("Context Messages: \(contextMessages)", systemImage: "list.clipboard")
                         }
-                        if conversation != mainConversation {
-                            Button(action: editConversation) {
-                                Label("Edit Chat", systemImage: "square.and.pencil")
+                        Picker(selection: $model) {
+                            ForEach(models, id: \.self) {
+                                Text($0).lineLimit(1)
                             }
-                        }
+                        } label: {
+                            Label("Model: \(model)", systemImage: "m.square")
+                        }.pickerStyle(.menu)
                         Button(role: .destructive, action: { showClearMesssageAlert = true }) {
                             Label("Clean Messages", systemImage: "trash")
                         }

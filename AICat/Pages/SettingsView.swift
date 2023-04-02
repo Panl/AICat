@@ -9,6 +9,15 @@ import SwiftUI
 import Foundation
 import Alamofire
 
+let models = [
+    "gpt-3.5-turbo",
+    "gpt-3.5-turbo-0301",
+    "gpt-4",
+    "gpt-4-0314",
+    "gpt-4-32k",
+    "gpt-4-32k-0314"
+]
+
 struct SettingsView: View {
 
     @State var apiKey = UserDefaults.openApiKey ?? ""
@@ -18,6 +27,7 @@ struct SettingsView: View {
     @AppStorage("currentChat.id") var chatId: String?
     @AppStorage("request.temperature") var temperature: Double = 1.0
     @AppStorage("request.context.messages") var messagesCount: Int = 0
+    @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
 
     var appVersion: String {
         Bundle.main.releaseVersion ?? "1.0"
@@ -78,8 +88,11 @@ struct SettingsView: View {
                 Section("Request Settings") {
                     HStack {
                         Text("Model")
-                        Spacer()
-                        Menu("gpt-3.5-turbo") {}
+                        Picker("", selection: $model) {
+                            ForEach(models, id: \.self) {
+                                Text($0).lineLimit(1)
+                            }
+                        }.pickerStyle(.menu)
                     }
                     HStack {
                         Text("Temperature: \(String(format: "%.1f", temperature))")
@@ -88,22 +101,11 @@ struct SettingsView: View {
                             Text("\(temperature)")
                         }.frame(width: 140)
                     }
-                    HStack {
-                        Text("Context Messages")
-                        Spacer()
-                        Menu {
-                            ForEach(0...10, id: \.self) { item in
-                                Button("\(item)") {
-                                    messagesCount = item
-                                }
-                            }
-                        } label: {
-                            HStack {
-                                Text("\(messagesCount)")
-                                Image(systemName: "chevron.up.chevron.down")
-                            }
+                    Picker("Context messages", selection: $messagesCount) {
+                        ForEach(0...10, id: \.self) { item in
+                            Text("\(item)")
                         }
-                    }
+                    }.pickerStyle(.menu)
                 }
                 Section("support") {
                     Link(destination: URL(string: "https://learnprompting.org/")!) {
