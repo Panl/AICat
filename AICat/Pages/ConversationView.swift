@@ -356,10 +356,7 @@ struct ConversationView: View {
             let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id)
             await appStateVM.saveMessage(chatMessage)
             await appStateVM.queryMessages(cid: conversation.id)
-            try await Task.sleep(nanoseconds: 200_000_000)
-            if isSending {
-                isAIGenerating = true
-            }
+            isAIGenerating = true
             if let selectedPrompt {
                 await completeMessages([newMessage], prompt: selectedPrompt.prompt)
             } else {
@@ -374,10 +371,7 @@ struct ConversationView: View {
         isSending = true
         let messagesToSend = appStateVM.messages.suffix(contextMessages + 1).map({ Message(role: $0.role, content: $0.content) })
         Task {
-            try await Task.sleep(nanoseconds: 200_000_000)
-            if isSending {
-                isAIGenerating = true
-            }
+            isAIGenerating = true
             if let selectedPrompt {
                 await completeMessages(messagesToSend.suffix(1), prompt: selectedPrompt.prompt)
             } else {

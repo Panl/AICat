@@ -13,7 +13,7 @@ struct ConversationListView: View {
     let onAddChat: () -> Void
     let onChatChanged: (Conversation) -> Void
 
-    @Environment(\.blackbirdDatabase) var db
+    @EnvironmentObject var appStateVM: AICatStateViewModel
     @State var showClearAllChatAlert = false
     @State var showSettingsView = false
 
@@ -143,7 +143,7 @@ struct ConversationListView: View {
         Task {
             var c = conversation
             c.timeRemoved = Date.now.timeInSecond
-            await db?.upsert(model: c)
+            await appStateVM.saveConversation(c)
         }
     }
 
@@ -151,7 +151,7 @@ struct ConversationListView: View {
         Task {
             for var c in conversations {
                 c.timeRemoved = Date.now.timeInSecond
-                await db?.upsert(model: c)
+                await appStateVM.saveConversation(c)
             }
         }
     }
