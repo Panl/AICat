@@ -38,6 +38,8 @@
 		8EECA01629CA07830021A6A1 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EECA01529CA07830021A6A1 /* MessageView.swift */; };
 		8EF5A5DC29D80D9000981A38 /* Credential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF5A5DB29D80D9000981A38 /* Credential.swift */; };
 		8EF5A5DE29D8527000981A38 /* SplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF5A5DD29D8527000981A38 /* SplitView.swift */; };
+		8EF5A5E129D92DBF00981A38 /* AppCenterAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */; };
+		8EF5A5E329D92DBF00981A38 /* AppCenterCrashes in Frameworks */ = {isa = PBXBuildFile; productRef = 8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,8 +82,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */,
+				8EF5A5E329D92DBF00981A38 /* AppCenterCrashes in Frameworks */,
 				8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */,
 				8E64873829C6FBD90029E14F /* Alamofire in Frameworks */,
+				8EF5A5E129D92DBF00981A38 /* AppCenterAnalytics in Frameworks */,
 				8E64873F29C70FD00029E14F /* Blackbird in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,6 +255,8 @@
 				8E64873E29C70FD00029E14F /* Blackbird */,
 				8E2E5BA229CC519D00EE0072 /* MarkdownUI */,
 				8E2E5BA729CC6FF500EE0072 /* Splash */,
+				8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */,
+				8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -285,6 +291,7 @@
 				8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */,
 				8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */,
+				8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -579,6 +586,14 @@
 				kind = branch;
 			};
 		};
+		8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/microsoft/appcenter-sdk-apple.git";
+			requirement = {
+				kind = exactVersion;
+				version = 5.0.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -601,6 +616,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */;
 			productName = Blackbird;
+		};
+		8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */;
+			productName = AppCenterAnalytics;
+		};
+		8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */;
+			productName = AppCenterCrashes;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
