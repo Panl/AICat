@@ -11,9 +11,7 @@ import Alamofire
 
 struct ConversationView: View {
     @EnvironmentObject var appStateVM: AICatStateViewModel
-
     @State var inputText: String = ""
-    let conversation: Conversation
     @State var isSending = false
     @State var error: AFError?
     @State var showAddConversation = false
@@ -25,6 +23,8 @@ struct ConversationView: View {
     @State var commnadCardHeight: CGFloat = 0
     @FocusState var isFocused: Bool
 
+    let conversation: Conversation
+    let showToolbar: Bool
 
     var filterdPrompts: [Conversation] {
         let query = inputText.lowercased().trimmingCharacters(in: ["/"])
@@ -47,78 +47,82 @@ struct ConversationView: View {
 
     let onChatsClick: () -> Void
 
-    init(conversation: Conversation, onChatsClick: @escaping () -> Void) {
+    init(conversation: Conversation, showToolbar: Bool = true, onChatsClick: @escaping () -> Void) {
         self.conversation = conversation
         self.onChatsClick = onChatsClick
+        self.showToolbar = showToolbar
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
-                HStack(spacing: 18) {
-                    Button(action: {
-                        isFocused = false
-                        onChatsClick()
-                    }) {
-                        Image(systemName: "bubble.left.and.bubble.right")
-                            .tint(.primary)
-                            .frame(width: 24, height: 24)
-                    }
-                    Spacer()
-                    VStack(spacing: 0) {
-                        Text(conversation.title)
-                            .font(.manrope(size: 16, weight: .heavy))
-                            .lineLimit(1)
-                        if !promptText.isEmpty {
-                            Text(promptText)
-                                .font(.manrope(size: 12, weight: .regular))
-                                .opacity(0.4)
+                if showToolbar{
+                    HStack(spacing: 18) {
+                        Button(action: {
+                            isFocused = false
+                            onChatsClick()
+                        }) {
+                            Image(systemName: "bubble.left.and.bubble.right")
+                                .tint(.primary)
+                                .frame(width: 24, height: 24)
+                        }.buttonStyle(.borderless)
+                        Spacer()
+                        VStack(spacing: 0) {
+                            Text(conversation.title)
+                                .font(.manrope(size: 16, weight: .heavy))
                                 .lineLimit(1)
-                        }
-                    }
-                    Spacer()
-                    Menu {
-                        if conversation != mainConversation {
-                            Button(action: editConversation) {
-                                Label("Edit Chat", systemImage: "square.and.pencil")
+                            if !promptText.isEmpty {
+                                Text(promptText)
+                                    .font(.manrope(size: 12, weight: .regular))
+                                    .opacity(0.4)
+                                    .lineLimit(1)
                             }
                         }
+                        Spacer()
                         Menu {
-                            ForEach(0...10, id: \.self) { item in
-                                Button("\(item)") {
-                                    saveContextMessages(count: item)
+                            if conversation != mainConversation {
+                                Button(action: editConversation) {
+                                    Label("Edit Chat", systemImage: "square.and.pencil")
                                 }
                             }
-                        } label: {
-                            Label("Context Messages: \(contextMessages)", systemImage: "list.clipboard")
-                        }
-                        Picker(selection: $model) {
-                            ForEach(models, id: \.self) {
-                                Text($0).lineLimit(1)
+                            Menu {
+                                ForEach(0...10, id: \.self) { item in
+                                    Button("\(item)") {
+                                        saveContextMessages(count: item)
+                                    }
+                                }
+                            } label: {
+                                Label("Context Messages: \(contextMessages)", systemImage: "list.clipboard")
+                            }
+                            Picker(selection: $model) {
+                                ForEach(models, id: \.self) {
+                                    Text($0).lineLimit(1)
+                                }
+                            } label: {
+                                Label("Model: \(model)", systemImage: "m.square")
+                            }.pickerStyle(.menu)
+                            Button(role: .destructive, action: { showClearMesssageAlert = true }) {
+                                Label("Clean Messages", systemImage: "trash")
                             }
                         } label: {
-                            Label("Model: \(model)", systemImage: "m.square")
-                        }.pickerStyle(.menu)
-                        Button(role: .destructive, action: { showClearMesssageAlert = true }) {
-                            Label("Clean Messages", systemImage: "trash")
+                            Image(systemName: "ellipsis")
+                                .frame(width: 24, height: 24)
+                                .clipShape(Rectangle())
                         }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .frame(width: 24, height: 24)
-                            .clipShape(Rectangle())
+                        .alert("Are you sure to clean all messages?", isPresented: $showClearMesssageAlert) {
+                            Button("Sure", role: .destructive) {
+                                cleanMessages()
+                            }
+                            Button("Cancel", role: .cancel) {
+                                showClearMesssageAlert = false
+                            }
+                        }
+                        .tint(.primary)
                     }
-                    .alert("Are you sure to clean all messages?", isPresented: $showClearMesssageAlert) {
-                        Button("Sure", role: .destructive) {
-                            cleanMessages()
-                        }
-                        Button("Cancel", role: .cancel) {
-                            showClearMesssageAlert = false
-                        }
-                    }
-                    .tint(.primary)
+                    .menuStyle(.button)
+                    .padding(.horizontal, 20)
+                    .frame(height: 44)
                 }
-                .padding(.horizontal, 20)
-                .frame(height: 44)
                 Spacer(minLength: 0)
                 ScrollViewReader { proxy in
                     ScrollView(showsIndicators: false) {
@@ -129,7 +133,7 @@ struct ConversationView: View {
                                 MessageView(message: message)
                                     .id(message.id)
                                     .contextMenu {
-                                        Button(action: { UIPasteboard.general.string = message.content }) {
+                                        Button(action: { /*UIPasteboard.general.string = message.content*/ }) {
                                             Label("Copy", systemImage: "doc.on.doc")
                                         }
                                         Button(role: .destructive, action: { deleteMessage(message) }) {
@@ -191,6 +195,7 @@ struct ConversationView: View {
                                     }
                                     .background(Color.background)
                                 }
+                                .buttonStyle(.borderless)
                                 .font(.manrope(size: 14, weight: .medium))
                                 .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
                                 .tint(.blackText.opacity(0.5))
@@ -227,7 +232,9 @@ struct ConversationView: View {
                                 self.selectedPrompt = nil
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                            }.tint(.blackText.opacity(0.8))
+                            }
+                            .buttonStyle(.borderless)
+                            .tint(.blackText.opacity(0.8))
                         }
                         .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 10))
                         .background(Color.background)
@@ -240,6 +247,7 @@ struct ConversationView: View {
                     TextField(text: $inputText) {
                         Text("Say something" + (conversation == mainConversation ? " or enter '/'" : ""))
                     }
+                    .textFieldStyle(.plain)
                     .focused($isFocused)
                     .tint(.blackText.opacity(0.8))
                     .submitLabel(.send)
@@ -286,6 +294,7 @@ struct ConversationView: View {
                                     )
                             }
                         }
+                        .buttonStyle(.borderless)
                         .disabled(inputText.isEmpty)
                     }
 

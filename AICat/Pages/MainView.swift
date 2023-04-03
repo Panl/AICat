@@ -18,8 +18,6 @@ struct MainView: View {
     @AppStorage("openApiKey")
     var apiKey: String?
 
-    @StateObject var appStateVM = AICatStateViewModel()
-
     var body: some View {
         GeometryReader { proxy in
             if proxy.size.width > 560 {
@@ -28,10 +26,6 @@ struct MainView: View {
                 CompactView()
             }
         }
-        .task {
-            await appStateVM.queryConversations()
-        }
-        .environmentObject(appStateVM)
         .sheet(isPresented: $showAddAPIKeySheet) {
             AddApiKeyView(
                 onValidateSuccess: { showAddAPIKeySheet = false },

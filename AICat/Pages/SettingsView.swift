@@ -41,6 +41,7 @@ struct SettingsView: View {
 
     var body: some View {
         VStack {
+            #if os(iOS)
             HStack {
                 Button(action: onClose) {
                     Image(systemName: "xmark")
@@ -62,6 +63,7 @@ struct SettingsView: View {
             }
             .padding(.horizontal, 20)
             .frame(height: 44)
+            #endif
             List {
                 Section("API Key") {
                     SecureField(text: $apiKey) {
@@ -120,9 +122,7 @@ struct SettingsView: View {
                         Label("Source Code", systemImage: "ellipsis.curlybraces")
                             .labelStyle(.titleAndIcon)
                     }.tint(.primary)
-                    Button(action: {
-                        UIApplication.shared.open(URL(string: "mailto:iplay.coder@gmail.com")!)
-                    }) {
+                    Link(destination: URL(string: "mailto:iplay.coder@gmail.com")!){
                         Label("Contact Us", systemImage: "envelope.open")
                             .labelStyle(.titleAndIcon)
                     }.tint(.primary)

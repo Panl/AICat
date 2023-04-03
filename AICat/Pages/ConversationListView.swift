@@ -59,6 +59,7 @@ struct ConversationListView: View {
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
                         }
+                        .buttonStyle(.borderless)
                         .tint(conversation == selectedChat ? .primary : .primary.opacity(0.7))
                         .contextMenu {
                             if conversation != mainConversation {
@@ -82,6 +83,7 @@ struct ConversationListView: View {
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
                     }
+                    .buttonStyle(.borderless)
                     .padding(.horizontal, 8)
                     .tint(.blackText.opacity(0.5))
                 }
@@ -96,6 +98,7 @@ struct ConversationListView: View {
                 }
                 .padding(.vertical, 10)
             }
+            .buttonStyle(.borderless)
             .tint(.blackText.opacity(0.5))
             .padding(.horizontal, 20)
             .alert("Are you sure to clean all chats", isPresented: $showClearAllChatAlert) {
@@ -106,7 +109,10 @@ struct ConversationListView: View {
                     showClearAllChatAlert = false
                 }
             }
-            Link(destination: URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!) {
+            Button(action: {
+            // destination: URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!
+                
+            }) {
                 HStack {
                     Image(systemName: "questionmark.circle")
                     Text("Help")
@@ -115,6 +121,7 @@ struct ConversationListView: View {
                 }
                 .padding(.vertical, 10)
             }
+            .buttonStyle(.borderless)
             .padding(.horizontal, 20)
             .tint(.blackText.opacity(0.5))
             Button(action: { showSettingsView = true }) {
@@ -126,15 +133,16 @@ struct ConversationListView: View {
                 }
                 .padding(.vertical, 10)
             }
+            .buttonStyle(.borderless)
             .padding(.horizontal, 20)
             .tint(.blackText.opacity(0.5))
             Spacer().frame(height: 32)
         }
-        .fullScreenCover(isPresented: $showSettingsView) {
-            SettingsView {
-                showSettingsView = false
-            }
-        }
+//        .fullScreenCover(isPresented: $showSettingsView) {
+//            SettingsView {
+//                showSettingsView = false
+//            }
+//        }
         .ignoresSafeArea(.keyboard)
         .font(.manrope(size: 16, weight: .medium))
     }

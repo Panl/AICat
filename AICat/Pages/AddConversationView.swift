@@ -24,6 +24,7 @@ struct AddConversationView: View {
 
     var body: some View {
         VStack {
+            Spacer(minLength: 56)
             Text(conversation == nil ? "New Chat" : "Edit Chat")
                 .font(.manrope(size: 28, weight: .bold))
             Spacer()
@@ -31,6 +32,7 @@ struct AddConversationView: View {
             TextField(text: $title) {
                 Text("Chat Name")
             }
+            .textFieldStyle(.plain)
             .tint(.primary.opacity(0.8))
             .font(.manrope(size: 16, weight: .regular))
             .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
@@ -68,7 +70,7 @@ struct AddConversationView: View {
                             RoundedRectangle(cornerRadius: 16)
                                 .foregroundColor(.gray.opacity(0.1))
                         }.onAppear {
-                            UITextView.appearance().backgroundColor = .clear
+                            // UITextView.appearance().backgroundColor = .clear
                         }
                 }
             }
@@ -84,9 +86,10 @@ struct AddConversationView: View {
                     .cornerRadius(25)
                     .tint(.white)
             }
+            .buttonStyle(.borderless)
             .font(.manrope(size: 20, weight: .medium))
             .disabled(title.isEmpty)
-
+            Spacer(minLength: 56)
         }
         .padding(.horizontal, 20)
         .onTapGesture {
