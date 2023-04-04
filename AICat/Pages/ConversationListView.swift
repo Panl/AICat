@@ -19,7 +19,7 @@ struct ConversationListView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image(systemName: "timelapse")
+            Image("chatgpt_logo")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 56, height: 56)

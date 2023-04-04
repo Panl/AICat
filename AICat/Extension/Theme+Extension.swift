@@ -9,10 +9,17 @@ import MarkdownUI
 import SwiftUI
 
 extension Theme {
+    static var fontSize: Double {
+        #if os(macOS)
+        return 14
+        #else
+        return 16
+        #endif
+    }
     static let fancy = Theme()
         .text {
             ForegroundColor(.whiteText)
-            FontSize(16)
+            FontSize(fontSize)
         }
 }
 

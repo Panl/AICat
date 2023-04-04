@@ -51,7 +51,7 @@ struct AICatApp: App {
             SettingsView(onClose: {})
                 .environmentObject(appStateVM)
         }
-        MenuBarExtra("AICat Main", systemImage: "bubble.left.fill") {
+        MenuBarExtra("AICat Main", systemImage: "bubble.left.and.bubble.right.fill") {
             MainView()
                 .frame(width: 375, height: 720)
                 .task {

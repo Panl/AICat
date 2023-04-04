@@ -23,9 +23,11 @@ struct MineMessageView: View {
                 ZStack {
                     if isMarkdown(message.content) {
                         Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                            .textSelection(.enabled)
                             .markdownTheme(.fancy)
                     } else {
                         Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                            .textSelection(.enabled)
                             .font(.manrope(size: 16, weight: .regular))
                             .foregroundColor(.whiteText)
                     }
@@ -47,19 +49,22 @@ struct MineMessageView: View {
 
 struct AICatMessageView: View {
     let message: ChatMessage
+
     var body: some View {
         if containsCodeBlock(content: message.content) {
             Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                .textSelection(.enabled)
-               .markdownCodeSyntaxHighlighter(.splash(theme: .sundellsColors(withFont: .init(size: 16))))
-               .markdownTheme(.gitHub)
+               .markdownCodeSyntaxHighlighter(.splash(theme: .sundellsColors(withFont: .init(size: Theme.fontSize))))
+               .markdownTheme(.gitHub.text { FontSize(Theme.fontSize) })
                .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
         } else {
             ZStack {
                 if isMarkdown(message.content) {
                     Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                        .textSelection(.enabled)
                 } else {
                     Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                        .textSelection(.enabled)
                         .font(.manrope(size: 16, weight: .regular))
                         .foregroundColor(.blackText)
                 }
