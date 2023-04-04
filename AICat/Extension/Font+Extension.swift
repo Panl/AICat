@@ -13,7 +13,8 @@ extension Font {
     static func manrope(size: CGFloat, weight: Font.Weight) -> Font {
         #if os(iOS)
         return Font.custom("Manrope", size: size).weight(weight)
-        #endif
+        #else
         return .system(size: size - 2, weight: weight)
+        #endif
     }
 }

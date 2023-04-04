@@ -35,7 +35,7 @@ struct MineMessageView: View {
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                 .background(
                     LinearGradient(
-                        colors: [.primary.opacity(0.8), .primary.opacity(0.5)],
+                        colors: [.primary, .primary.opacity(0.7)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing)
                 )
@@ -62,6 +62,7 @@ struct AICatMessageView: View {
                 if isMarkdown(message.content) {
                     Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                         .textSelection(.enabled)
+                        .markdownTheme(.aiMessage)
                 } else {
                     Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                         .textSelection(.enabled)
@@ -178,7 +179,7 @@ struct ErrorMessageView: View {
                             .frame(width: 28, height: 28)
                             .tint(
                                 LinearGradient(
-                                    colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
+                                    colors: [.primary, .primary.opacity(0.7)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
@@ -187,9 +188,10 @@ struct ErrorMessageView: View {
                         Image(systemName: "arrow.clockwise.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
-                            .tint(.primary.opacity(0.8))
+                            .tint(.primary)
                     }
                 }
+                .buttonStyle(.borderless)
                 Button(
                     action: clear
                 ) {
@@ -199,7 +201,7 @@ struct ErrorMessageView: View {
                             .frame(width: 28, height: 28)
                             .tint(
                                 LinearGradient(
-                                    colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
+                                    colors: [.primary, .primary.opacity(0.7)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
@@ -208,9 +210,10 @@ struct ErrorMessageView: View {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
-                            .tint(.primary.opacity(0.8))
+                            .tint(.primary)
                     }
                 }
+                .buttonStyle(.borderless)
             }.padding(.horizontal, 20)
         }
     }

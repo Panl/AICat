@@ -267,7 +267,7 @@ struct ConversationView: View {
                     ) {
                         if isSending {
                             LoadingIndocator()
-                                .frame(width: 26, height: 26)
+                                .frame(width: 20, height: 20)
                         } else {
                             if #available(iOS 16.0, *) {
                                 Image(systemName: "paperplane.circle.fill")

@@ -26,8 +26,15 @@
 
 ### Screenshots
 
-![](Screenshots/chatlist.png) | ![](Screenshots/command.png) | ![](Screenshots/conversation.png)
+- **iOS**
+  
+![](Screenshots/AICat_Chatlist.png) | ![](Screenshots/AICat_Command.png) | ![](Screenshots/AICat_Conversation.png)
 ---|---|---
 
+- **MacOS**
+
+![](Screenshots/AICat_macOS.png) | ![](Screenshots/AICat_menubar.png)
+---|---
 ### Download
-[Testflight](https://testflight.apple.com/join/ow799Vvb)
+
+- [Testflight](https://testflight.apple.com/join/ow799Vvb)

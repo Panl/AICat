@@ -21,9 +21,11 @@ struct ConversationListView: View {
         VStack(spacing: 0) {
             Image("chatgpt_logo")
                 .resizable()
+                .renderingMode(.template)
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 56, height: 56)
                 .padding(.top, 32)
+                .foregroundColor(.primary)
             Spacer().frame(height: 32)
             HStack {
                 Text("Conversations")

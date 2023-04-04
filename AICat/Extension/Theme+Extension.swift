@@ -16,9 +16,16 @@ extension Theme {
         return 16
         #endif
     }
+
     static let fancy = Theme()
         .text {
             ForegroundColor(.whiteText)
+            FontSize(fontSize)
+        }
+
+    static let aiMessage = Theme()
+        .text {
+            ForegroundColor(.blackText)
             FontSize(fontSize)
         }
 }
