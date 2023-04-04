@@ -14,6 +14,8 @@ import AppCenterAnalytics
 
 @main
 struct AICatApp: App {
+    @StateObject var appStateVM = AICatStateViewModel()
+    
     init() {
         AppCenter.start(
             withAppSecret: appCenterSecretKey,
@@ -25,9 +27,41 @@ struct AICatApp: App {
     }
 
     var body: some Scene {
+        #if os(iOS)
         WindowGroup {
             MainView()
+                .task {
+                    await appStateVM.queryConversations()
+                }
+                .environmentObject(appStateVM)
                 .background(Color.background.ignoresSafeArea())
         }
+        #elseif os(macOS)
+        WindowGroup {
+            MainView()
+                .task {
+                    await appStateVM.queryConversations()
+                }
+                .environmentObject(appStateVM)
+                .background(Color.background.ignoresSafeArea())
+        }
+        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unified(showsTitle: false))
+        Settings {
+            SettingsView(onClose: {})
+                .environmentObject(appStateVM)
+        }
+        MenuBarExtra("AICat Main", systemImage: "timelapse") {
+            MainView()
+                .frame(width: 375, height: 720)
+                .task {
+                    await appStateVM.queryConversations()
+                }
+                .environmentObject(appStateVM)
+                .background(Color.background.ignoresSafeArea())
+        }
+        .menuBarExtraStyle(.window)
+        .keyboardShortcut("M", modifiers: .command)
+        #endif
     }
 }

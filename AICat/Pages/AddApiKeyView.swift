@@ -9,69 +9,93 @@ import SwiftUI
 import Alamofire
 
 struct AddApiKeyView: View {
-    @State var apiKey = ""
+    @State var apiKey = UserDefaults.openApiKey ?? ""
     @State var isValidating = false
     @State var error: AFError?
+    @State private var isSecured: Bool = true
 
     let onValidateSuccess: () -> Void
     let onSkip: () -> Void
 
     var body: some View {
-        ZStack {
-            VStack {
-                Text("Add OpenAI API Key")
-                    .font(.manrope(size: 28, weight: .bold))
+        VStack {
+            HStack {
                 Spacer()
-                    .frame(height: 40)
-                TextField(text: $apiKey) {
-                    Text("API key")
+                Button(action: onSkip) {
+                    Image(systemName: "xmark.circle")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 20, height: 20)
                 }
+                .buttonStyle(.borderless)
+                .tint(.primary)
+            }.padding(20)
+            Spacer(minLength: 56)
+            Text("Add OpenAI API Key")
+                .font(.manrope(size: 28, weight: .bold))
+            Spacer()
+                .frame(height: 40)
+            ZStack(alignment: .trailing) {
+                Group {
+                    if isSecured {
+                        SecureField("Enter API Key", text: $apiKey)
+                    } else {
+                        TextField("Enter API Key", text: $apiKey)
+                    }
+                }
+                .textFieldStyle(.plain)
                 .tint(.black.opacity(0.8))
                 .font(.manrope(size: 18, weight: .regular))
-                .padding(.init(top: 12, leading: 20, bottom: 12, trailing: 20))
-                .background {
-                    RoundedRectangle(cornerRadius: 16)
-                        .foregroundColor(.gray.opacity(0.1))
-                }
-                Text(LocalizedStringKey("[Where to get OpenAI API key?](https://platform.openai.com/account/api-keys)"))
-                Spacer()
-                    .frame(height: 60)
-                Button(action: validateApiKey) {
-                    if isValidating {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .frame(width: 28, height: 28)
-                            .frame(width: 260, height: 50)
-                            .background(apiKey.isEmpty ? .gray.opacity(0.1) : .black)
-                            .cornerRadius(25)
-                            .tint(.white)
+                .padding(.trailing, 32)
+                Button(action: {
+                    isSecured.toggle()
+                }) {
+                    Image(systemName: self.isSecured ? "eye.slash" : "eye")
+                        .accentColor(.gray)
+                }.buttonStyle(.borderless)
+            }
+            .frame(minWidth: 280)
+            .padding(.init(top: 12, leading: 20, bottom: 12, trailing: 20))
+            .background {
+                RoundedRectangle(cornerRadius: 16)
+                    .foregroundColor(.gray.opacity(0.1))
+            }
+            .padding(.horizontal, 40)
 
-                    } else {
-                        Text("Validate and Save")
-                            .frame(width: 260, height: 50)
-                            .background(apiKey.isEmpty ? .gray.opacity(0.1) : .black)
-                            .cornerRadius(25)
-                            .tint(.white)
-                    }
+            Text(LocalizedStringKey("[Where to get OpenAI API key?](https://platform.openai.com/account/api-keys)"))
+            Spacer()
+                .frame(height: 60)
+            Button(action: validateApiKey) {
+                if isValidating {
+                    LoadingIndocator()
+                        .frame(width: 28, height: 28)
+                        .frame(width: 260, height: 50)
+                        .background(apiKey.isEmpty ? .gray.opacity(0.1) : .black)
+                        .cornerRadius(25)
+                        .tint(.white)
 
-                }
-                .font(.manrope(size: 20, weight: .medium))
-                .disabled(apiKey.isEmpty)
-
-                Button(action: onSkip) {
-                    Text("Skip")
-                }
-
-                if let error {
-                    Text(error.localizedDescription)
-                        .foregroundColor(.red)
-                        .lineLimit(5)
+                } else {
+                    Text("Validate and Save")
+                        .frame(width: 260, height: 50)
+                        .background(apiKey.isEmpty ? .gray.opacity(0.1) : .black)
+                        .cornerRadius(25)
+                        .tint(.white)
                 }
 
             }
-            .padding(.horizontal, 20)
-            .font(.manrope(size: 16, weight: .medium))
+            .buttonStyle(.borderless)
+            .font(.manrope(size: 20, weight: .medium))
+            .disabled(apiKey.isEmpty)
+
+            if let error {
+                Text(error.localizedDescription)
+                    .foregroundColor(.red)
+                    .frame(height: 80)
+                    .padding(.top, 20)
+            }
+            Spacer(minLength: 56)
         }
+        .font(.manrope(size: 16, weight: .medium))
     }
 
     func validateApiKey() {

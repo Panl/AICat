@@ -13,12 +13,10 @@ let mainConversation = Conversation(id: "AICat.Conversation.Main", title: "AICat
 struct MainView: View {
 
     
-    @State var showAddAPIKeySheet = false
+    @EnvironmentObject var appStateVM: AICatStateViewModel
 
     @AppStorage("openApiKey")
     var apiKey: String?
-
-    @StateObject var appStateVM = AICatStateViewModel()
 
     var body: some View {
         GeometryReader { proxy in
@@ -28,20 +26,16 @@ struct MainView: View {
                 CompactView()
             }
         }
-        .task {
-            await appStateVM.queryConversations()
-        }
-        .environmentObject(appStateVM)
-        .sheet(isPresented: $showAddAPIKeySheet) {
+        .sheet(isPresented: $appStateVM.showAddAPIKeySheet) {
             AddApiKeyView(
-                onValidateSuccess: { showAddAPIKeySheet = false },
-                onSkip: { showAddAPIKeySheet = false }
+                onValidateSuccess: { appStateVM.showAddAPIKeySheet = false },
+                onSkip: { appStateVM.showAddAPIKeySheet = false }
             )
         }
         .onAppear {
-//            if apiKey == nil {
-//                showAddAPIKeySheet = true
-//            }
+            if apiKey == nil {
+                appStateVM.showAddAPIKeySheet = true
+            }
         }
     }
 }

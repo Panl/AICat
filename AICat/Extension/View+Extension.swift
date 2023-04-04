@@ -10,11 +10,9 @@ import SwiftUI
 extension View {
 
     func endEditing(force: Bool) {
-        UIApplication.shared.windows.forEach { $0.endEditing(force) }
-    }
-
-    func getScreenSize() -> CGRect {
-        UIScreen.main.bounds
+        #if os(iOS)
+        (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.forEach { $0.endEditing(true) }
+        #endif
     }
 
     @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {

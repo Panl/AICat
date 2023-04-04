@@ -23,9 +23,11 @@ struct MineMessageView: View {
                 ZStack {
                     if isMarkdown(message.content) {
                         Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                            .textSelection(.enabled)
                             .markdownTheme(.fancy)
                     } else {
                         Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                            .textSelection(.enabled)
                             .font(.manrope(size: 16, weight: .regular))
                             .foregroundColor(.whiteText)
                     }
@@ -33,7 +35,7 @@ struct MineMessageView: View {
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
                 .background(
                     LinearGradient(
-                        colors: [.primary.opacity(0.8), .primary.opacity(0.5)],
+                        colors: [.primary, .primary.opacity(0.7)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing)
                 )
@@ -47,19 +49,23 @@ struct MineMessageView: View {
 
 struct AICatMessageView: View {
     let message: ChatMessage
+
     var body: some View {
         if containsCodeBlock(content: message.content) {
             Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                .textSelection(.enabled)
-               .markdownCodeSyntaxHighlighter(.splash(theme: .sundellsColors(withFont: .init(size: 16))))
-               .markdownTheme(.gitHub)
+               .markdownCodeSyntaxHighlighter(.splash(theme: .sundellsColors(withFont: .init(size: Theme.fontSize))))
+               .markdownTheme(.gitHub.text { FontSize(Theme.fontSize) })
                .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
         } else {
             ZStack {
                 if isMarkdown(message.content) {
                     Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                        .textSelection(.enabled)
+                        .markdownTheme(.aiMessage)
                 } else {
                     Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                        .textSelection(.enabled)
                         .font(.manrope(size: 16, weight: .regular))
                         .foregroundColor(.blackText)
                 }
@@ -94,13 +100,60 @@ struct MessageView: View {
     }
 }
 
+struct RectCorner: OptionSet {
+
+    let rawValue: Int
+
+    static let topLeft = RectCorner(rawValue: 1 << 0)
+    static let topRight = RectCorner(rawValue: 1 << 1)
+    static let bottomRight = RectCorner(rawValue: 1 << 2)
+    static let bottomLeft = RectCorner(rawValue: 1 << 3)
+
+    static let allCorners: RectCorner = [.topLeft, topRight, .bottomLeft, .bottomRight]
+}
+
+
+// draws shape with specified rounded corners applying corner radius
 struct CornerRadiusShape: Shape {
-    var radius = CGFloat.infinity
-    var corners = UIRectCorner.allCorners
+
+    var radius: CGFloat = .zero
+    var corners: RectCorner = .allCorners
 
     func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
+        var path = Path()
+
+        let p1 = CGPoint(x: rect.minX, y: corners.contains(.topLeft) ? rect.minY + radius  : rect.minY )
+        let p2 = CGPoint(x: corners.contains(.topLeft) ? rect.minX + radius : rect.minX, y: rect.minY )
+
+        let p3 = CGPoint(x: corners.contains(.topRight) ? rect.maxX - radius : rect.maxX, y: rect.minY )
+        let p4 = CGPoint(x: rect.maxX, y: corners.contains(.topRight) ? rect.minY + radius  : rect.minY )
+
+        let p5 = CGPoint(x: rect.maxX, y: corners.contains(.bottomRight) ? rect.maxY - radius : rect.maxY )
+        let p6 = CGPoint(x: corners.contains(.bottomRight) ? rect.maxX - radius : rect.maxX, y: rect.maxY )
+
+        let p7 = CGPoint(x: corners.contains(.bottomLeft) ? rect.minX + radius : rect.minX, y: rect.maxY )
+        let p8 = CGPoint(x: rect.minX, y: corners.contains(.bottomLeft) ? rect.maxY - radius : rect.maxY )
+
+
+        path.move(to: p1)
+        path.addArc(tangent1End: CGPoint(x: rect.minX, y: rect.minY),
+                    tangent2End: p2,
+                    radius: radius)
+        path.addLine(to: p3)
+        path.addArc(tangent1End: CGPoint(x: rect.maxX, y: rect.minY),
+                    tangent2End: p4,
+                    radius: radius)
+        path.addLine(to: p5)
+        path.addArc(tangent1End: CGPoint(x: rect.maxX, y: rect.maxY),
+                    tangent2End: p6,
+                    radius: radius)
+        path.addLine(to: p7)
+        path.addArc(tangent1End: CGPoint(x: rect.minX, y: rect.maxY),
+                    tangent2End: p8,
+                    radius: radius)
+        path.closeSubpath()
+
+        return path
     }
 }
 
@@ -126,7 +179,7 @@ struct ErrorMessageView: View {
                             .frame(width: 28, height: 28)
                             .tint(
                                 LinearGradient(
-                                    colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
+                                    colors: [.primary, .primary.opacity(0.7)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
@@ -135,9 +188,10 @@ struct ErrorMessageView: View {
                         Image(systemName: "arrow.clockwise.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
-                            .tint(.primary.opacity(0.8))
+                            .tint(.primary)
                     }
                 }
+                .buttonStyle(.borderless)
                 Button(
                     action: clear
                 ) {
@@ -147,7 +201,7 @@ struct ErrorMessageView: View {
                             .frame(width: 28, height: 28)
                             .tint(
                                 LinearGradient(
-                                    colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
+                                    colors: [.primary, .primary.opacity(0.7)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
@@ -156,9 +210,10 @@ struct ErrorMessageView: View {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
-                            .tint(.primary.opacity(0.8))
+                            .tint(.primary)
                     }
                 }
+                .buttonStyle(.borderless)
             }.padding(.horizontal, 20)
         }
     }

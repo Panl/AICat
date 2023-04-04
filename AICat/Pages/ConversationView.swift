@@ -11,9 +11,7 @@ import Alamofire
 
 struct ConversationView: View {
     @EnvironmentObject var appStateVM: AICatStateViewModel
-
     @State var inputText: String = ""
-    let conversation: Conversation
     @State var isSending = false
     @State var error: AFError?
     @State var showAddConversation = false
@@ -25,6 +23,7 @@ struct ConversationView: View {
     @State var commnadCardHeight: CGFloat = 0
     @FocusState var isFocused: Bool
 
+    let conversation: Conversation
 
     var filterdPrompts: [Conversation] {
         let query = inputText.lowercased().trimmingCharacters(in: ["/"])
@@ -63,7 +62,7 @@ struct ConversationView: View {
                         Image(systemName: "bubble.left.and.bubble.right")
                             .tint(.primary)
                             .frame(width: 24, height: 24)
-                    }
+                    }.buttonStyle(.borderless)
                     Spacer()
                     VStack(spacing: 0) {
                         Text(conversation.title)
@@ -107,6 +106,8 @@ struct ConversationView: View {
                             .frame(width: 24, height: 24)
                             .clipShape(Rectangle())
                     }
+                    .menuStyle(.borderlessButton)
+                    .frame(width: 24)
                     .alert("Are you sure to clean all messages?", isPresented: $showClearMesssageAlert) {
                         Button("Sure", role: .destructive) {
                             cleanMessages()
@@ -129,7 +130,7 @@ struct ConversationView: View {
                                 MessageView(message: message)
                                     .id(message.id)
                                     .contextMenu {
-                                        Button(action: { UIPasteboard.general.string = message.content }) {
+                                        Button(action: { /*UIPasteboard.general.string = message.content*/ }) {
                                             Label("Copy", systemImage: "doc.on.doc")
                                         }
                                         Button(role: .destructive, action: { deleteMessage(message) }) {
@@ -191,6 +192,7 @@ struct ConversationView: View {
                                     }
                                     .background(Color.background)
                                 }
+                                .buttonStyle(.borderless)
                                 .font(.manrope(size: 14, weight: .medium))
                                 .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
                                 .tint(.blackText.opacity(0.5))
@@ -227,7 +229,9 @@ struct ConversationView: View {
                                 self.selectedPrompt = nil
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                            }.tint(.blackText.opacity(0.8))
+                            }
+                            .buttonStyle(.borderless)
+                            .tint(.blackText.opacity(0.8))
                         }
                         .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 10))
                         .background(Color.background)
@@ -240,6 +244,7 @@ struct ConversationView: View {
                     TextField(text: $inputText) {
                         Text("Say something" + (conversation == mainConversation ? " or enter '/'" : ""))
                     }
+                    .textFieldStyle(.plain)
                     .focused($isFocused)
                     .tint(.blackText.opacity(0.8))
                     .submitLabel(.send)
@@ -255,21 +260,20 @@ struct ConversationView: View {
                     .onSubmit {
                         completeMessage()
                     }
-                    if isSending {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .frame(width: 28, height: 28)
-                    } else {
-                        Button(
-                            action: {
-                                completeMessage()
-                            }
-                        ) {
+                    Button(
+                        action: {
+                            completeMessage()
+                        }
+                    ) {
+                        if isSending {
+                            LoadingIndocator()
+                                .frame(width: 20, height: 20)
+                        } else {
                             if #available(iOS 16.0, *) {
                                 Image(systemName: "paperplane.circle.fill")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 28, height: 28)
+                                    .frame(width: 26, height: 26)
                                     .tint(
                                         LinearGradient(
                                             colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
@@ -280,18 +284,19 @@ struct ConversationView: View {
                                 Image(systemName: "paperplane.circle.fill")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 28, height: 28)
+                                    .frame(width: 26, height: 26)
                                     .tint(
                                         .primary.opacity(0.8)
                                     )
                             }
                         }
-                        .disabled(inputText.isEmpty)
                     }
-
+                    .frame(width: 26, height: 26)
+                    .buttonStyle(.borderless)
+                    .disabled(inputText.isEmpty)
                 }
                 .frame(height: 50)
-                .padding(.leading, 20)
+                .padding(.leading, 16)
                 .padding(.trailing, 12)
                 .background(Color.background)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -311,7 +316,7 @@ struct ConversationView: View {
                 await appStateVM.queryMessages(cid: newValue.id)
             }
         }.sheet(isPresented: $showAddConversation) {
-            AddConversationView(conversation: conversation) { _ in
+            AddConversationView(conversation: conversation) {
                 showAddConversation = false
             }
         }.font(.manrope(size: 16, weight: .regular))
