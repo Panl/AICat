@@ -11,7 +11,7 @@ extension View {
 
     func endEditing(force: Bool) {
         #if os(iOS)
-        UIApplication.shared.windows.forEach { $0.endEditing(force) }
+        (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.forEach { $0.endEditing(true) }
         #endif
     }
 

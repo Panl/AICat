@@ -52,10 +52,8 @@ struct SplitView: View {
                 onDismiss: {}
             ) {
                 AddConversationView(
-                    onSave: { conversation in
-                        appStateVM.setCurrentConversation(conversation)
+                    onClose: {
                         showAddConversationSheet = false
-                        chatId = conversation.id
                     }
                 )
             }.onChange(of: appStateVM.conversations) { newValue in

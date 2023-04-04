@@ -26,18 +26,33 @@ struct ConversationListView: View {
                 .padding(.top, 32)
             Spacer().frame(height: 32)
             HStack {
-                Text("Chats")
-                    .font(.manrope(size: 18, weight: .semibold))
+                Text("Conversations")
+                    .font(.manrope(size: 12, weight: .semibold))
                     .foregroundColor(.blackText.opacity(0.4))
                 Spacer()
             }.padding(.leading, 20)
             ScrollView(showsIndicators: false) {
                 LazyVStack {
                     Spacer().frame(height: 10)
+                    Button(action: onAddChat) {
+                        HStack {
+                            Image(systemName: "plus.bubble")
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20)
+                            Text("New Chat")
+                                .lineLimit(1)
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(.horizontal, 8)
+                    .tint(.blackText.opacity(0.5))
                     ForEach(conversations) { conversation in
                         Button(action: { onChatChanged(conversation) }) {
                             HStack {
-                                Image(systemName: conversation == mainConversation ? "command" : "bubble.left" )
+                                Image(systemName: conversation.isMain ? "command" : "bubble.left" )
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 20)
                                 Text(conversation.title)
@@ -71,28 +86,17 @@ struct ConversationListView: View {
                         .padding(.horizontal, 8)
 
                     }
-                    Button(action: onAddChat) {
-                        HStack {
-                            Image(systemName: "plus.bubble")
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 20)
-                            Text("New Chat")
-                                .lineLimit(1)
-                            Spacer()
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 12)
-                    }
-                    .buttonStyle(.borderless)
-                    .padding(.horizontal, 8)
-                    .tint(.blackText.opacity(0.5))
                 }
             }
-            Spacer(minLength: 20)
+            RoundedRectangle(cornerRadius: 0.5)
+                .frame(height: 1)
+                .foregroundColor(Color.gray.opacity(0.1))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 6)
             Button(action: { showClearAllChatAlert = true }) {
                 HStack {
                     Image(systemName: "trash")
-                    Text("Clean Chats")
+                    Text("Clear Conversations")
                         .lineLimit(1)
                     Spacer()
                 }
@@ -101,7 +105,7 @@ struct ConversationListView: View {
             .buttonStyle(.borderless)
             .tint(.blackText.opacity(0.5))
             .padding(.horizontal, 20)
-            .alert("Are you sure to clean all chats", isPresented: $showClearAllChatAlert) {
+            .alert("Are you sure to clear all conversations", isPresented: $showClearAllChatAlert) {
                 Button("Sure", role: .destructive) {
                     clearAllConversation()
                 }
@@ -109,13 +113,28 @@ struct ConversationListView: View {
                     showClearAllChatAlert = false
                 }
             }
+            Button(action: { appStateVM.showAddAPIKeySheet = true }) {
+                HStack {
+                    Image(systemName: "key.viewfinder")
+                    Text("OpenAI API Key")
+                        .lineLimit(1)
+                    Spacer()
+                }
+                .padding(.vertical, 10)
+            }
+            .buttonStyle(.borderless)
+            .tint(.blackText.opacity(0.5))
+            .padding(.horizontal, 20)
             Button(action: {
-            // destination: URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!
-                
+                #if os(iOS)
+                UIApplication.shared.open(URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!)
+                #elseif os(macOS)
+                NSWorkspace.shared.open(URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!)
+                #endif
             }) {
                 HStack {
                     Image(systemName: "questionmark.circle")
-                    Text("Help")
+                    Text("Updates & FAQ")
                         .lineLimit(1)
                     Spacer()
                 }
@@ -124,6 +143,7 @@ struct ConversationListView: View {
             .buttonStyle(.borderless)
             .padding(.horizontal, 20)
             .tint(.blackText.opacity(0.5))
+            #if os(iOS)
             Button(action: { showSettingsView = true }) {
                 HStack {
                     Image(systemName: "gearshape")
@@ -136,13 +156,14 @@ struct ConversationListView: View {
             .buttonStyle(.borderless)
             .padding(.horizontal, 20)
             .tint(.blackText.opacity(0.5))
+            .fullScreenCover(isPresented: $showSettingsView) {
+                SettingsView {
+                    showSettingsView = false
+                }
+            }
+            #endif
             Spacer().frame(height: 32)
         }
-//        .fullScreenCover(isPresented: $showSettingsView) {
-//            SettingsView {
-//                showSettingsView = false
-//            }
-//        }
         .ignoresSafeArea(.keyboard)
         .font(.manrope(size: 16, weight: .medium))
     }

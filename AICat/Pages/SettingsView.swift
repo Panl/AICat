@@ -44,10 +44,12 @@ struct SettingsView: View {
             #if os(iOS)
             HStack {
                 Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .tint(.primary)
-                        .frame(width: 24, height: 24)
+                    Image(systemName: "xmark.circle")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 20, height: 20)
                 }
+                .tint(.primary)
                 Spacer()
                 VStack(spacing: 0) {
                     Text("Settings")
@@ -74,8 +76,8 @@ struct SettingsView: View {
                             validateApiKey()
                         }
                         if isValidating {
-                            ProgressView()
-                                .progressViewStyle(.circular)
+                            LoadingIndocator()
+                                .frame(width: 24, height: 14)
                         }
                         if error != nil {
                             Image(systemName: "exclamationmark.triangle.fill")
@@ -109,28 +111,29 @@ struct SettingsView: View {
                         }
                     }.pickerStyle(.menu)
                 }
+                .menuStyle(.borderlessButton)
                 Section("support") {
                     Link(destination: URL(string: "https://learnprompting.org/")!) {
                         Label("Learn Prompting", systemImage: "book")
                             .labelStyle(.titleAndIcon)
-                    }.tint(.primary)
+                    }
                     Link(destination: URL(string: "https://github.com/f/awesome-chatgpt-prompts")!) {
                         Label("Awesome chatgpt prompts", systemImage: "square.stack.3d.up")
                             .labelStyle(.titleAndIcon)
-                    }.tint(.primary)
+                    }
                     Link(destination: URL(string: "https://github.com/Panl/AICat.git")!){
                         Label("Source Code", systemImage: "ellipsis.curlybraces")
                             .labelStyle(.titleAndIcon)
-                    }.tint(.primary)
+                    }
                     Link(destination: URL(string: "mailto:iplay.coder@gmail.com")!){
                         Label("Contact Us", systemImage: "envelope.open")
                             .labelStyle(.titleAndIcon)
-                    }.tint(.primary)
+                    }
                     Link(destination: URL(string: "https://epochpro.app/aicat_privacy")!) {
-                        Label("Privacy and Policy", systemImage: "checkmark.shield")
+                        Label("Privacy and Policy", systemImage: "lock.rectangle.on.rectangle")
                             .labelStyle(.titleAndIcon)
-                    }.tint(.primary)
-                }
+                    }
+                }.tint(.primary)
                 Section(
                     header: Text("More App"),
                     footer: HStack {
@@ -150,8 +153,9 @@ struct SettingsView: View {
                             VStack(alignment: .leading) {
                                 Text("Epoch - Guitar Tuner")
                                     .font(.manrope(size: 14, weight: .medium))
-                                Text("Guitar, Bass, Ukulele tuner, Metronome\n Practice Tracker")
+                                Text("Guitar, Bass, Ukulele tuner, Metronome Practice Tracker")
                                     .font(.manrope(size: 12, weight: .regular))
+                                    .multilineTextAlignment(.leading)
                                     .foregroundColor(.gray)
                             }
                         }.padding(.vertical, 4)

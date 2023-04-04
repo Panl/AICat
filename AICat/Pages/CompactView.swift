@@ -108,10 +108,8 @@ struct CompactView: View {
             onDismiss: {}
         ) {
             AddConversationView(
-                onSave: { conversation in
-                    appStateVM.setCurrentConversation(conversation)
+                onClose: {
                     showAddConversationSheet = false
-                    chatId = conversation.id
                     withAnimation(.easeInOut(duration: openDrawerDuration)) {
                         lastTranslationX = 0
                         translationX = 0

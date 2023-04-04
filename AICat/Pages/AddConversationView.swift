@@ -10,20 +10,32 @@ import SwiftUI
 struct AddConversationView: View {
 
     let conversation: Conversation?
-    let onSave: (Conversation) -> Void
+    let onClose: () -> Void
     @State var title: String
     @State var prompt: String
     @EnvironmentObject var appStateVM: AICatStateViewModel
+    @AppStorage("currentChat.id") var chatId: String?
 
-    init(conversation: Conversation? = nil, onSave: @escaping (Conversation) -> Void) {
+    init(conversation: Conversation? = nil, onClose: @escaping () -> Void) {
         self.conversation = conversation
-        self.onSave = onSave
+        self.onClose = onClose
         self.title = conversation?.title ?? ""
         self.prompt = conversation?.prompt ?? ""
     }
 
     var body: some View {
         VStack {
+            HStack {
+                Spacer()
+                Button(action: onClose) {
+                    Image(systemName: "xmark.circle")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 20, height: 20)
+                }
+                .buttonStyle(.borderless)
+                .tint(.primary)
+            }.padding(20)
             Spacer(minLength: 56)
             Text(conversation == nil ? "New Chat" : "Edit Chat")
                 .font(.manrope(size: 28, weight: .bold))
@@ -42,6 +54,8 @@ struct AddConversationView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .foregroundColor(.gray.opacity(0.1))
             }
+            .padding(.horizontal, 20)
+
             Spacer()
                 .frame(height: 20)
             ZStack(alignment: .topLeading){
@@ -70,12 +84,15 @@ struct AddConversationView: View {
                             RoundedRectangle(cornerRadius: 16)
                                 .foregroundColor(.gray.opacity(0.1))
                         }.onAppear {
-                            // UITextView.appearance().backgroundColor = .clear
+                            #if os(iOS)
+                            UITextView.appearance().backgroundColor = .clear
+                            #endif
                         }
                 }
             }
             .font(.manrope(size: 16, weight: .regular))
             .foregroundColor(.blackText.opacity(0.8))
+            .padding(.horizontal, 20)
 
             Spacer()
                 .frame(height: 36)
@@ -91,10 +108,6 @@ struct AddConversationView: View {
             .disabled(title.isEmpty)
             Spacer(minLength: 56)
         }
-        .padding(.horizontal, 20)
-        .onTapGesture {
-            self.endEditing(force: true)
-        }
         .font(.manrope(size: 16, weight: .regular))
     }
 
@@ -104,19 +117,19 @@ struct AddConversationView: View {
             conversation.title = title
             conversation.prompt = prompt
             await appStateVM.saveConversation(conversation)
-            onSave(conversation)
+            onClose()
         } else {
             let conversation = Conversation(title: title, prompt: prompt)
             await appStateVM.saveConversation(conversation)
-            onSave(conversation)
+            chatId = conversation.id
+            onClose()
         }
-
     }
 }
 
 
 struct AddConversationView_Previews: PreviewProvider {
     static var previews: some View {
-        AddConversationView(onSave: { _ in})
+        AddConversationView(onClose: {})
     }
 }

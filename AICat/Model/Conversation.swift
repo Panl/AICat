@@ -17,4 +17,8 @@ struct Conversation: BlackbirdModel {
     @BlackbirdColumn var contextMessages: Int = 0
     @BlackbirdColumn var timeCreated: Int = Date.now.timeInSecond
     @BlackbirdColumn var timeRemoved: Int = 0
+
+    var isMain: Bool {
+        id == "AICat.Conversation.Main"
+    }
 }

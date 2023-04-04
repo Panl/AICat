@@ -1,6 +1,15 @@
 # AICat
 > An chat app base on ChatGPT
 
+### Build Requirements
+- Xcode 14.3 (Not verified on other version)
+- Create Credential.Swift
+  ```Swift
+  // for App Crash Tracking
+  let appCenterSecretKey = "{Your AppCenter App Secret}"
+  ```
+  [AppCenter](https://appcenter.ms/)
+
 ### Features
 
 - [Features of ChatGPT Web App](https://chat.openai.com/chat)

@@ -17,6 +17,8 @@ let dbPath = "\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDom
     @Published private(set) var currentConversation = mainConversation
     @Published private(set) var messages: [ChatMessage] = []
 
+    @Published var showAddAPIKeySheet: Bool = false
+
     var allConversations: [Conversation] {
         [mainConversation] + conversations
     }

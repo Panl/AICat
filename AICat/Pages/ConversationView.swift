@@ -24,7 +24,6 @@ struct ConversationView: View {
     @FocusState var isFocused: Bool
 
     let conversation: Conversation
-    let showToolbar: Bool
 
     var filterdPrompts: [Conversation] {
         let query = inputText.lowercased().trimmingCharacters(in: ["/"])
@@ -47,82 +46,80 @@ struct ConversationView: View {
 
     let onChatsClick: () -> Void
 
-    init(conversation: Conversation, showToolbar: Bool = true, onChatsClick: @escaping () -> Void) {
+    init(conversation: Conversation, onChatsClick: @escaping () -> Void) {
         self.conversation = conversation
         self.onChatsClick = onChatsClick
-        self.showToolbar = showToolbar
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
-                if showToolbar{
-                    HStack(spacing: 18) {
-                        Button(action: {
-                            isFocused = false
-                            onChatsClick()
-                        }) {
-                            Image(systemName: "bubble.left.and.bubble.right")
-                                .tint(.primary)
-                                .frame(width: 24, height: 24)
-                        }.buttonStyle(.borderless)
-                        Spacer()
-                        VStack(spacing: 0) {
-                            Text(conversation.title)
-                                .font(.manrope(size: 16, weight: .heavy))
+                HStack(spacing: 18) {
+                    Button(action: {
+                        isFocused = false
+                        onChatsClick()
+                    }) {
+                        Image(systemName: "bubble.left.and.bubble.right")
+                            .tint(.primary)
+                            .frame(width: 24, height: 24)
+                    }.buttonStyle(.borderless)
+                    Spacer()
+                    VStack(spacing: 0) {
+                        Text(conversation.title)
+                            .font(.manrope(size: 16, weight: .heavy))
+                            .lineLimit(1)
+                        if !promptText.isEmpty {
+                            Text(promptText)
+                                .font(.manrope(size: 12, weight: .regular))
+                                .opacity(0.4)
                                 .lineLimit(1)
-                            if !promptText.isEmpty {
-                                Text(promptText)
-                                    .font(.manrope(size: 12, weight: .regular))
-                                    .opacity(0.4)
-                                    .lineLimit(1)
+                        }
+                    }
+                    Spacer()
+                    Menu {
+                        if conversation != mainConversation {
+                            Button(action: editConversation) {
+                                Label("Edit Chat", systemImage: "square.and.pencil")
                             }
                         }
-                        Spacer()
                         Menu {
-                            if conversation != mainConversation {
-                                Button(action: editConversation) {
-                                    Label("Edit Chat", systemImage: "square.and.pencil")
+                            ForEach(0...10, id: \.self) { item in
+                                Button("\(item)") {
+                                    saveContextMessages(count: item)
                                 }
-                            }
-                            Menu {
-                                ForEach(0...10, id: \.self) { item in
-                                    Button("\(item)") {
-                                        saveContextMessages(count: item)
-                                    }
-                                }
-                            } label: {
-                                Label("Context Messages: \(contextMessages)", systemImage: "list.clipboard")
-                            }
-                            Picker(selection: $model) {
-                                ForEach(models, id: \.self) {
-                                    Text($0).lineLimit(1)
-                                }
-                            } label: {
-                                Label("Model: \(model)", systemImage: "m.square")
-                            }.pickerStyle(.menu)
-                            Button(role: .destructive, action: { showClearMesssageAlert = true }) {
-                                Label("Clean Messages", systemImage: "trash")
                             }
                         } label: {
-                            Image(systemName: "ellipsis")
-                                .frame(width: 24, height: 24)
-                                .clipShape(Rectangle())
+                            Label("Context Messages: \(contextMessages)", systemImage: "list.clipboard")
                         }
-                        .alert("Are you sure to clean all messages?", isPresented: $showClearMesssageAlert) {
-                            Button("Sure", role: .destructive) {
-                                cleanMessages()
+                        Picker(selection: $model) {
+                            ForEach(models, id: \.self) {
+                                Text($0).lineLimit(1)
                             }
-                            Button("Cancel", role: .cancel) {
-                                showClearMesssageAlert = false
-                            }
+                        } label: {
+                            Label("Model: \(model)", systemImage: "m.square")
+                        }.pickerStyle(.menu)
+                        Button(role: .destructive, action: { showClearMesssageAlert = true }) {
+                            Label("Clean Messages", systemImage: "trash")
                         }
-                        .tint(.primary)
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .frame(width: 24, height: 24)
+                            .clipShape(Rectangle())
                     }
-                    .menuStyle(.button)
-                    .padding(.horizontal, 20)
-                    .frame(height: 44)
+                    .menuStyle(.borderlessButton)
+                    .frame(width: 24)
+                    .alert("Are you sure to clean all messages?", isPresented: $showClearMesssageAlert) {
+                        Button("Sure", role: .destructive) {
+                            cleanMessages()
+                        }
+                        Button("Cancel", role: .cancel) {
+                            showClearMesssageAlert = false
+                        }
+                    }
+                    .tint(.primary)
                 }
+                .padding(.horizontal, 20)
+                .frame(height: 44)
                 Spacer(minLength: 0)
                 ScrollViewReader { proxy in
                     ScrollView(showsIndicators: false) {
@@ -263,21 +260,20 @@ struct ConversationView: View {
                     .onSubmit {
                         completeMessage()
                     }
-                    if isSending {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .frame(width: 28, height: 28)
-                    } else {
-                        Button(
-                            action: {
-                                completeMessage()
-                            }
-                        ) {
+                    Button(
+                        action: {
+                            completeMessage()
+                        }
+                    ) {
+                        if isSending {
+                            LoadingIndocator()
+                                .frame(width: 26, height: 26)
+                        } else {
                             if #available(iOS 16.0, *) {
                                 Image(systemName: "paperplane.circle.fill")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 28, height: 28)
+                                    .frame(width: 26, height: 26)
                                     .tint(
                                         LinearGradient(
                                             colors: [.primary.opacity(0.9), .primary.opacity(0.6)],
@@ -288,19 +284,19 @@ struct ConversationView: View {
                                 Image(systemName: "paperplane.circle.fill")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 28, height: 28)
+                                    .frame(width: 26, height: 26)
                                     .tint(
                                         .primary.opacity(0.8)
                                     )
                             }
                         }
-                        .buttonStyle(.borderless)
-                        .disabled(inputText.isEmpty)
                     }
-
+                    .frame(width: 26, height: 26)
+                    .buttonStyle(.borderless)
+                    .disabled(inputText.isEmpty)
                 }
                 .frame(height: 50)
-                .padding(.leading, 20)
+                .padding(.leading, 16)
                 .padding(.trailing, 12)
                 .background(Color.background)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -320,7 +316,7 @@ struct ConversationView: View {
                 await appStateVM.queryMessages(cid: newValue.id)
             }
         }.sheet(isPresented: $showAddConversation) {
-            AddConversationView(conversation: conversation) { _ in
+            AddConversationView(conversation: conversation) {
                 showAddConversation = false
             }
         }.font(.manrope(size: 16, weight: .regular))
