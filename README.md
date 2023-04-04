@@ -38,3 +38,4 @@
 ### Download
 
 - [Testflight](https://testflight.apple.com/join/ow799Vvb)
+- [AICat.dmg](Products/AICat.dmg)
