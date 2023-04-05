@@ -18,13 +18,16 @@ let models = [
     "gpt-4-32k-0314"
 ]
 
+let temperatures: [Double] = [
+    0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
+]
+
 struct SettingsView: View {
 
     @State var apiKey = UserDefaults.openApiKey ?? ""
     @State var isValidating = false
     @State var error: AFError?
     @State var isValidated = false
-    @AppStorage("currentChat.id") var chatId: String?
     @AppStorage("request.temperature") var temperature: Double = 1.0
     @AppStorage("request.context.messages") var messagesCount: Int = 0
     @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
@@ -44,10 +47,10 @@ struct SettingsView: View {
             #if os(iOS)
             HStack {
                 Button(action: onClose) {
-                    Image(systemName: "xmark.circle")
+                    Image(systemName: "xmark")
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 20, height: 20)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 16, height: 16)
                 }
                 .tint(.primary)
                 Spacer()
@@ -89,7 +92,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                Section("Request Settings") {
+                Section("Main Chat Settings") {
                     HStack {
                         Text("Model")
                         Picker("", selection: $model) {

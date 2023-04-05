@@ -51,17 +51,24 @@ struct AICatApp: App {
             SettingsView(onClose: {})
                 .environmentObject(appStateVM)
         }
-        MenuBarExtra("AICat Main", systemImage: "timelapse") {
-            MainView()
-                .frame(width: 375, height: 720)
-                .task {
-                    await appStateVM.queryConversations()
-                }
-                .environmentObject(appStateVM)
-                .background(Color.background.ignoresSafeArea())
-        }
+
+        MenuBarExtra(
+            content: {
+                MainView()
+                    .frame(width: 375, height: 720)
+                    .task {
+                        await appStateVM.queryConversations()
+                    }
+                    .environmentObject(appStateVM)
+                    .background(Color.background.ignoresSafeArea())
+            },
+            label: {
+                Image("chatgpt_logo_menu")
+                    .renderingMode(.template)
+                    .foregroundColor(.primary)
+            }
+        )
         .menuBarExtraStyle(.window)
-        .keyboardShortcut("M", modifiers: .command)
         #endif
     }
 }

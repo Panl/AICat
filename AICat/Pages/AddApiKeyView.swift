@@ -22,10 +22,10 @@ struct AddApiKeyView: View {
             HStack {
                 Spacer()
                 Button(action: onSkip) {
-                    Image(systemName: "xmark.circle")
+                    Image(systemName: "xmark")
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 20, height: 20)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 16, height: 16)
                 }
                 .buttonStyle(.borderless)
                 .tint(.primary)

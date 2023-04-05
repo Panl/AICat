@@ -15,6 +15,7 @@ struct ChatMessage: BlackbirdModel {
     @BlackbirdColumn var role: String
     @BlackbirdColumn var content: String
     @BlackbirdColumn var conversationId: String
+    @BlackbirdColumn var model: String = "gpt-3.5-turbo"
     @BlackbirdColumn var timeCreated: Int = Date.now.timeInSecond
     @BlackbirdColumn var timeRemoved: Int = 0
 }

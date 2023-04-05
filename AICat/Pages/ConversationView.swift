@@ -20,13 +20,14 @@ struct ConversationView: View {
     @State var showCommands = false
     @AppStorage("request.context.messages") var contextCount: Int = 0
     @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
+    @AppStorage("request.temperature") var temperature: Double = 1.0
     @State var commnadCardHeight: CGFloat = 0
     @FocusState var isFocused: Bool
 
     let conversation: Conversation
 
     var filterdPrompts: [Conversation] {
-        let query = inputText.lowercased().trimmingCharacters(in: ["/"])
+        let query = inputText.lowercased().trimmingCharacters(in: .whitespaces)
         return appStateVM.conversations.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
     }
 
@@ -93,10 +94,17 @@ struct ConversationView: View {
                         }
                         Picker(selection: $model) {
                             ForEach(models, id: \.self) {
-                                Text($0).lineLimit(1)
+                                Text($0)
                             }
                         } label: {
                             Label("Model: \(model)", systemImage: "m.square")
+                        }.pickerStyle(.menu)
+                        Picker(selection: $temperature) {
+                            ForEach(temperatures, id: \.self) {
+                                Text("\(String(format: "%.1f", $0))")
+                            }
+                        } label: {
+                            Label("Temperature: \(String(format: "%.1f", temperature))", systemImage: "thermometer.medium")
                         }.pickerStyle(.menu)
                         Button(role: .destructive, action: { showClearMesssageAlert = true }) {
                             Label("Clean Messages", systemImage: "trash")
@@ -242,7 +250,7 @@ struct ConversationView: View {
 
                 HStack {
                     TextField(text: $inputText) {
-                        Text("Say something" + (conversation == mainConversation ? " or enter '/'" : ""))
+                        Text("Say something" + (conversation == mainConversation ? " or enter 'space'" : ""))
                     }
                     .textFieldStyle(.plain)
                     .focused($isFocused)
@@ -250,7 +258,7 @@ struct ConversationView: View {
                     .submitLabel(.send)
                     .onChange(of: inputText) { newValue in
                         if conversation == mainConversation {
-                            if newValue.starts(with: "/") {
+                            if newValue.starts(with: " ") {
                                 showCommands = true
                             } else {
                                 showCommands = false

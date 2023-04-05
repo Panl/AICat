@@ -28,8 +28,8 @@ struct ConversationListView: View {
                 .foregroundColor(.primary)
             Spacer().frame(height: 32)
             HStack {
-                Text("Conversations")
-                    .font(.manrope(size: 12, weight: .semibold))
+                Text("Conversations".uppercased())
+                    .font(.manrope(size: 14, weight: .semibold))
                     .foregroundColor(.blackText.opacity(0.4))
                 Spacer()
             }.padding(.leading, 20)
@@ -94,7 +94,7 @@ struct ConversationListView: View {
                 .frame(height: 1)
                 .foregroundColor(Color.gray.opacity(0.1))
                 .padding(.horizontal, 20)
-                .padding(.vertical, 6)
+                .padding(.bottom, 6)
             Button(action: { showClearAllChatAlert = true }) {
                 HStack {
                     Image(systemName: "trash")
@@ -164,7 +164,7 @@ struct ConversationListView: View {
                 }
             }
             #endif
-            Spacer().frame(height: 32)
+            Spacer().frame(height: 16)
         }
         .ignoresSafeArea(.keyboard)
         .font(.manrope(size: 16, weight: .medium))

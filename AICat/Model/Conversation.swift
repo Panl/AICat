@@ -15,6 +15,10 @@ struct Conversation: BlackbirdModel {
     @BlackbirdColumn var title: String
     @BlackbirdColumn var prompt: String
     @BlackbirdColumn var contextMessages: Int = 0
+    @BlackbirdColumn var temperature: Double = 0.7
+    @BlackbirdColumn var model: String = "gpt-3.5-turbo"
+    @BlackbirdColumn var maxTokens: Int = 2048
+    @BlackbirdColumn var cost: Double = 0
     @BlackbirdColumn var timeCreated: Int = Date.now.timeInSecond
     @BlackbirdColumn var timeRemoved: Int = 0
 
