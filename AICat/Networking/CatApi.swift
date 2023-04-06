@@ -96,6 +96,19 @@ enum CatApi {
         }
     }
 
+    static func cancelMessageStream() {
+        cancelTaskWithUrl(URL(string: "https://api.openai.com/v1/chat/completions"))
+    }
+
+    static func cancelTaskWithUrl(_ url: URL?) {
+        URLSession.shared.getAllTasks { tasks in
+            tasks
+                .filter { $0.state == .running }
+                .filter { $0.originalRequest?.url == url }.first?
+                .cancel()
+        }
+    }
+
     static func decodeResponse(data: Data) -> StreamResponse? {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase

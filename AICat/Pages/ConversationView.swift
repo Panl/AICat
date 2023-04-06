@@ -13,7 +13,7 @@ struct ConversationView: View {
     @EnvironmentObject var appStateVM: AICatStateViewModel
     @State var inputText: String = ""
     @State var isSending = false
-    @State var error: AFError?
+    @State var error: NSError?
     @State var showAddConversation = false
     @State var showClearMesssageAlert = false
     @State var isAIGenerating = false
@@ -138,7 +138,13 @@ struct ConversationView: View {
                                 MessageView(message: message)
                                     .id(message.id)
                                     .contextMenu {
-                                        Button(action: { /*UIPasteboard.general.string = message.content*/ }) {
+                                        Button(action: {
+                                            #if os(iOS)
+                                            UIPasteboard.general.string = message.content
+                                            #elseif os(macOS)
+                                            NSPasteboard.general.string = message.content
+                                            #endif
+                                        }) {
                                             Label("Copy", systemImage: "doc.on.doc")
                                         }
                                         Button(role: .destructive, action: { deleteMessage(message) }) {
@@ -267,6 +273,17 @@ struct ConversationView: View {
                     }
                     .onSubmit {
                         completeMessage()
+                    }
+                    if isSending {
+                        Button(action: {
+                            CatApi.cancelMessageStream()
+                        }) {
+                            Rectangle()
+                                .foregroundColor(.primary)
+                                .frame(width: 17, height: 17)
+                                .cornerRadius(2)
+                                .opacity(0.5)
+                        }
                     }
                     Button(
                         action: {
@@ -409,10 +426,14 @@ struct ConversationView: View {
             }
             isSending = false
         } catch {
-            self.error = AFError.sessionTaskFailed(error: error)
+            let err = error as NSError
+            if err.code != -999 {
+                self.error = err
+                deleteMessage(chatMessage)
+            }
             isAIGenerating = false
             isSending = false
-            deleteMessage(chatMessage)
+
         }
     }
 
