@@ -39,3 +39,6 @@
 
 - [Testflight](https://testflight.apple.com/join/ow799Vvb)
 - [AICat.dmg](Products/AICat.dmg)
+
+### Telegram
+- [AICat News](https://t.me/aicatevents)
