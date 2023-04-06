@@ -139,11 +139,7 @@ struct ConversationView: View {
                                     .id(message.id)
                                     .contextMenu {
                                         Button(action: {
-                                            #if os(iOS)
-                                            UIPasteboard.general.string = message.content
-                                            #elseif os(macOS)
-                                            NSPasteboard.general.string = message.content
-                                            #endif
+                                            SystemUtil.copyToPasteboard(content: message.content)
                                         }) {
                                             Label("Copy", systemImage: "doc.on.doc")
                                         }
@@ -283,7 +279,7 @@ struct ConversationView: View {
                                 .frame(width: 17, height: 17)
                                 .cornerRadius(2)
                                 .opacity(0.5)
-                        }
+                        }.buttonStyle(.borderless)
                     }
                     Button(
                         action: {
