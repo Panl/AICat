@@ -9,28 +9,12 @@ import SwiftUI
 import Foundation
 import Alamofire
 
-let models = [
-    "gpt-3.5-turbo",
-    "gpt-3.5-turbo-0301",
-    "gpt-4",
-    "gpt-4-0314",
-    "gpt-4-32k",
-    "gpt-4-32k-0314"
-]
-
-let temperatures: [Double] = [
-    0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
-]
-
 struct SettingsView: View {
 
     @State var apiKey = UserDefaults.openApiKey ?? ""
     @State var isValidating = false
     @State var error: AFError?
     @State var isValidated = false
-    @AppStorage("request.temperature") var temperature: Double = 1.0
-    @AppStorage("request.context.messages") var messagesCount: Int = 0
-    @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
 
     var appVersion: String {
         Bundle.main.releaseVersion ?? "1.0"
@@ -61,8 +45,8 @@ struct SettingsView: View {
                         .lineLimit(1)
                 }
                 Spacer()
-                Image(systemName: "ellipsis")
-                    .frame(width: 24, height: 24)
+                Rectangle()
+                    .frame(width: 16, height: 16)
                     .clipShape(Rectangle())
                     .hidden()
             }
@@ -92,29 +76,6 @@ struct SettingsView: View {
                         }
                     }
                 }
-                Section("Main Chat Settings") {
-                    HStack {
-                        Text("Model")
-                        Picker("", selection: $model) {
-                            ForEach(models, id: \.self) {
-                                Text($0).lineLimit(1)
-                            }
-                        }.pickerStyle(.menu)
-                    }
-                    HStack {
-                        Text("Temperature: \(String(format: "%.1f", temperature))")
-                        Spacer()
-                        Slider(value: $temperature, in: 0...1.0) {
-                            Text("\(temperature)")
-                        }.frame(width: 140)
-                    }
-                    Picker("Context messages", selection: $messagesCount) {
-                        ForEach(0...10, id: \.self) { item in
-                            Text("\(item)")
-                        }
-                    }.pickerStyle(.menu)
-                }
-                .menuStyle(.borderlessButton)
                 Section("support") {
                     Link(destination: URL(string: "https://learnprompting.org/")!) {
                         Label("Learn Prompting", systemImage: "book")

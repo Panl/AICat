@@ -79,7 +79,7 @@ struct ConversationListView: View {
                         .buttonStyle(.borderless)
                         .tint(conversation == selectedChat ? .primary : .primary.opacity(0.7))
                         .contextMenu {
-                            if conversation != mainConversation {
+                            if !conversation.isMain {
                                 Button(role: .destructive, action: { deleteConversation(conversation) }) {
                                     Label("Delete", systemImage: "trash")
                                 }
@@ -191,8 +191,8 @@ struct ConversationListView: View {
 struct ConversationListView_Previews: PreviewProvider {
     static var previews: some View {
         ConversationListView(
-            selectedChat: mainConversation,
-            conversations: [mainConversation, Conversation(title: "How to make a gift", prompt: "")],
+            selectedChat: Conversation(title: "Main", prompt: ""),
+            conversations: [Conversation(title: "Main", prompt: ""), Conversation(title: "How to make a gift", prompt: "")],
             onAddChat: {}, onChatChanged: { _ in }
         )
     }

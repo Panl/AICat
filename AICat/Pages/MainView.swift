@@ -8,8 +8,6 @@
 import SwiftUI
 import Blackbird
 
-let mainConversation = Conversation(id: "AICat.Conversation.Main", title: "AICat Main", prompt: "")
-
 struct MainView: View {
 
     

@@ -36,4 +36,5 @@ extension Color {
     static let blackText = Color("BlackText")
     static let whiteText = Color("WhiteText")
     static let aiBubbleBg = Color("AIBubbleBg")
+    static let thumb = Color("Thumb")
 }

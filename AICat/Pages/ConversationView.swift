@@ -16,11 +16,9 @@ struct ConversationView: View {
     @State var error: NSError?
     @State var showAddConversation = false
     @State var showClearMesssageAlert = false
+    @State var showParamEditSheetView = false
     @State var isAIGenerating = false
     @State var showCommands = false
-    @AppStorage("request.context.messages") var contextCount: Int = 0
-    @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
-    @AppStorage("request.temperature") var temperature: Double = 1.0
     @State var commnadCardHeight: CGFloat = 0
     @FocusState var isFocused: Bool
 
@@ -38,11 +36,7 @@ struct ConversationView: View {
     }
 
     var contextMessages: Int {
-        if conversation == mainConversation {
-            return contextCount
-        } else {
-            return conversation.contextMessages
-        }
+        conversation.contextMessages
     }
 
     let onChatsClick: () -> Void
@@ -78,34 +72,14 @@ struct ConversationView: View {
                     }
                     Spacer()
                     Menu {
-                        if conversation != mainConversation {
+                        if !conversation.isMain {
                             Button(action: editConversation) {
-                                Label("Edit Chat", systemImage: "square.and.pencil")
+                                Label("Edit Prompt", systemImage: "note.text")
                             }
                         }
-                        Menu {
-                            ForEach(0...10, id: \.self) { item in
-                                Button("\(item)") {
-                                    saveContextMessages(count: item)
-                                }
-                            }
-                        } label: {
-                            Label("Context Messages: \(contextMessages)", systemImage: "list.clipboard")
+                        Button(action: { showParamEditSheetView = true }) {
+                            Label("Edit Parameters", systemImage: "rectangle.and.pencil.and.ellipsis")
                         }
-                        Picker(selection: $model) {
-                            ForEach(models, id: \.self) {
-                                Text($0)
-                            }
-                        } label: {
-                            Label("Model: \(model)", systemImage: "m.square")
-                        }.pickerStyle(.menu)
-                        Picker(selection: $temperature) {
-                            ForEach(temperatures, id: \.self) {
-                                Text("\(String(format: "%.1f", $0))")
-                            }
-                        } label: {
-                            Label("Temperature: \(String(format: "%.1f", temperature))", systemImage: "thermometer.medium")
-                        }.pickerStyle(.menu)
                         Button(role: .destructive, action: { showClearMesssageAlert = true }) {
                             Label("Clean Messages", systemImage: "trash")
                         }
@@ -252,14 +226,14 @@ struct ConversationView: View {
 
                 HStack {
                     TextField(text: $inputText) {
-                        Text("Say something" + (conversation == mainConversation ? " or enter 'space'" : ""))
+                        Text("Say something" + (conversation.isMain ? " or enter 'space'" : ""))
                     }
                     .textFieldStyle(.plain)
                     .focused($isFocused)
                     .tint(.blackText.opacity(0.8))
                     .submitLabel(.send)
                     .onChange(of: inputText) { newValue in
-                        if conversation == mainConversation {
+                        if !conversation.isMain {
                             if newValue.starts(with: " ") {
                                 showCommands = true
                             } else {
@@ -327,20 +301,29 @@ struct ConversationView: View {
             }
         }.task {
             await appStateVM.queryMessages(cid: conversation.id)
-        }.onChange(of: conversation) { newValue in
+        }.onChange(of: conversation.id) { newValue in
             selectedPrompt = nil
             inputText = ""
             error = nil
             appStateVM.resetMessages()
             showCommands = false
             Task {
-                await appStateVM.queryMessages(cid: newValue.id)
+                await appStateVM.queryMessages(cid: newValue)
             }
         }.sheet(isPresented: $showAddConversation) {
             AddConversationView(conversation: conversation) {
                 showAddConversation = false
             }
-        }.font(.manrope(size: 16, weight: .regular))
+        }.sheet(isPresented: $showParamEditSheetView) {
+            if #available(iOS 16, *) {
+                ParamsEditView(conversation: conversation)
+                    .presentationDetents([.height(480)])
+                    .presentationDragIndicator(.visible)
+            } else {
+                ParamsEditView(conversation: conversation)
+            }
+        }
+        .font(.manrope(size: 16, weight: .regular))
     }
 
     struct SizeKey: PreferenceKey {
@@ -430,18 +413,6 @@ struct ConversationView: View {
             isAIGenerating = false
             isSending = false
 
-        }
-    }
-
-    func saveContextMessages(count: Int) {
-        if conversation == mainConversation {
-            contextCount = count
-        } else {
-            Task {
-                var c = conversation
-                c.contextMessages = count
-                await appStateVM.saveConversation(c)
-            }
         }
     }
 }

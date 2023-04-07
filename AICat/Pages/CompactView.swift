@@ -116,8 +116,8 @@ struct CompactView: View {
                     }
                 }
             )
-        }.onChange(of: appStateVM.conversations) { newValue in
-            let conversation = newValue.first(where: { $0.id == chatId }) ?? mainConversation
+        }.onChange(of: appStateVM.allConversations) { newValue in
+            let conversation = newValue.first(where: { $0.id == chatId })
             appStateVM.setCurrentConversation(conversation)
         }
     }
