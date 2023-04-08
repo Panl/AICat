@@ -19,6 +19,7 @@
 - [ ] Share messages
 - [ ] Add Proxy
 - [ ] Copy code block
+- [ ] iCloud Sync
 
 > the command mode depends on chats with prompt, creating more prompts is important
 
@@ -42,7 +43,6 @@
 ### Download
 
 - [Testflight](https://testflight.apple.com/join/ow799Vvb)
-- [AICat.dmg](Products/AICat.dmg)
 
 ### Telegram
 - [AICat News](https://t.me/aicatevents)

@@ -85,16 +85,28 @@ struct SettingsView: View {
                         Label("Awesome chatgpt prompts", systemImage: "square.stack.3d.up")
                             .labelStyle(.titleAndIcon)
                     }
-                    Link(destination: URL(string: "https://github.com/Panl/AICat.git")!){
-                        Label("Source Code", systemImage: "ellipsis.curlybraces")
-                            .labelStyle(.titleAndIcon)
-                    }
                     Link(destination: URL(string: "mailto:iplay.coder@gmail.com")!){
                         Label("Contact Us", systemImage: "envelope.open")
                             .labelStyle(.titleAndIcon)
                     }
                     Link(destination: URL(string: "https://epochpro.app/aicat_privacy")!) {
                         Label("Privacy and Policy", systemImage: "lock.rectangle.on.rectangle")
+                            .labelStyle(.titleAndIcon)
+                    }
+                }.tint(.primary)
+                Section("Open Source") {
+                    Link(destination: URL(string: "https://github.com/Panl/AICat.git")!){
+                        Label("AICat.git", image: "github_mark")
+                            .labelStyle(.titleAndIcon)
+                    }
+                }.tint(.primary)
+                Section("Social") {
+                    Link(destination: URL(string: "https://github.com/Panl")!){
+                        Label("Panl", image: "github_mark")
+                            .labelStyle(.titleAndIcon)
+                    }
+                    Link(destination: URL(string: "https://twitter.com/panlei106")!){
+                        Label("Rego", image: "twitter_circled")
                             .labelStyle(.titleAndIcon)
                     }
                 }.tint(.primary)
@@ -154,5 +166,6 @@ struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView(onClose: {})
+            .environment(\.colorScheme, .light)
     }
 }
