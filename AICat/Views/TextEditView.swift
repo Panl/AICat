@@ -25,7 +25,6 @@ struct TextEditView<PlaceHolder>: View where PlaceHolder: View {
         #elseif os(macOS)
         TextField(text: $text, axis: .vertical, label: placeHolder)
             .lineLimit(1...8)
-            .submitLabel(.return)
         #endif
     }
 }

@@ -226,12 +226,7 @@ struct ConversationView: View {
 
                 HStack(alignment: .bottom, spacing: 4) {
                     TextEditView(text: $inputText) {
-                        #if os(iOS)
                         Text("Say something" + (conversation.isMain ? " or enter 'space'" : ""))
-                        #elseif os(macOS)
-                        Text("Say something" + (conversation.isMain ? " or enter 'space'" : "") + ", submit with [cmd + enter]")
-                            .lineLimit(1)
-                        #endif
                     }
                     .textFieldStyle(.plain)
                     .frame(minHeight: 26)
@@ -247,11 +242,7 @@ struct ConversationView: View {
                         }
                     }
                     .onSubmit {
-                        #if os(iOS)
                         completeMessage()
-                        #elseif os(macOS)
-                        inputText += "\n"
-                        #endif
                     }
                     if isSending {
                         Button(action: {
@@ -381,10 +372,10 @@ struct ConversationView: View {
             await appStateVM.queryMessages(cid: conversation.id)
             isAIGenerating = true
             if let selectedPrompt {
-                await completeMessages([newMessage], selected: selectedPrompt)
+                await completeMessages([newMessage], selected: selectedPrompt, replyToId: chatMessage.id)
             } else {
                 let messagesToSend = appStateVM.messages.suffix(contextMessages).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
-                await completeMessages(messagesToSend)
+                await completeMessages(messagesToSend, replyToId: chatMessage.id)
             }
         }
     }
@@ -393,18 +384,20 @@ struct ConversationView: View {
         error = nil
         isSending = true
         let messagesToSend = appStateVM.messages.suffix(contextMessages + 1).map({ Message(role: $0.role, content: $0.content) })
+        let replyToId = appStateVM.messages.last?.id ?? ""
         Task {
             isAIGenerating = true
             if let selectedPrompt {
-                await completeMessages(messagesToSend.suffix(1), selected: selectedPrompt)
+                await completeMessages(messagesToSend.suffix(1), selected: selectedPrompt, replyToId: replyToId)
             } else {
-                await completeMessages(messagesToSend)
+                await completeMessages(messagesToSend, replyToId: replyToId)
             }
         }
     }
 
-    func completeMessages(_ messages: [Message], selected: Conversation? = nil) async {
+    func completeMessages(_ messages: [Message], selected: Conversation? = nil, replyToId: String) async {
         var chatMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
+        chatMessage.replyToId = replyToId
         do {
             let stream = try await CatApi.completeMessageStream(messages: messages, conversation: selected ?? conversation)
             for try await (model, delta) in stream {

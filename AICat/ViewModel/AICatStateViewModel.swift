@@ -23,7 +23,7 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
     @AppStorage("request.temperature") var temperature: Double = 1.0
     @AppStorage("request.context.messages") var messagesCount: Int = 0
     @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
-    @AppStorage("database.conversations.didMigrateParams") var didMigrateParams: Bool = false
+    @AppStorage("db.conversations.didMigrateParams") var didMigrateParams: Bool = false
 
     var allConversations: [Conversation] {
         [main] + conversations
@@ -37,7 +37,7 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
             mainChatToSave.temperature = temperature
             mainChatToSave.contextMessages = messagesCount
             mainChatToSave.model = model
-            await saveConversation(mainConversation)
+            await saveConversation(mainChatToSave)
         }
     }
 
