@@ -18,6 +18,8 @@ let models = [
     "gpt-4-32k-0314"
 ]
 
+// https://platform.openai.com/docs/api-reference/completions/create
+
 struct ParamsEditView: View {
 
     @EnvironmentObject var appStateVM: AICatStateViewModel
@@ -31,6 +33,7 @@ struct ParamsEditView: View {
 
     var body: some View {
         VStack(spacing: 20) {
+            Spacer()
             HStack {
                 Text("Context Messages")
                     .padding(.leading, 10)
@@ -39,7 +42,9 @@ struct ParamsEditView: View {
                     ForEach(contextCounts, id: \.self) {
                         Text("\($0)")
                     }
-                }.pickerStyle(.menu)
+                }
+                .pickerStyle(.menu)
+                .tint(.primary.opacity(0.6))
             }
             .padding(.vertical, 4)
             .overlay {
@@ -56,7 +61,9 @@ struct ParamsEditView: View {
                     ForEach(models, id: \.self) {
                         Text($0)
                     }
-                }.pickerStyle(.menu)
+                }
+                .pickerStyle(.menu)
+                .tint(.primary.opacity(0.6))
             }
             .padding(.vertical, 4)
             .overlay {
@@ -81,10 +88,10 @@ struct ParamsEditView: View {
                 HStack {
                     Text("Top P")
                     Spacer()
-                    Text(String(format: "%.2f", temperature))
+                    Text(String(format: "%.2f", conversation.topP))
                 }
                 .padding(.horizontal, 12)
-                SliderView(value: $temperature, sliderRange: 0...2)
+                SliderView(value: $conversation.topP, sliderRange: 0...1)
                     .frame(height: 20)
             }.padding(.horizontal, 10)
 
@@ -92,10 +99,10 @@ struct ParamsEditView: View {
                 HStack {
                     Text("Frequency penalty")
                     Spacer()
-                    Text(String(format: "%.2f", temperature))
+                    Text(String(format: "%.2f", conversation.frequencyPenalty))
                 }
                 .padding(.horizontal, 12)
-                SliderView(value: $temperature, sliderRange: 0...2)
+                SliderView(value: $conversation.frequencyPenalty, sliderRange: -2...2)
                     .frame(height: 20)
             }.padding(.horizontal, 10)
 
@@ -103,12 +110,13 @@ struct ParamsEditView: View {
                 HStack {
                     Text("Presence penalty")
                     Spacer()
-                    Text(String(format: "%.2f", temperature))
+                    Text(String(format: "%.2f", conversation.presencePenalty))
                 }
                 .padding(.horizontal, 12)
-                SliderView(value: $temperature, sliderRange: 0...2)
+                SliderView(value: $conversation.presencePenalty, sliderRange: -2...2)
                     .frame(height: 20)
             }.padding(.horizontal, 10)
+            Spacer()
         }
         .padding(.horizontal, 20)
         .font(.manrope(size: 16, weight: .medium))

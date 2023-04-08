@@ -23,6 +23,7 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
     @AppStorage("request.temperature") var temperature: Double = 1.0
     @AppStorage("request.context.messages") var messagesCount: Int = 0
     @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
+    @AppStorage("database.conversations.didMigrateParams") var didMigrateParams: Bool = false
 
     var allConversations: [Conversation] {
         [main] + conversations
@@ -40,8 +41,26 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
         }
     }
 
+    func migrateConversationParamsIfNeeded() async {
+        if !didMigrateParams {
+            let chats = try! await Conversation.read(from: db, matching: \.$timeRemoved == 0 && \.$id != mainConversation.id, orderBy: .descending(\.$timeCreated))
+            let defaultChat = Conversation(title: "", prompt: "")
+            for var chat in chats {
+                chat.contextMessages = defaultChat.contextMessages
+                chat.temperature = defaultChat.temperature
+                chat.frequencyPenalty = defaultChat.frequencyPenalty
+                chat.presencePenalty = defaultChat.presencePenalty
+                chat.topP = defaultChat.topP
+                chat.model = defaultChat.model
+                await db.upsert(model: chat)
+            }
+            didMigrateParams = true
+        }
+    }
+
     func queryConversations() async {
         await writeMainToDBIfNeeded()
+        await migrateConversationParamsIfNeeded()
         let chats = try! await Conversation.read(from: db, matching: \.$timeRemoved == 0 && \.$id != mainConversation.id, orderBy: .descending(\.$timeCreated))
         conversations = chats
     }

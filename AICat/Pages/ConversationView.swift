@@ -78,7 +78,7 @@ struct ConversationView: View {
                             }
                         }
                         Button(action: { showParamEditSheetView = true }) {
-                            Label("Edit Parameters", systemImage: "rectangle.and.pencil.and.ellipsis")
+                            Label("Edit Model", systemImage: "rectangle.and.pencil.and.ellipsis")
                         }
                         Button(role: .destructive, action: { showClearMesssageAlert = true }) {
                             Label("Clean Messages", systemImage: "trash")
@@ -217,7 +217,7 @@ struct ConversationView: View {
                             .buttonStyle(.borderless)
                             .tint(.blackText.opacity(0.8))
                         }
-                        .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 10))
+                        .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 6))
                         .background(Color.background)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: .primary.opacity(0.1), radius: 12)
@@ -233,7 +233,7 @@ struct ConversationView: View {
                     .tint(.blackText.opacity(0.8))
                     .submitLabel(.send)
                     .onChange(of: inputText) { newValue in
-                        if !conversation.isMain {
+                        if conversation.isMain {
                             if newValue.starts(with: " ") {
                                 showCommands = true
                             } else {
@@ -362,12 +362,12 @@ struct ConversationView: View {
         inputText = ""
         let newMessage = Message(role: "user", content: sendText)
         Task {
-            let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id)
+            let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
             await appStateVM.saveMessage(chatMessage)
             await appStateVM.queryMessages(cid: conversation.id)
             isAIGenerating = true
             if let selectedPrompt {
-                await completeMessages([newMessage], prompt: selectedPrompt.prompt)
+                await completeMessages([newMessage], selected: selectedPrompt)
             } else {
                 let messagesToSend = appStateVM.messages.suffix(contextMessages).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
                 await completeMessages(messagesToSend)
@@ -382,24 +382,25 @@ struct ConversationView: View {
         Task {
             isAIGenerating = true
             if let selectedPrompt {
-                await completeMessages(messagesToSend.suffix(1), prompt: selectedPrompt.prompt)
+                await completeMessages(messagesToSend.suffix(1), selected: selectedPrompt)
             } else {
                 await completeMessages(messagesToSend)
             }
         }
     }
 
-    func completeMessages(_ messages: [Message], prompt: String? = nil) async {
+    func completeMessages(_ messages: [Message], selected: Conversation? = nil) async {
         var chatMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         do {
-            let stream = try await CatApi.completeMessageStream(messages: messages, with: prompt ?? conversation.prompt)
-            for try await delta in stream {
+            let stream = try await CatApi.completeMessageStream(messages: messages, conversation: selected ?? conversation)
+            for try await (model, delta) in stream {
                 if let role = delta.role {
                     chatMessage.role = role
                 }
                 if let content = delta.content {
                     chatMessage.content += content
                 }
+                chatMessage.model = model
                 await appStateVM.saveMessage(chatMessage)
                 isAIGenerating = false
             }

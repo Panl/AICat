@@ -55,9 +55,7 @@ struct SliderView: View {
                                 progressWidth = calculateProgressWidth(gesture: g, slideWidth: slideWidth)
                                 value = (progressWidth / slideWidth) * totalAmount + start
                             }
-                            .onEnded { g in
-                                progressWidth = calculateProgressWidth(gesture: g, slideWidth: slideWidth)
-                                value = (progressWidth / slideWidth) * totalAmount + start
+                            .onEnded { _ in
                                 lastWidth = progressWidth
                             }
                     )
@@ -75,7 +73,7 @@ struct SliderView: View {
     }
 
     func valueToProgressWidth(slideWidth: CGFloat) -> CGFloat {
-        return slideWidth * value / totalAmount
+        return slideWidth * (value - start) / totalAmount
     }
 }
 

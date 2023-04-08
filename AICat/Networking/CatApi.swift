@@ -42,26 +42,28 @@ struct StreamResponse: Codable {
 
 enum CatApi {
 
-    static func completeMessageStream(apiKey: String? = nil, messages: [Message], with prompt: String? = nil) async throws -> AsyncThrowingStream<StreamResponse.Delta, Error> {
+    static func completeMessageStream(apiKey: String? = nil, messages: [Message], conversation: Conversation) async throws -> AsyncThrowingStream<(String, StreamResponse.Delta), Error> {
         let key = apiKey ?? UserDefaults.openApiKey
         guard let key else { throw NSError(domain: "missing OpenAI API key", code: -1) }
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer \(key)"
         ]
-        let temperature = UserDefaults.temperature
-        let model = UserDefaults.model
         var messageToSend = messages
-        if let prompt, !prompt.isEmpty {
+        let prompt = conversation.prompt
+        if !prompt.isEmpty {
             let system = Message(role: "system", content: prompt)
             messageToSend = [system] + messages
         }
         var request = try URLRequest(url: "https://api.openai.com/v1/chat/completions", method: .post, headers: headers)
         let body = CompleteParams(
-            model: model,
+            model: conversation.model,
             messages: messageToSend,
-            temperature: temperature,
-            stream: true
+            temperature: conversation.temperature,
+            stream: true,
+            topP: conversation.topP,
+            frequencyPenalty: conversation.frequencyPenalty,
+            presencePenalty: conversation.presencePenalty
         )
         request.httpBody = try JSONEncoder().encode(body)
         request.timeoutInterval = 60
@@ -77,7 +79,7 @@ enum CatApi {
             }
             throw NSError(domain: "Bad response: \(httpResponse.statusCode), \(errorText)", code: 0)
         }
-        return AsyncThrowingStream<StreamResponse.Delta, Error> { continuation in
+        return AsyncThrowingStream<(String, StreamResponse.Delta), Error> { continuation in
             Task {
                 do {
                     for try await line in result.lines {
@@ -85,7 +87,8 @@ enum CatApi {
                            let data = line.dropFirst(6).data(using: .utf8),
                            let response = decodeResponse(data: data),
                            let delta = response.choices.first?.delta {
-                            continuation.yield(delta)
+                            let model = response.model
+                            continuation.yield((model, delta))
                         }
                     }
                     continuation.finish()
@@ -155,7 +158,10 @@ enum CatApi {
                 model: model,
                 messages: messages,
                 temperature: temperature,
-                stream: false
+                stream: false,
+                topP: 1,
+                frequencyPenalty: 0,
+                presencePenalty: 0
             ),
             encoder: .json,
             headers: headers,
@@ -224,6 +230,19 @@ struct CompleteParams: Codable {
     let messages: [Message]
     let temperature: Double
     let stream: Bool
+    let topP: Double
+    let frequencyPenalty: Double
+    let presencePenalty: Double
+
+    enum CodingKeys: String, CodingKey {
+        case model = "model"
+        case messages = "messages"
+        case temperature = "temperature"
+        case stream = "stream"
+        case topP = "top_p"
+        case frequencyPenalty = "frequency_penalty"
+        case presencePenalty = "presence_penalty"
+    }
 }
 
 struct CompleteResponse: Codable {

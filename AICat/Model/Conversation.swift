@@ -18,6 +18,9 @@ struct Conversation: BlackbirdModel {
     @BlackbirdColumn var temperature: Double = 0.7
     @BlackbirdColumn var model: String = "gpt-3.5-turbo"
     @BlackbirdColumn var maxTokens: Int = 2048
+    @BlackbirdColumn var topP: Double = 1
+    @BlackbirdColumn var presencePenalty: Double = 0
+    @BlackbirdColumn var frequencyPenalty: Double = 0
     @BlackbirdColumn var cost: Double = 0
     @BlackbirdColumn var timeCreated: Int = Date.now.timeInSecond
     @BlackbirdColumn var timeRemoved: Int = 0
