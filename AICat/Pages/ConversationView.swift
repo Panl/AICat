@@ -224,14 +224,19 @@ struct ConversationView: View {
                     }.padding(.horizontal, 20)
                 }
 
-                HStack {
-                    TextField(text: $inputText) {
+                HStack(alignment: .bottom, spacing: 4) {
+                    TextEditView(text: $inputText) {
+                        #if os(iOS)
                         Text("Say something" + (conversation.isMain ? " or enter 'space'" : ""))
+                        #elseif os(macOS)
+                        Text("Say something" + (conversation.isMain ? " or enter 'space'" : "") + ", submit with [cmd + enter]")
+                            .lineLimit(1)
+                        #endif
                     }
                     .textFieldStyle(.plain)
+                    .frame(minHeight: 26)
                     .focused($isFocused)
                     .tint(.blackText.opacity(0.8))
-                    .submitLabel(.send)
                     .onChange(of: inputText) { newValue in
                         if conversation.isMain {
                             if newValue.starts(with: " ") {
@@ -242,7 +247,11 @@ struct ConversationView: View {
                         }
                     }
                     .onSubmit {
+                        #if os(iOS)
                         completeMessage()
+                        #elseif os(macOS)
+                        inputText += "\n"
+                        #endif
                     }
                     if isSending {
                         Button(action: {
@@ -253,7 +262,9 @@ struct ConversationView: View {
                                 .frame(width: 17, height: 17)
                                 .cornerRadius(2)
                                 .opacity(0.5)
-                        }.buttonStyle(.borderless)
+                        }
+                        .frame(width: 26, height: 26)
+                        .buttonStyle(.borderless)
                     }
                     Button(
                         action: {
@@ -286,11 +297,13 @@ struct ConversationView: View {
                             }
                         }
                     }
+                    .keyboardShortcut(KeyEquivalent.return, modifiers: [.command])
                     .frame(width: 26, height: 26)
                     .buttonStyle(.borderless)
                     .disabled(inputText.isEmpty)
                 }
-                .frame(height: 50)
+                .padding(.vertical, 12)
+                .frame(minHeight: 50)
                 .padding(.leading, 16)
                 .padding(.trailing, 12)
                 .background(Color.background)
@@ -356,9 +369,10 @@ struct ConversationView: View {
     }
 
     func completeMessage() {
-        guard !inputText.isEmpty, !isSending else { return }
+        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty, !isSending else { return }
         isSending = true
-        let sendText = inputText
+        let sendText = text
         inputText = ""
         let newMessage = Message(role: "user", content: sendText)
         Task {

@@ -1,7 +1,6 @@
-# AICat
-> An chat app base on ChatGPT
+# AICat - Apple Platform Client for ChatGPT
 
-### Build Requirements
+### Build
 - Xcode 14.3 (Not verified on other version)
 - Create Credential.Swift
   ```Swift
@@ -12,16 +11,21 @@
 
 ### Features
 
-- [Features of ChatGPT Web App](https://chat.openai.com/chat)
-- Create Chat with prompt
-- Command mode inspired by Telegram
-- Custom some request parameters in Settings
-- CRUD for Chat and Messages
+- [x] [Features of ChatGPT Web App](https://chat.openai.com/chat)
+- [x] Create Chat with prompt
+- [x] Command mode inspired by Telegram
+- [x] Custom request parameters for every conversation
+- [x] CRUD for Chat and Messages
+- [ ] Share messages
+- [ ] Add Proxy
+- [ ] Copy code block
 
 > the command mode depends on chats with prompt, creating more prompts is important
 
 ### Requirements
 - [OpenAI API Key](https://platform.openai.com/account/api-keys)
+- iOS, iPadOS 15 and later version
+- macOS 13 and later version
 
 
 ### Screenshots

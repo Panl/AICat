@@ -58,7 +58,6 @@ struct CompactView: View {
             )
             .background {
                 Color.background
-                    .ignoresSafeArea()
                     .clipShape(RoundedRectangle(cornerRadius: 12 * progress))
                     .shadow(color: .primary.opacity(0.1).opacity(progress), radius: 4)
             }
