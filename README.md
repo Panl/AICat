@@ -16,8 +16,8 @@
 - [x] Command mode inspired by Telegram
 - [x] Custom request parameters for every conversation
 - [x] CRUD for Chat and Messages
+- [x] Custom API Host
 - [ ] Share messages
-- [ ] Add Proxy
 - [ ] Copy code block
 - [ ] iCloud Sync
 

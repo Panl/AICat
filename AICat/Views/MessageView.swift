@@ -42,7 +42,7 @@ struct MineMessageView: View {
                 )
                 .clipShape(CornerRadiusShape(radius: 4, corners: .topRight))
                 .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topLeft]))
-                .padding(.trailing, 20)
+                .padding(.trailing, 16)
             }
         }
     }
@@ -76,7 +76,7 @@ struct AICatMessageView: View {
             .background(Color.aiBubbleBg)
             .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
             .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
-            .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
+            .padding(.init(top: 0, leading: 16, bottom: 0, trailing: 36))
 
         }
     }
@@ -216,7 +216,7 @@ struct ErrorMessageView: View {
                     }
                 }
                 .buttonStyle(.borderless)
-            }.padding(.horizontal, 20)
+            }.padding(.horizontal, 16)
         }
     }
 }
@@ -249,7 +249,7 @@ struct InputingMessageView: View {
         .background(Color.aiBubbleBg)
         .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
         .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
-        .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 36))
+        .padding(.init(top: 0, leading: 16, bottom: 0, trailing: 36))
         .onAppear {
             self.shouldAnimate.toggle()
         }

@@ -61,8 +61,19 @@ struct SettingsView: View {
             #endif
             List {
                 Section("API Key") {
-                    SecureField(text: $apiKey) {
-                        Text("Enter API key")
+                    HStack {
+                        SecureField(text: $apiKey) {
+                            Text("Enter API key")
+                        }
+                        if !apiKey.isEmpty {
+                            Button(action: {
+                                apiKey = ""
+                            }) {
+                                Image(systemName: "multiply.circle.fill")
+                            }
+                            .tint(.gray)
+                            .buttonStyle(.borderless)
+                        }
                     }
                     HStack(spacing: 8) {
                         Button("Validate and save") {
@@ -93,8 +104,19 @@ struct SettingsView: View {
                     }
                 )
                 Section("API HOST") {
-                    TextField(text: $apiHost) {
-                        Text("Enter api host")
+                    HStack {
+                        TextField(text: $apiHost) {
+                            Text("Enter api host")
+                        }
+                        if !apiHost.isEmpty {
+                            Button(action: {
+                                apiHost = ""
+                            }) {
+                                Image(systemName: "multiply.circle.fill")
+                            }
+                            .tint(.gray)
+                            .buttonStyle(.borderless)
+                        }
                     }
                     HStack(spacing: 8) {
                         Button("Validate and save") {
@@ -112,7 +134,12 @@ struct SettingsView: View {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.green)
                         }
+                        Spacer()
                     }
+                    Button("Reset", action: {
+                        apiHost = "https://api.openai.com"
+                        UserDefaults.apiHost = "https://api.openai.com"
+                    })
                 }
                 .alert(
                     "Validate Failed",
@@ -142,15 +169,19 @@ struct SettingsView: View {
                             .labelStyle(.titleAndIcon)
                     }
                 }.tint(.primary)
-                Section("Open Source") {
+                Section("Source Code") {
                     Link(destination: URL(string: "https://github.com/Panl/AICat.git")!){
-                        Label("AICat.git", image: "github_mark")
+                        Label("AICat.git", image: "github_icon")
                             .labelStyle(.titleAndIcon)
                     }
                 }.tint(.primary)
                 Section("Social") {
+                    Link(destination: URL(string: "https://t.me/aicatevents")!){
+                        Label("AICat News", image: "telegram_icon")
+                            .labelStyle(.titleAndIcon)
+                    }
                     Link(destination: URL(string: "https://github.com/Panl")!){
-                        Label("Panl", image: "github_mark")
+                        Label("Panl", image: "github_icon")
                             .labelStyle(.titleAndIcon)
                     }
                     Link(destination: URL(string: "https://twitter.com/panlei106")!){

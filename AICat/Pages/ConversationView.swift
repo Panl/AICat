@@ -157,7 +157,7 @@ struct ConversationView: View {
                             }
                         }
                     }
-                }
+                }.padding(.bottom, 36)
             }
             VStack {
                 if showCommands, !filterdPrompts.isEmpty {
@@ -300,7 +300,7 @@ struct ConversationView: View {
                 .background(Color.background)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .shadow(color: .primary.opacity(0.1), radius: 4)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 16)
                 .padding(.bottom, 16)
             }
         }.task {
