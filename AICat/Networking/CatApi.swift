@@ -8,20 +8,6 @@
 import Foundation
 import Alamofire
 
-//{
-//    "id": "chatcmpl-6yCEXASoUbnpxciRDjFSBdVCtVv7d",
-//    "object": "chat.completion.chunk",
-//    "created": 1679804725,
-//    "model": "gpt-3.5-turbo-0301",
-//    "choices": [{
-//        "delta": {
-//            "content": "As"
-//        },
-//        "index": 0,
-//        "finish_reason": null
-//    }]
-//}
-
 struct StreamResponse: Codable {
     let id: String
     let object: String
@@ -55,7 +41,7 @@ enum CatApi {
             let system = Message(role: "system", content: prompt)
             messageToSend = [system] + messages
         }
-        var request = try URLRequest(url: "https://api.openai.com/v1/chat/completions", method: .post, headers: headers)
+        var request = try URLRequest(url: "\(UserDefaults.apiHost)/v1/chat/completions", method: .post, headers: headers)
         let body = CompleteParams(
             model: conversation.model,
             messages: messageToSend,
@@ -124,23 +110,8 @@ enum CatApi {
         return nil
     }
 
-    static func decode(data: Data) -> StreamResponse? {
-        let str = String(decoding: data, as: UTF8.self)
-        if str.hasPrefix("data: ") {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            do {
-                let validData = str.dropFirst(6).data(using: .utf8)
-                let response = try decoder.decode(StreamResponse.self, from: validData!)
-                return response
-            } catch {
-                print("decode error: \(error) - rawJson: \(str)")
-            }
-        }
-        return nil
-    }
-
-    static func complete(apiKey: String? = nil, messages: [Message]) async -> Result<CompleteResponse, AFError> {
+    static func complete(apiHost: String? = nil, apiKey: String? = nil, messages: [Message]) async -> Result<CompleteResponse, AFError> {
+        let host = apiHost ?? UserDefaults.apiHost
         let key = apiKey ?? UserDefaults.openApiKey
         guard let key else {
             return .failure(AFError.createURLRequestFailed(error: NSError(domain: "missing OpenAI API key", code: -1)))
@@ -152,7 +123,7 @@ enum CatApi {
         let temperature = UserDefaults.temperature
         let model = UserDefaults.model
         return await AF.request(
-            "https://api.openai.com/v1/chat/completions",
+            "\(host)/v1/chat/completions",
             method: .post,
             parameters: CompleteParams(
                 model: model,
@@ -177,17 +148,12 @@ enum CatApi {
         .result
     }
 
-    static func complete(messages: [Message], with prompt: String) async -> Result<CompleteResponse, AFError> {
-        if prompt.isEmpty {
-            return await complete(messages: messages)
-        } else {
-            let system = Message(role: "system", content: prompt)
-            return await complete(messages: [system] + messages)
-        }
-    }
-
     static func validate(apiKey: String) async -> Result<CompleteResponse, AFError> {
         await complete(apiKey: apiKey, messages: [Message(role: "user", content: "say this is a test")])
+    }
+
+    static func validate(apiHost: String) async -> Result<CompleteResponse, AFError> {
+        await complete(apiHost: apiHost, messages: [Message(role: "user", content: "say this is a test")])
     }
 }
 

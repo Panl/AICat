@@ -39,4 +39,13 @@ extension UserDefaults {
         }
     }
 
+    static var apiHost: String {
+        set {
+            defaults.set(newValue, forKey: "AICat.apiHost")
+        }
+        get {
+            defaults.string(forKey: "AICat.apiHost") ?? "https://api.openai.com"
+        }
+    }
+
 }

@@ -12,9 +12,15 @@ import Alamofire
 struct SettingsView: View {
 
     @State var apiKey = UserDefaults.openApiKey ?? ""
+    @State var apiHost = UserDefaults.apiHost
     @State var isValidating = false
     @State var error: AFError?
+    @State var showApiKeyAlert = false
     @State var isValidated = false
+    @State var isValidatingApiHost = false
+    @State var isValidatedApiHost = false
+    @State var apiHostError: AFError?
+    @State var showApiHostAlert = false
 
     var appVersion: String {
         Bundle.main.releaseVersion ?? "1.0"
@@ -76,6 +82,48 @@ struct SettingsView: View {
                         }
                     }
                 }
+                .alert(
+                    "Validate Failed",
+                    isPresented: $showApiKeyAlert,
+                    actions: {
+                        Button("OK", action: { showApiKeyAlert = false })
+                    },
+                    message: {
+                        Text("\(error?.localizedDescription ?? "")")
+                    }
+                )
+                Section("API HOST") {
+                    TextField(text: $apiHost) {
+                        Text("Enter api host")
+                    }
+                    HStack(spacing: 8) {
+                        Button("Validate and save") {
+                            validateApiHost()
+                        }
+                        if isValidatingApiHost {
+                            LoadingIndocator()
+                                .frame(width: 24, height: 14)
+                        }
+                        if apiHostError != nil {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.red)
+                        }
+                        if isValidatedApiHost {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        }
+                    }
+                }
+                .alert(
+                    "Validate Failed",
+                    isPresented: $showApiHostAlert,
+                    actions: {
+                        Button("OK", action: { showApiHostAlert = false })
+                    },
+                    message: {
+                        Text("\(apiHostError?.localizedDescription ?? "")")
+                    }
+                )
                 Section("support") {
                     Link(destination: URL(string: "https://learnprompting.org/")!) {
                         Label("Learn Prompting", systemImage: "book")
@@ -156,8 +204,29 @@ struct SettingsView: View {
                 isValidated = true
             case .failure(let failure):
                 error = failure
+                showApiKeyAlert = true
             }
             isValidating = false
+        }
+
+    }
+
+    func validateApiHost() {
+        guard !isValidatingApiHost else { return }
+        apiHostError = nil
+        isValidatingApiHost = true
+        isValidatedApiHost = false
+        Task {
+            let result = await CatApi.validate(apiHost: apiHost)
+            switch result {
+            case .success(_):
+                UserDefaults.apiHost = apiHost
+                isValidatedApiHost = true
+            case .failure(let failure):
+                apiHostError = failure
+                showApiHostAlert = true
+            }
+            isValidatingApiHost = false
         }
 
     }
