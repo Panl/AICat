@@ -413,9 +413,9 @@ struct ConversationView: View {
                 chatMessage.model = model
                 await appStateVM.saveMessage(chatMessage)
                 isAIGenerating = false
-                appStateVM.incrementSentMessageCount()
             }
             isSending = false
+            appStateVM.incrementSentMessageCount()
         } catch {
             let err = error as NSError
             if err.code != -999 {
