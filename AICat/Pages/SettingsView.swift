@@ -24,6 +24,8 @@ struct SettingsView: View {
 
     @EnvironmentObject var appStateVM: AICatStateViewModel
 
+    @State var toast: Toast?
+
     var appVersion: String {
         Bundle.main.releaseVersion ?? "1.0"
     }
@@ -62,7 +64,7 @@ struct SettingsView: View {
             .frame(height: 44)
             #endif
             List {
-                if appStateVM.developMode {
+                if appStateVM.isDeveloperModeEnable {
                     Section("API Key") {
                         HStack {
                             SecureField(text: $apiKey) {
@@ -208,7 +210,11 @@ struct SettingsView: View {
                                 LongPressGesture()
                                     .onEnded { _ in
                                         appStateVM.developMode.toggle()
-                                        HapticEngine.trigger()
+                                        if appStateVM.developMode {
+                                            toast = Toast(type: .info, message: "You are in Develper Mode, enter API key", duration: 2)
+                                        } else {
+                                            toast = Toast(type: .info, message: "You are in Normal Mode", duration: 2)
+                                        }
                                     }
                             )
                         Spacer()
@@ -234,6 +240,7 @@ struct SettingsView: View {
             }
             .background(Color.background)
             .font(.manrope(size: 16, weight: .medium))
+            .toast($toast)
         }
     }
 

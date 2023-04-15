@@ -22,6 +22,8 @@ struct PremiumPage: View {
 
     @State var isPurchasing: Bool = false
 
+    @State var toast: Toast?
+
     var body: some View {
         VStack {
             HStack {
@@ -47,7 +49,7 @@ struct PremiumPage: View {
                 FeatureView(title: "Higher word limit", description: "Enjoy extended conversations with a higher word limit per message.")
                 FeatureView(title: "Get new features first", description: "Be the first to access and try out new and upcoming features.")
             }
-            .padding(.top, 20)
+            .padding(.vertical, 20)
             .padding(.horizontal, 40)
             Spacer()
             Button(action: {
@@ -109,18 +111,21 @@ struct PremiumPage: View {
             await appStateVM.fetchPayWall()
         }
         .background(.background)
+        .toast($toast)
     }
 
     func subscribeNow() async {
-        // guard !SystemUtil.maybeFromTestFlight else { return }
         guard !isPurchasing, !appStateVM.isPremium else { return }
         if let product {
             isPurchasing = true
             let result = await Apphud.purchase(product)
             if result.success {
-
-            } else {
-
+                toast = Toast(type: .success, message: "You get AICat Premium Now!", duration: 2)
+            }
+            if let error = result.error as? NSError {
+                toast = Toast(type: .error, message: "Purchase failed, \(error.localizedDescription))", duration: 4)
+            } else if result.error != nil {
+                toast = Toast(type: .error, message: "Purchase failed!", duration: 2)
             }
             isPurchasing = false
         }
@@ -131,6 +136,11 @@ struct PremiumPage: View {
         isPurchasing = true
         Apphud.restorePurchases { _, _, _ in
             isPurchasing = false
+            if Apphud.hasPremiumAccess() {
+                toast = Toast(type: .success, message: "You get AICat Premium Now!", duration: 2)
+            } else {
+                toast = Toast(type: .error, message: "You are not premium user!", duration: 2)
+            }
         }
     }
 }
@@ -151,7 +161,7 @@ struct FeatureView: View {
             Text(description)
                 .font(.manrope(size: 14, weight: .medium))
                 .foregroundColor(.gray)
-                .padding(.leading, 30)
+                .padding(.leading, 32)
         }
     }
 }
