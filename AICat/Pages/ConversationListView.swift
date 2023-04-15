@@ -17,6 +17,14 @@ struct ConversationListView: View {
     @State var showClearAllChatAlert = false
     @State var showSettingsView = false
 
+    var premiumText: String {
+        if appStateVM.isPremium {
+            return "AICat Premium"
+        } else {
+            return "AICat Premium(\(appStateVM.sentMessageCount)/\(appStateVM.freeMessageCount))"
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             Image("chatgpt_logo")
@@ -157,7 +165,7 @@ struct ConversationListView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 20, height: 20)
-                            Text("AICat Premium")
+                            Text(premiumText)
                             Spacer()
                         }
                         .padding(.vertical, 10)

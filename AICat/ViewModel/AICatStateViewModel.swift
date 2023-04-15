@@ -42,11 +42,11 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
     private var cancellable: AnyCancellable?
 
     init() {
+        NSUbiquitousKeyValueStore.default.synchronize()
         cancellable = NotificationCenter.default.publisher(for: NSUbiquitousKeyValueStore.didChangeExternallyNotification)
             .sink { [weak self] _ in
                 self?.fetchValueFromICloud()
             }
-
         fetchValueFromICloud()
     }
 
@@ -57,6 +57,9 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
 
     func incrementSentMessageCount() {
         sentMessageCount += 1
+        if sentMessageCount > freeMessageCount {
+            sentMessageCount = freeMessageCount
+        }
         let keyValueStore = NSUbiquitousKeyValueStore.default
         keyValueStore.set(sentMessageCount, forKey: "AICat.sentMessageCount")
         keyValueStore.synchronize()
