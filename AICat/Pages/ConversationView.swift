@@ -132,7 +132,7 @@ struct ConversationView: View {
                             if isAIGenerating && isSending {
                                 InputingMessageView().id("generating")
                             }
-                            Spacer().frame(height: 100)
+                            Spacer().frame(height: 80)
                                 .id("Bottom")
                         }
                     }
@@ -360,6 +360,9 @@ struct ConversationView: View {
     }
 
     func completeMessage() {
+        if appStateVM.needBuyPremium() {
+            return
+        }
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, !isSending else { return }
         isSending = true
@@ -410,6 +413,7 @@ struct ConversationView: View {
                 chatMessage.model = model
                 await appStateVM.saveMessage(chatMessage)
                 isAIGenerating = false
+                appStateVM.incrementSentMessageCount()
             }
             isSending = false
         } catch {

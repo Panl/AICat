@@ -30,10 +30,8 @@ struct MainView: View {
                 onSkip: { appStateVM.showAddAPIKeySheet = false }
             )
         }
-        .onAppear {
-            if apiKey == nil {
-                appStateVM.showAddAPIKeySheet = true
-            }
+        .sheet(isPresented: $appStateVM.showPremumPage) {
+            PremiumPage()
         }
     }
 }

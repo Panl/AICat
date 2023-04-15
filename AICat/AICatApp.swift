@@ -11,6 +11,7 @@ import Foundation
 import AppCenter
 import AppCenterCrashes
 import AppCenterAnalytics
+import ApphudSDK
 
 @main
 struct AICatApp: App {
@@ -24,6 +25,7 @@ struct AICatApp: App {
                 Crashes.self
             ]
         )
+        Apphud.start(apiKey: appHudKey)
     }
 
     var body: some Scene {

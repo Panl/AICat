@@ -29,8 +29,7 @@ struct StreamResponse: Codable {
 enum CatApi {
 
     static func completeMessageStream(apiKey: String? = nil, messages: [Message], conversation: Conversation) async throws -> AsyncThrowingStream<(String, StreamResponse.Delta), Error> {
-        let key = apiKey ?? UserDefaults.openApiKey
-        guard let key else { throw NSError(domain: "missing OpenAI API key", code: -1) }
+        let key = apiKey ?? UserDefaults.openApiKey ?? openAIKey
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer \(key)"
@@ -53,9 +52,11 @@ enum CatApi {
         )
         request.httpBody = try JSONEncoder().encode(body)
         request.timeoutInterval = 60
+        #if DEBUG
         print("=====request=====")
         print(body)
         print("======")
+        #endif
         let (result, response) = try await URLSession.shared.bytes(for: request)
         guard let httpResponse = response as? HTTPURLResponse else { throw NSError(domain: "Invalid response", code: 0) }
         guard 200...299 ~= httpResponse.statusCode else {
@@ -86,7 +87,7 @@ enum CatApi {
     }
 
     static func cancelMessageStream() {
-        cancelTaskWithUrl(URL(string: "https://api.openai.com/v1/chat/completions"))
+        cancelTaskWithUrl(URL(string: "\(UserDefaults.apiHost)/v1/chat/completions"))
     }
 
     static func cancelTaskWithUrl(_ url: URL?) {
@@ -112,10 +113,7 @@ enum CatApi {
 
     static func complete(apiHost: String? = nil, apiKey: String? = nil, messages: [Message]) async -> Result<CompleteResponse, AFError> {
         let host = apiHost ?? UserDefaults.apiHost
-        let key = apiKey ?? UserDefaults.openApiKey
-        guard let key else {
-            return .failure(AFError.createURLRequestFailed(error: NSError(domain: "missing OpenAI API key", code: -1)))
-        }
+        let key = apiKey ?? UserDefaults.openApiKey ?? openAIKey
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer \(key)"

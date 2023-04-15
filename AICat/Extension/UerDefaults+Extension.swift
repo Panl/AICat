@@ -9,7 +9,6 @@ import Foundation
 
 let defaults = UserDefaults.standard
 
-
 extension UserDefaults {
 
     static var openApiKey: String? {
@@ -44,8 +43,12 @@ extension UserDefaults {
             defaults.set(newValue, forKey: "AICat.apiHost")
         }
         get {
-            defaults.string(forKey: "AICat.apiHost") ?? "https://api.openai.com"
+            defaults.string(forKey: "AICat.apiHost") ?? (isDeveloperModeEnable ? "https://api.openai.com" : proxyAPIHost)
         }
+    }
+
+    static var isDeveloperModeEnable: Bool {
+        defaults.bool(forKey: "AICat.developerMode") || openApiKey != nil
     }
 
 }

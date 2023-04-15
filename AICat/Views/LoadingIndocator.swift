@@ -10,6 +10,7 @@ import SwiftUI
 struct LoadingIndocator: View {
 
     @State private var isLoading = false
+    var themeColor = Color.primary
 
     var body: some View {
         GeometryReader { proxy in
@@ -19,11 +20,11 @@ struct LoadingIndocator: View {
             ZStack {
                 Color.clear
                 Circle()
-                    .stroke(Color.gray.opacity(0.5), lineWidth: borderWidth)
+                    .stroke(themeColor.opacity(0.3), lineWidth: borderWidth)
                     .frame(width: drawSize, height: drawSize)
                 Circle()
                     .trim(from: 0, to: 0.25)
-                    .stroke(.primary, style: StrokeStyle(lineWidth: 0.08 * size, lineCap: .round))
+                    .stroke(themeColor, style: StrokeStyle(lineWidth: 0.15 * size, lineCap: .round))
                     .frame(width: drawSize, height: drawSize)
                     .rotationEffect(Angle(degrees: isLoading ? 360 : 0))
                     .animation(.linear(duration: 0.6).repeatForever(autoreverses: false), value: isLoading)
@@ -37,8 +38,9 @@ struct LoadingIndocator: View {
 
 struct LoadingIndicator_Previews: PreviewProvider {
     static var previews: some View {
-        LoadingIndocator()
+        LoadingIndocator(themeColor: .white)
             .frame(width: 24, height: 24)
+            .background()
             .environment(\.colorScheme, .dark)
     }
 }

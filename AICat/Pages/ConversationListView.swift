@@ -95,75 +95,97 @@ struct ConversationListView: View {
                 .foregroundColor(Color.gray.opacity(0.1))
                 .padding(.horizontal, 20)
                 .padding(.bottom, 6)
-            Button(action: { showClearAllChatAlert = true }) {
-                HStack {
-                    Image(systemName: "trash")
-                    Text("Clear Conversations")
-                        .lineLimit(1)
-                    Spacer()
+            VStack(spacing: 0) {
+                Button(action: { showClearAllChatAlert = true }) {
+                    HStack {
+                        Image(systemName: "trash")
+                        Text("Clear Conversations")
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.vertical, 10)
                 }
-                .padding(.vertical, 10)
-            }
-            .buttonStyle(.borderless)
-            .tint(.blackText.opacity(0.5))
-            .padding(.horizontal, 20)
-            .alert("Are you sure to clear all conversations", isPresented: $showClearAllChatAlert) {
-                Button("Sure", role: .destructive) {
-                    clearAllConversation()
+                .buttonStyle(.borderless)
+                .tint(.blackText.opacity(0.5))
+                .padding(.horizontal, 20)
+                .alert("Are you sure to clear all conversations", isPresented: $showClearAllChatAlert) {
+                    Button("Sure", role: .destructive) {
+                        clearAllConversation()
+                    }
+                    Button("Cancel", role: .cancel) {
+                        showClearAllChatAlert = false
+                    }
                 }
-                Button("Cancel", role: .cancel) {
-                    showClearAllChatAlert = false
+                if appStateVM.isDeveloperModeEnable {
+                    Button(action: { appStateVM.showAddAPIKeySheet = true }) {
+                        HStack {
+                            Image(systemName: "key.viewfinder")
+                            Text("OpenAI API Key")
+                                .lineLimit(1)
+                            Spacer()
+                        }
+                        .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.borderless)
+                    .tint(.blackText.opacity(0.5))
+                    .padding(.horizontal, 20)
                 }
-            }
-            Button(action: { appStateVM.showAddAPIKeySheet = true }) {
-                HStack {
-                    Image(systemName: "key.viewfinder")
-                    Text("OpenAI API Key")
-                        .lineLimit(1)
-                    Spacer()
+                Button(action: {
+                    #if os(iOS)
+                    UIApplication.shared.open(URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!)
+                    #elseif os(macOS)
+                    NSWorkspace.shared.open(URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!)
+                    #endif
+                }) {
+                    HStack {
+                        Image(systemName: "questionmark.circle")
+                        Text("Updates & FAQ")
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.vertical, 10)
                 }
-                .padding(.vertical, 10)
-            }
-            .buttonStyle(.borderless)
-            .tint(.blackText.opacity(0.5))
-            .padding(.horizontal, 20)
-            Button(action: {
+                .buttonStyle(.borderless)
+                .padding(.horizontal, 20)
+                .tint(.blackText.opacity(0.5))
+                if !appStateVM.developMode {
+                    Button(
+                        action: { appStateVM.showPremumPage = true }
+                    ) {
+                        HStack {
+                            Image(systemName: "crown")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                            Text("AICat Premium")
+                            Spacer()
+                        }
+                        .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(.horizontal, 20)
+                    .tint(.blackText.opacity(0.5))
+                }
                 #if os(iOS)
-                UIApplication.shared.open(URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!)
-                #elseif os(macOS)
-                NSWorkspace.shared.open(URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!)
+                Button(action: { showSettingsView = true }) {
+                    HStack {
+                        Image(systemName: "gearshape")
+                        Text("Settings")
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.vertical, 10)
+                }
+                .buttonStyle(.borderless)
+                .padding(.horizontal, 20)
+                .tint(.blackText.opacity(0.5))
+                .fullScreenCover(isPresented: $showSettingsView) {
+                    SettingsView {
+                        showSettingsView = false
+                    }
+                }
                 #endif
-            }) {
-                HStack {
-                    Image(systemName: "questionmark.circle")
-                    Text("Updates & FAQ")
-                        .lineLimit(1)
-                    Spacer()
-                }
-                .padding(.vertical, 10)
             }
-            .buttonStyle(.borderless)
-            .padding(.horizontal, 20)
-            .tint(.blackText.opacity(0.5))
-            #if os(iOS)
-            Button(action: { showSettingsView = true }) {
-                HStack {
-                    Image(systemName: "gearshape")
-                    Text("Settings")
-                        .lineLimit(1)
-                    Spacer()
-                }
-                .padding(.vertical, 10)
-            }
-            .buttonStyle(.borderless)
-            .padding(.horizontal, 20)
-            .tint(.blackText.opacity(0.5))
-            .fullScreenCover(isPresented: $showSettingsView) {
-                SettingsView {
-                    showSettingsView = false
-                }
-            }
-            #endif
             Spacer().frame(height: 16)
         }
         .ignoresSafeArea(.keyboard)
@@ -194,6 +216,6 @@ struct ConversationListView_Previews: PreviewProvider {
             selectedChat: Conversation(title: "Main", prompt: ""),
             conversations: [Conversation(title: "Main", prompt: ""), Conversation(title: "How to make a gift", prompt: "")],
             onAddChat: {}, onChatChanged: { _ in }
-        )
+        ).environmentObject(AICatStateViewModel())
     }
 }
