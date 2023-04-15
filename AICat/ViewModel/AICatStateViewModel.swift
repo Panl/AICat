@@ -70,11 +70,26 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
     }
 
     var isPremium: Bool {
-        Apphud.hasPremiumAccess()
+        UserDefaults.openApiKey != nil || hasPremiumAccess
     }
 
     var isDeveloperModeEnable: Bool {
         UserDefaults.openApiKey != nil || developMode
+    }
+
+    private var hasPremiumAccess: Bool {
+        if let subscription = Apphud.subscription() {
+            if subscription.isActive() {
+                if !subscription.isSandbox {
+                    return true
+                }
+                if subscription.isSandbox && SystemUtil.maybeFromTestFlight {
+                    return true
+                }
+            }
+            return false
+        }
+        return false
     }
 
     func writeMainToDBIfNeeded() async {
