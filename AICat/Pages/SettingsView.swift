@@ -22,6 +22,8 @@ struct SettingsView: View {
     @State var apiHostError: AFError?
     @State var showApiHostAlert = false
 
+    @EnvironmentObject var appStateVM: AICatStateViewModel
+
     var appVersion: String {
         Bundle.main.releaseVersion ?? "1.0"
     }
@@ -60,97 +62,103 @@ struct SettingsView: View {
             .frame(height: 44)
             #endif
             List {
-                Section("API Key") {
-                    HStack {
-                        SecureField(text: $apiKey) {
-                            Text("Enter API key")
-                        }
-                        if !apiKey.isEmpty {
-                            Button(action: {
-                                apiKey = ""
-                            }) {
-                                Image(systemName: "multiply.circle.fill")
+                if appStateVM.developMode {
+                    Section("API Key") {
+                        HStack {
+                            SecureField(text: $apiKey) {
+                                Text("Enter API key")
                             }
-                            .tint(.gray)
-                            .buttonStyle(.borderless)
-                        }
-                    }
-                    HStack(spacing: 8) {
-                        Button("Validate and save") {
-                            validateApiKey()
-                        }
-                        if isValidating {
-                            LoadingIndocator()
-                                .frame(width: 24, height: 14)
-                        }
-                        if error != nil {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.red)
-                        }
-                        if isValidated {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                        }
-                    }
-                }
-                .alert(
-                    "Validate Failed",
-                    isPresented: $showApiKeyAlert,
-                    actions: {
-                        Button("OK", action: { showApiKeyAlert = false })
-                    },
-                    message: {
-                        Text("\(error?.localizedDescription ?? "")")
-                    }
-                )
-                Section("API HOST") {
-                    HStack {
-                        TextField(text: $apiHost) {
-                            Text("Enter api host")
-                        }
-                        if !apiHost.isEmpty {
-                            Button(action: {
-                                apiHost = ""
-                            }) {
-                                Image(systemName: "multiply.circle.fill")
+                            if !apiKey.isEmpty {
+                                Button(action: {
+                                    apiKey = ""
+                                }) {
+                                    Image(systemName: "multiply.circle.fill")
+                                }
+                                .tint(.gray)
+                                .buttonStyle(.borderless)
                             }
-                            .tint(.gray)
-                            .buttonStyle(.borderless)
                         }
+                        HStack(spacing: 8) {
+                            Button("Validate and save") {
+                                validateApiKey()
+                            }
+                            if isValidating {
+                                LoadingIndocator()
+                                    .frame(width: 24, height: 14)
+                            }
+                            if error != nil {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.red)
+                            }
+                            if isValidated {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                            }
+                        }
+                        Button("Delete", action: {
+                            apiKey = ""
+                            UserDefaults.openApiKey = nil
+                        })
                     }
-                    HStack(spacing: 8) {
-                        Button("Validate and save") {
-                            validateApiHost()
+                    .alert(
+                        "Validate Failed",
+                        isPresented: $showApiKeyAlert,
+                        actions: {
+                            Button("OK", action: { showApiKeyAlert = false })
+                        },
+                        message: {
+                            Text("\(error?.localizedDescription ?? "")")
                         }
-                        if isValidatingApiHost {
-                            LoadingIndocator()
-                                .frame(width: 24, height: 14)
+                    )
+                    Section("API HOST") {
+                        HStack {
+                            TextField(text: $apiHost) {
+                                Text("Enter api host")
+                            }
+                            if !apiHost.isEmpty {
+                                Button(action: {
+                                    apiHost = ""
+                                }) {
+                                    Image(systemName: "multiply.circle.fill")
+                                }
+                                .tint(.gray)
+                                .buttonStyle(.borderless)
+                            }
                         }
-                        if apiHostError != nil {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.red)
+                        HStack(spacing: 8) {
+                            Button("Validate and save") {
+                                validateApiHost()
+                            }
+                            if isValidatingApiHost {
+                                LoadingIndocator()
+                                    .frame(width: 24, height: 14)
+                            }
+                            if apiHostError != nil {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.red)
+                            }
+                            if isValidatedApiHost {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                            }
+                            Spacer()
                         }
-                        if isValidatedApiHost {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                        }
-                        Spacer()
+                        Button("Reset", action: {
+                            apiHost = "https://api.openai.com"
+                            UserDefaults.apiHost = "https://api.openai.com"
+                        })
                     }
-                    Button("Reset", action: {
-                        apiHost = "https://api.openai.com"
-                        UserDefaults.apiHost = "https://api.openai.com"
-                    })
+                    .alert(
+                        "Validate Failed",
+                        isPresented: $showApiHostAlert,
+                        actions: {
+                            Button("OK", action: { showApiHostAlert = false })
+                        },
+                        message: {
+                            Text("\(apiHostError?.localizedDescription ?? "")")
+                        }
+                    )
                 }
-                .alert(
-                    "Validate Failed",
-                    isPresented: $showApiHostAlert,
-                    actions: {
-                        Button("OK", action: { showApiHostAlert = false })
-                    },
-                    message: {
-                        Text("\(apiHostError?.localizedDescription ?? "")")
-                    }
-                )
                 Section("support") {
                     Link(destination: URL(string: "https://learnprompting.org/")!) {
                         Label("Learn Prompting", systemImage: "book")
@@ -196,6 +204,13 @@ struct SettingsView: View {
                         Text("AICat \(appVersion)(\(buildNumber))")
                             .font(.manrope(size: 12, weight: .regular))
                             .padding(12)
+                            .gesture(
+                                LongPressGesture()
+                                    .onEnded { _ in
+                                        appStateVM.developMode.toggle()
+                                        HapticEngine.trigger()
+                                    }
+                            )
                         Spacer()
                     }) {
                     Link(destination: URL(string: "https://apps.apple.com/app/epoch-music-toolkit/id1459345397")!) {
@@ -267,5 +282,6 @@ struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView(onClose: {})
             .environment(\.colorScheme, .light)
+            .environmentObject(AICatStateViewModel())
     }
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import Blackbird
+import ApphudSDK
 
 fileprivate let dbPath = "\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])/db.sqlite"
 fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", title: "AICat Main", prompt: "")
@@ -18,15 +19,59 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
     @Published private(set) var currentConversation = mainConversation
     @Published private(set) var messages: [ChatMessage] = []
     @Published var showAddAPIKeySheet: Bool = false
+    @Published var showPremumPage: Bool = false
+    @Published var monthlyPremium: ApphudProduct?
 
     @Published private(set) var main = mainConversation
     @AppStorage("request.temperature") var temperature: Double = 1.0
     @AppStorage("request.context.messages") var messagesCount: Int = 0
     @AppStorage("request.model") var model: String = "gpt-3.5-turbo"
     @AppStorage("db.conversations.didMigrateParams") var didMigrateParams: Bool = false
+    @AppStorage("AICat.developerMode") var developMode: Bool = false
+
+    @Published var sentMessageCount: Int64 = 0
+
+    var freeMessageCount: Int64 {
+        #if DEBUG
+        return 5
+        #else
+        return 20
+        #endif
+    }
+
+    private var cancellable: AnyCancellable?
+
+    init() {
+        cancellable = NotificationCenter.default.publisher(for: NSUbiquitousKeyValueStore.didChangeExternallyNotification)
+            .sink { [weak self] _ in
+                self?.fetchValueFromICloud()
+            }
+
+        fetchValueFromICloud()
+    }
+
+    func fetchValueFromICloud() {
+        let value = NSUbiquitousKeyValueStore.default.longLong(forKey: "AICat.sentMessageCount")
+        sentMessageCount = value
+    }
+
+    func incrementSentMessageCount() {
+        sentMessageCount += 1
+        let keyValueStore = NSUbiquitousKeyValueStore.default
+        keyValueStore.set(sentMessageCount, forKey: "AICat.sentMessageCount")
+        keyValueStore.synchronize()
+    }
 
     var allConversations: [Conversation] {
         [main] + conversations
+    }
+
+    var isPremium: Bool {
+        Apphud.hasPremiumAccess()
+    }
+
+    var isDeveloperModeEnable: Bool {
+        UserDefaults.openApiKey != nil || developMode
     }
 
     func writeMainToDBIfNeeded() async {
@@ -85,5 +130,19 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
 
     func resetMessages() {
         messages = []
+    }
+
+    func fetchPayWall() async {
+        if let payWall = await Apphud.paywalls().first, let product = payWall.products.first {
+            monthlyPremium = product
+        }
+    }
+
+    func needBuyPremium() -> Bool {
+        if !isPremium && sentMessageCount >= freeMessageCount {
+            showPremumPage = true
+            return true
+        }
+        return false
     }
 }

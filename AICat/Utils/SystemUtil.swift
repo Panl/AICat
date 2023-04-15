@@ -20,4 +20,20 @@ enum SystemUtil {
         NSPasteboard.general.setString(content, forType: .string)
         #endif
     }
+
+    static var maybeFromTestFlight: Bool {
+        guard let url = Bundle.main.appStoreReceiptURL else { return false }
+        return url.absoluteString.lowercased().contains("sandbox")
+    }
+}
+
+enum HapticEngine {
+
+    static func trigger() {
+        #if os(iOS)
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
+        #endif
+    }
 }
