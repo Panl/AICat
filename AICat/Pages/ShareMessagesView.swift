@@ -10,7 +10,7 @@ import SwiftUI
 struct ShareMessagesView: View {
 
     var title: String = "AICat Main"
-    var prompt: String = "Your ultimate AI assiatant"
+    var prompt: String = "Your ultimate AI assistant"
     var messages: [ChatMessage] = []
 
     var body: some View {
@@ -53,7 +53,7 @@ struct ShareMessagesView: View {
                     Text("AICat")
                         .font(.manrope(size: 16, weight: .bold))
                         .foregroundColor(.primary.opacity(0.7))
-                    Text("Your ultimate AI assiatant")
+                    Text("Your ultimate AI assistant")
                         .font(.manrope(size: 12, weight: .regular))
                         .foregroundColor(.gray)
                 }
