@@ -32,6 +32,7 @@ struct SliderView: View {
             let barHeight = thumbSize / 4
             let slideWidth = width - thumbSize
             ZStack(alignment: .leading) {
+                Color.clear.preference(key: SizePreferenceKey.self, value: proxy.size)
                 RoundedRectangle(cornerRadius: barHeight / 2)
                     .foregroundColor(color.opacity(0.2))
                     .frame(height: barHeight)
@@ -59,10 +60,11 @@ struct SliderView: View {
                                 lastWidth = progressWidth
                             }
                     )
-            }.onAppear {
-                progressWidth = valueToProgressWidth(slideWidth: slideWidth)
-                lastWidth = progressWidth
             }
+        }
+        .onPreferenceChange(SizePreferenceKey.self) { newValue in
+            progressWidth = valueToProgressWidth(slideWidth: newValue.width)
+            lastWidth = progressWidth
         }
     }
 
@@ -77,11 +79,19 @@ struct SliderView: View {
     }
 }
 
+struct SizePreferenceKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        value = nextValue()
+    }
+}
+
 struct SliderView_Previews: PreviewProvider {
     @State static var value: Double = 1
     
     static var previews: some View {
-        SliderView(value: $value)
+        SliderView(value: $value, sliderRange: -2...2)
             .frame(height: 20)
             .onChange(of: value) { newValue in
                 print("---\(newValue)")
