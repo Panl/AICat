@@ -14,10 +14,20 @@ func isMarkdown(_ string: String) -> Bool {
     return regex.firstMatch(in: string, range: NSRange(location: 0, length: string.utf16.count)) != nil
 }
 
+typealias DeleteFunction = () -> Void
+typealias CopyFunction = () -> Void
+typealias ShareFunction = () -> Void
+typealias ClickFunction = () -> Void
+
 struct MineMessageView: View {
     let message: ChatMessage
+    var onDelete: DeleteFunction?
+    var onCopy: CopyFunction?
+    var onShare: ShareFunction?
+    var showActions = false
+
     var body: some View {
-        ZStack {
+        VStack(spacing: 8) {
             HStack {
                 Spacer(minLength: 40)
                 ZStack {
@@ -36,7 +46,7 @@ struct MineMessageView: View {
                 .frame(minWidth: 60, minHeight: 40)
                 .background(
                     LinearGradient(
-                        colors: [.primary, .primary.opacity(0.7)],
+                        colors: [.primaryColor, .primaryColor.opacity(0.7)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing)
                 )
@@ -44,40 +54,87 @@ struct MineMessageView: View {
                 .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topLeft]))
                 .padding(.trailing, 16)
             }
+            if showActions {
+                HStack {
+                    Spacer()
+                    Button(action: { onCopy?() }) {
+                        Image(systemName: "doc.circle.fill")
+                    }
+                    Button(action: { onDelete?() }) {
+                        Image(systemName: "trash.circle.fill")
+                    }
+                    Button(action: { onShare?() }) {
+                        Image(systemName: "arrowshape.turn.up.right.circle.fill")
+                    }
+                }
+                .padding(.horizontal, 30)
+                .tint(.primaryColor.opacity(0.6))
+            }
         }
     }
 }
 
 struct AICatMessageView: View {
     let message: ChatMessage
+    var onDelete: DeleteFunction?
+    var onCopy: CopyFunction?
+    var onShare: ShareFunction?
+    var showActions = false
 
     var body: some View {
         if containsCodeBlock(content: message.content) {
-            Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
-               .textSelection(.enabled)
-               .markdownCodeSyntaxHighlighter(.splash(theme: .sundellsColors(withFont: .init(size: Theme.fontSize))))
-               .markdownTheme(.gitHub.text { FontSize(Theme.fontSize) })
-               .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
-        } else {
-            ZStack {
-                if isMarkdown(message.content) {
-                    Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
-                        .textSelection(.enabled)
-                        .markdownTheme(.aiMessage)
-                } else {
-                    Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
-                        .textSelection(.enabled)
-                        .font(.manrope(size: 16, weight: .regular))
-                        .foregroundColor(.blackText)
+            VStack(alignment: .leading, spacing: 0) {
+                Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                   .textSelection(.enabled)
+                   .markdownCodeSyntaxHighlighter(.splash(theme: .sundellsColors(withFont: .init(size: Theme.fontSize))))
+                   .markdownTheme(.gitHub.text { FontSize(Theme.fontSize) })
+                   .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+                if showActions {
+                    actionsView
+                        .padding(.horizontal, 16)
+                        .tint(.primaryColor.opacity(0.6))
                 }
             }
-            .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-            .frame(minWidth: 60, minHeight: 40)
-            .background(Color.aiBubbleBg)
-            .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
-            .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
-            .padding(.init(top: 0, leading: 16, bottom: 0, trailing: 36))
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack {
+                    if isMarkdown(message.content) {
+                        Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                            .textSelection(.enabled)
+                            .markdownTheme(.aiMessage)
+                    } else {
+                        Text(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
+                            .textSelection(.enabled)
+                            .font(.manrope(size: 16, weight: .regular))
+                            .foregroundColor(.blackText)
+                    }
+                }
+                .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
+                .frame(minWidth: 60, minHeight: 40)
+                .background(Color.aiBubbleBg)
+                .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
+                .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))
+                .padding(.init(top: 0, leading: 16, bottom: 0, trailing: 36))
+                if showActions {
+                    actionsView
+                        .padding(.horizontal, 30)
+                        .tint(.primaryColor.opacity(0.6))
+                }
+            }
+        }
+    }
 
+    var actionsView: some View {
+        HStack {
+            Button(action: { onCopy?() }) {
+                Image(systemName: "doc.circle.fill")
+            }
+            Button(action: { onDelete?() }) {
+                Image(systemName: "trash.circle.fill")
+            }
+            Button(action: { onShare?() }) {
+                Image(systemName: "arrowshape.turn.up.right.circle.fill")
+            }
         }
     }
 
@@ -93,11 +150,15 @@ struct AICatMessageView: View {
 
 struct MessageView: View {
     let message: ChatMessage
+    var onDelete: DeleteFunction?
+    var onCopy: CopyFunction?
+    var onShare: ShareFunction?
+    var showActions: Bool = false
     var body: some View {
         if message.role == "user" {
-            MineMessageView(message: message)
+            MineMessageView(message: message, onDelete: onDelete, onCopy: onCopy, onShare: onShare, showActions: showActions)
         } else {
-            AICatMessageView(message: message)
+            AICatMessageView(message: message, onDelete: onDelete, onCopy: onCopy, onShare: onShare, showActions: showActions)
         }
     }
 }
@@ -181,7 +242,7 @@ struct ErrorMessageView: View {
                             .frame(width: 28, height: 28)
                             .tint(
                                 LinearGradient(
-                                    colors: [.primary, .primary.opacity(0.7)],
+                                    colors: [Color.primaryColor, Color.primaryColor.opacity(0.7)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
@@ -190,7 +251,7 @@ struct ErrorMessageView: View {
                         Image(systemName: "arrow.clockwise.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
-                            .tint(.primary)
+                            .tint(Color.primaryColor)
                     }
                 }
                 .buttonStyle(.borderless)
@@ -203,7 +264,7 @@ struct ErrorMessageView: View {
                             .frame(width: 28, height: 28)
                             .tint(
                                 LinearGradient(
-                                    colors: [.primary, .primary.opacity(0.7)],
+                                    colors: [.primaryColor, .primaryColor.opacity(0.7)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing)
                             )
@@ -212,7 +273,7 @@ struct ErrorMessageView: View {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
-                            .tint(.primary)
+                            .tint(.primaryColor)
                     }
                 }
                 .buttonStyle(.borderless)
@@ -229,17 +290,17 @@ struct InputingMessageView: View {
     var body: some View {
         HStack(spacing: 4) {
             Circle()
-                .fill(Color.primary.opacity(0.8))
+                .fill(Color.primaryColor.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever(), value: shouldAnimate)
             Circle()
-                .fill(Color.primary.opacity(0.8))
+                .fill(Color.primaryColor.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.3), value: shouldAnimate)
             Circle()
-                .fill(Color.primary.opacity(0.8))
+                .fill(Color.primaryColor.opacity(0.8))
                 .frame(width: circleSize, height: circleSize)
                 .scaleEffect(shouldAnimate ? 1.0 : 0.5)
                 .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.6), value: shouldAnimate)
@@ -258,11 +319,16 @@ struct InputingMessageView: View {
 
 struct MessageView_Previews: PreviewProvider {
     static var previews: some View {
-        VStack {
+        VStack(alignment: .leading) {
+            Spacer()
             AICatMessageView(message: ChatMessage(role: "user", content: "you are beautiful", conversationId: ""))
             MineMessageView(message: ChatMessage(role: "", content: "### title ```swift```", conversationId: ""))
             ErrorMessageView(errorMessage: "RequestTime out", retry: {}, clear: {})
+            Spacer()
         }
+        .background()
+        .environment(\.colorScheme, .light)
+
     }
 }
 

@@ -46,7 +46,7 @@ struct SettingsView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 16, height: 16)
                 }
-                .tint(.primary)
+                .tint(.primaryColor)
                 Spacer()
                 VStack(spacing: 0) {
                     Text("Settings")
@@ -64,7 +64,7 @@ struct SettingsView: View {
             .frame(height: 44)
             #endif
             List {
-                if appStateVM.isDeveloperModeEnable {
+                if appStateVM.developMode {
                     Section("API Key") {
                         HStack {
                             SecureField(text: $apiKey) {
@@ -100,6 +100,7 @@ struct SettingsView: View {
                         Button("Delete", action: {
                             apiKey = ""
                             UserDefaults.openApiKey = nil
+                            toast = Toast(type: .success, message: "API Key deleted!")
                         })
                     }
                     .alert(
@@ -147,7 +148,8 @@ struct SettingsView: View {
                         }
                         Button("Reset", action: {
                             apiHost = "https://api.openai.com"
-                            UserDefaults.apiHost = "https://api.openai.com"
+                            UserDefaults.resetApiHost()
+                            toast = Toast(type: .success, message: "ApiHost reset sucessfully!")
                         })
                     }
                     .alert(
@@ -178,13 +180,13 @@ struct SettingsView: View {
                         Label("Privacy and Policy", systemImage: "lock.rectangle.on.rectangle")
                             .labelStyle(.titleAndIcon)
                     }
-                }.tint(.primary)
+                }.tint(.primaryColor)
                 Section("Source Code") {
                     Link(destination: URL(string: "https://github.com/Panl/AICat.git")!){
                         Label("AICat.git", image: "github_icon")
                             .labelStyle(.titleAndIcon)
                     }
-                }.tint(.primary)
+                }.tint(.primaryColor)
                 Section("Social") {
                     Link(destination: URL(string: "https://t.me/aicatevents")!){
                         Label("AICat News", image: "telegram_icon")
@@ -198,7 +200,7 @@ struct SettingsView: View {
                         Label("Rego", image: "twitter_circled")
                             .labelStyle(.titleAndIcon)
                     }
-                }.tint(.primary)
+                }.tint(.primaryColor)
                 Section(
                     header: Text("More App"),
                     footer: HStack {
@@ -235,7 +237,7 @@ struct SettingsView: View {
                                     .foregroundColor(.gray)
                             }
                         }.padding(.vertical, 4)
-                    }.tint(.primary)
+                    }.tint(.primaryColor)
                 }
             }
             .background(Color.background)

@@ -59,7 +59,7 @@ struct CompactView: View {
             .background {
                 Color.background
                     .clipShape(RoundedRectangle(cornerRadius: 12 * progress))
-                    .shadow(color: .primary.opacity(0.1).opacity(progress), radius: 4)
+                    .shadow(color: .primaryColor.opacity(0.1).opacity(progress), radius: 4)
             }
             .scaleEffect(x: 1 - progress * 0.05, y: 1 - progress * 0.05)
             .offset(x: translationX, y: 0)

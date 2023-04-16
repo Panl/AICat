@@ -23,9 +23,9 @@ enum ToastStyle {
 extension ToastStyle {
     var themeColor: Color {
         switch self {
-        case .error: return Color.red
-        case .warning: return Color.orange
-        case .info: return Color.blue
+        case .error: return Color.pink
+        case .warning: return Color.yellow
+        case .info: return Color.cyan
         case .success: return Color.green
         }
     }
@@ -35,7 +35,7 @@ extension ToastStyle {
         case .info: return "info.circle.fill"
         case .warning: return "exclamationmark.triangle.fill"
         case .success: return "checkmark.circle.fill"
-        case .error: return "xmark.circle.fill"
+        case .error: return "exclamationmark.circle.fill"
         }
     }
 }
@@ -88,8 +88,8 @@ struct ToastModifier: ViewModifier {
             .overlay(
                 ZStack {
                     mainToastView()
-                        .offset(y: 24)
-                }.animation(.spring(), value: toast)
+                        .offset(y: 16)
+                }.animation(.spring(response: 0.35), value: toast)
             )
             .onChange(of: toast) { value in
                 showToast()

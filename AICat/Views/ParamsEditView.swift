@@ -44,7 +44,7 @@ struct ParamsEditView: View {
                     }
                 }
                 .pickerStyle(.menu)
-                .tint(.primary.opacity(0.6))
+                .tint(.primaryColor.opacity(0.6))
             }
             .padding(.vertical, 4)
             .overlay {
@@ -63,7 +63,7 @@ struct ParamsEditView: View {
                     }
                 }
                 .pickerStyle(.menu)
-                .tint(.primary.opacity(0.6))
+                .tint(.primaryColor.opacity(0.6))
             }
             .padding(.vertical, 4)
             .overlay {

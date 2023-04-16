@@ -10,7 +10,7 @@ import SwiftUI
 struct LoadingIndocator: View {
 
     @State private var isLoading = false
-    var themeColor = Color.primary
+    var themeColor = Color.primaryColor
 
     var body: some View {
         GeometryReader { proxy in

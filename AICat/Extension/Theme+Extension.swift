@@ -32,7 +32,7 @@ extension Theme {
 
 extension Color {
     static let background = Color("Background")
-    static let primary = Color("Primary")
+    static let primaryColor = Color("Primary")
     static let blackText = Color("BlackText")
     static let whiteText = Color("WhiteText")
     static let aiBubbleBg = Color("AIBubbleBg")

@@ -28,7 +28,7 @@ struct AddApiKeyView: View {
                         .frame(width: 16, height: 16)
                 }
                 .buttonStyle(.borderless)
-                .tint(.primary)
+                .tint(.primaryColor)
             }.padding(20)
             Spacer(minLength: 56)
             Text("Add OpenAI API Key")
