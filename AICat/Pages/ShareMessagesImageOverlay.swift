@@ -13,13 +13,12 @@ struct ShareMessagesImageOverlay: View {
     var body: some View {
         ZStack {
             if let shareMessagesSnapshot = appStateVM.shareMessagesSnapshot {
-                Color.black.opacity(0.618)
+                Color.black.opacity(0.816)
                     .ignoresSafeArea()
-                VStack(spacing: 20) {
+                VStack(spacing: 10) {
                     Image(uiImage: shareMessagesSnapshot)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .padding()
                     HStack(spacing: 20) {
                         Button(action: {
                             appStateVM.shareMessagesSnapshot = nil
@@ -45,7 +44,7 @@ struct ShareMessagesImageOverlay: View {
                                 .frame(width: 36, height: 36)
                         }
                     }
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 16)
                     .tint(.white)
                 }
             }

@@ -59,12 +59,18 @@ struct MineMessageView: View {
                     Spacer()
                     Button(action: { onCopy?() }) {
                         Image(systemName: "doc.circle.fill")
+                            .resizable()
+                            .frame(width: 20, height: 20)
                     }
                     Button(action: { onDelete?() }) {
                         Image(systemName: "trash.circle.fill")
+                            .resizable()
+                            .frame(width: 20, height: 20)
                     }
 //                    Button(action: { onShare?() }) {
 //                        Image(systemName: "arrowshape.turn.up.right.circle.fill")
+//                            .resizable()
+//                            .frame(width: 20, height: 20)
 //                    }
                 }
                 .padding(.horizontal, 30)
@@ -128,12 +134,18 @@ struct AICatMessageView: View {
         HStack {
             Button(action: { onCopy?() }) {
                 Image(systemName: "doc.circle.fill")
+                    .resizable()
+                    .frame(width: 20, height: 20)
             }
             Button(action: { onDelete?() }) {
                 Image(systemName: "trash.circle.fill")
+                    .resizable()
+                    .frame(width: 20, height: 20)
             }
             Button(action: { onShare?() }) {
                 Image(systemName: "arrowshape.turn.up.right.circle.fill")
+                    .resizable()
+                    .frame(width: 20, height: 20)
             }
         }
     }
@@ -321,8 +333,8 @@ struct MessageView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(alignment: .leading) {
             Spacer()
-            AICatMessageView(message: ChatMessage(role: "user", content: "you are beautiful", conversationId: ""))
-            MineMessageView(message: ChatMessage(role: "", content: "### title ```swift```", conversationId: ""))
+            AICatMessageView(message: ChatMessage(role: "user", content: "you are beautiful", conversationId: ""), showActions: true)
+            MineMessageView(message: ChatMessage(role: "", content: "### title ```swift```", conversationId: ""), showActions: true)
             ErrorMessageView(errorMessage: "RequestTime out", retry: {}, clear: {})
             Spacer()
         }

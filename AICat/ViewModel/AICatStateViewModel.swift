@@ -185,7 +185,7 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
                 let title = currentConversation.title
                 var prompt = currentConversation.prompt
                 if prompt.isEmpty {
-                    prompt = "Your ultimate AI assiatant"
+                    prompt = "Your ultimate AI assistant"
                 }
                 let shareMessagesView = ShareMessagesView(title: title, prompt: prompt, messages: messages)
                 let image = shareMessagesView.snapshot()
