@@ -63,9 +63,9 @@ struct MineMessageView: View {
                     Button(action: { onDelete?() }) {
                         Image(systemName: "trash.circle.fill")
                     }
-                    Button(action: { onShare?() }) {
-                        Image(systemName: "arrowshape.turn.up.right.circle.fill")
-                    }
+//                    Button(action: { onShare?() }) {
+//                        Image(systemName: "arrowshape.turn.up.right.circle.fill")
+//                    }
                 }
                 .padding(.horizontal, 30)
                 .tint(.primaryColor.opacity(0.6))
@@ -91,7 +91,7 @@ struct AICatMessageView: View {
                    .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
                 if showActions {
                     actionsView
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, 20)
                         .tint(.primaryColor.opacity(0.6))
                 }
             }

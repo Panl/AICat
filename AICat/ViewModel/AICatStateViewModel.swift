@@ -9,11 +9,14 @@ import SwiftUI
 import Combine
 import Blackbird
 import ApphudSDK
+#if canImport(UIKit)
+import UIKit
+#endif
 
 fileprivate let dbPath = "\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])/db.sqlite"
 fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", title: "AICat Main", prompt: "")
 
-@MainActor class AICatStateViewModel: ObservableObject {
+@MainActor class AICatStateViewModel: NSObject, ObservableObject {
     var db = try! Blackbird.Database(path: dbPath, options: .debugPrintEveryQuery)
     @Published private(set) var conversations: [Conversation] = [mainConversation]
     @Published private(set) var currentConversation = mainConversation
@@ -30,6 +33,8 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
     @AppStorage("AICat.developerMode") var developMode: Bool = false
 
     @Published var sentMessageCount: Int64 = 0
+    @Published var shareMessagesSnapshot: UIImage?
+    @Published var saveImageToast: Toast?
 
     var freeMessageCount: Int64 {
         #if DEBUG
@@ -41,7 +46,8 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
 
     private var cancellable: AnyCancellable?
 
-    init() {
+    override init() {
+        super.init()
         NSUbiquitousKeyValueStore.default.synchronize()
         cancellable = NotificationCenter.default.publisher(for: NSUbiquitousKeyValueStore.didChangeExternallyNotification)
             .sink { [weak self] _ in
@@ -132,6 +138,10 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
         messages = (try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated)))
     }
 
+    func queryMessage(mid: String) async -> ChatMessage? {
+        try! await ChatMessage.read(from: db, id: mid)
+    }
+
     func saveMessage(_ message: ChatMessage) async {
         await db.upsert(model: message)
         await queryMessages(cid: currentConversation.id)
@@ -162,5 +172,39 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
             return true
         }
         return false
+    }
+
+    func shareMessage(_ message: ChatMessage) {
+        let replyToId = message.replyToId
+        Task {
+            var messages = [message]
+            if let replyToMessage = await queryMessage(mid: replyToId) {
+                messages = [replyToMessage, message]
+            }
+            await MainActor.run {
+                let title = currentConversation.title
+                var prompt = currentConversation.prompt
+                if prompt.isEmpty {
+                    prompt = "Your ultimate AI assiatant"
+                }
+                let shareMessagesView = ShareMessagesView(title: title, prompt: prompt, messages: messages)
+                let image = shareMessagesView.snapshot()
+                shareMessagesSnapshot = image
+            }
+        }
+    }
+
+    func saveImageToAlbum(image: UIImage) {
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+        shareMessagesSnapshot = nil
+    }
+
+
+    @objc func imageSaved(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            saveImageToast = Toast(type: .error, message: "Save image failed, \(error.localizedDescription)", duration: 4)
+        } else {
+            saveImageToast = Toast(type: .success, message: "Image saved!")
+        }
     }
 }

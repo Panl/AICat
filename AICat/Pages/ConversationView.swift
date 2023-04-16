@@ -123,6 +123,7 @@ struct ConversationView: View {
                                     },
                                     onShare: {
                                         HapticEngine.trigger()
+                                        appStateVM.shareMessage(message)
                                     },
                                     showActions: message.id == tappedMessageId
                                 ).onTapGesture {

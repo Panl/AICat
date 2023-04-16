@@ -10,6 +10,8 @@
 		8E0F0ECD29CB3AF60011B4F7 /* Manrope.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */; };
 		8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */; };
 		8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ED029CB53570011B4F7 /* View+Extension.swift */; };
+		8E2128DF29EBE2CF00D50ADC /* ShareMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */; };
+		8E2128E129EC04F500D50ADC /* ShareMessagesImageOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */; };
 		8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA229CC519D00EE0072 /* MarkdownUI */; };
 		8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */; };
 		8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA729CC6FF500EE0072 /* Splash */; };
@@ -55,6 +57,8 @@
 		8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Manrope.ttf; sourceTree = "<group>"; };
 		8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
 		8E0F0ED029CB53570011B4F7 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareMessagesView.swift; sourceTree = "<group>"; };
+		8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareMessagesImageOverlay.swift; sourceTree = "<group>"; };
 		8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extension.swift"; sourceTree = "<group>"; };
 		8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextOutputFormat.swift; sourceTree = "<group>"; };
 		8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashCodeSyntaxHighlighter.swift; sourceTree = "<group>"; };
@@ -253,6 +257,8 @@
 				8E2E5BAF29CCC60700EE0072 /* MainView.swift */,
 				8EF5A5DD29D8527000981A38 /* SplitView.swift */,
 				8E401DD429E7171100E2F403 /* PremiumView.swift */,
+				8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */,
+				8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */,
 			);
 			path = Pages;
 			sourceTree = "<group>";
@@ -360,6 +366,7 @@
 			files = (
 				8EF5A5EB29E0729B00981A38 /* ParamsEditView.swift in Sources */,
 				8E64872929C6E1B00029E14F /* CompactView.swift in Sources */,
+				8E2128E129EC04F500D50ADC /* ShareMessagesImageOverlay.swift in Sources */,
 				8EE9264729D49B29005E6FB7 /* Bundle+Extension.swift in Sources */,
 				8E3DA87D29DC6E6800327A2A /* LoadingIndocator.swift in Sources */,
 				8EECA00A29C82E9D0021A6A1 /* AddConversationView.swift in Sources */,
@@ -385,6 +392,7 @@
 				8EF5A5E929E0651A00981A38 /* SliderView.swift in Sources */,
 				8EE9264C29D6FAB5005E6FB7 /* AICatStateViewModel.swift in Sources */,
 				8E2E5BAE29CC707B00EE0072 /* SplashCodeSyntaxHighlighter.swift in Sources */,
+				8E2128DF29EBE2CF00D50ADC /* ShareMessagesView.swift in Sources */,
 				8E401DD529E7171100E2F403 /* PremiumView.swift in Sources */,
 				8EECA01629CA07830021A6A1 /* MessageView.swift in Sources */,
 				8E401DD729EA9E9A00E2F403 /* SKProduct+Extension.swift in Sources */,
