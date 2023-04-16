@@ -25,6 +25,15 @@ enum SystemUtil {
         guard let url = Bundle.main.appStoreReceiptURL else { return false }
         return url.absoluteString.lowercased().contains("sandbox")
     }
+
+    static func shareImage(_ image: UIImage) {
+        #if os(iOS)
+        let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            windowScene.windows.first?.rootViewController?.present(activityViewController, animated: true, completion: nil)
+        }
+        #endif
+    }
 }
 
 enum HapticEngine {
