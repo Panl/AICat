@@ -67,7 +67,7 @@ struct AICatApp: App {
             label: {
                 Image("chatgpt_logo_menu")
                     .renderingMode(.template)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.primaryColor)
             }
         )
         .menuBarExtraStyle(.window)

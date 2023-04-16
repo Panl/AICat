@@ -51,4 +51,8 @@ extension UserDefaults {
         defaults.bool(forKey: "AICat.developerMode") || openApiKey != nil
     }
 
+    static func resetApiHost() {
+        defaults.set(nil, forKey: "AICat.apiHost")
+    }
+
 }

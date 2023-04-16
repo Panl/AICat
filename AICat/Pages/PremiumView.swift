@@ -35,7 +35,7 @@ struct PremiumPage: View {
                         .resizable()
                         .frame(width: 16, height: 16)
                         .padding(16)
-                }.tint(.primary)
+                }.tint(.primaryColor)
             }
             Spacer()
             Text("AICat Premium")

@@ -33,7 +33,7 @@ struct ConversationListView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 56, height: 56)
                 .padding(.top, 32)
-                .foregroundColor(.primary)
+                .foregroundColor(.primaryColor)
             Spacer().frame(height: 32)
             HStack {
                 Text("Conversations".uppercased())
@@ -75,7 +75,7 @@ struct ConversationListView: View {
                                         .frame(width: 10, height: 10)
                                         .foregroundStyle(
                                             LinearGradient(
-                                                colors: [.primary.opacity(0.8), .primary.opacity(0.5)],
+                                                colors: [.primaryColor.opacity(0.8), .primaryColor.opacity(0.5)],
                                                 startPoint: .topLeading,
                                                 endPoint: .bottomTrailing)
                                         )
@@ -85,7 +85,7 @@ struct ConversationListView: View {
                             .padding(.horizontal, 12)
                         }
                         .buttonStyle(.borderless)
-                        .tint(conversation == selectedChat ? .primary : .primary.opacity(0.7))
+                        .tint(conversation == selectedChat ? .primaryColor : .primaryColor.opacity(0.7))
                         .contextMenu {
                             if !conversation.isMain {
                                 Button(role: .destructive, action: { deleteConversation(conversation) }) {
@@ -124,7 +124,7 @@ struct ConversationListView: View {
                         showClearAllChatAlert = false
                     }
                 }
-                if appStateVM.isDeveloperModeEnable {
+                if appStateVM.developMode {
                     Button(action: { appStateVM.showAddAPIKeySheet = true }) {
                         HStack {
                             Image(systemName: "key.viewfinder")
