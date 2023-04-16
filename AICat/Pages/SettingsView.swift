@@ -211,9 +211,9 @@ struct SettingsView: View {
                                     .onEnded { _ in
                                         appStateVM.developMode.toggle()
                                         if appStateVM.developMode {
-                                            toast = Toast(type: .info, message: "You are in Develper Mode, enter API key", duration: 2)
+                                            toast = Toast(type: .info, message: "You are in Develper Mode, enter API key", duration: 4)
                                         } else {
-                                            toast = Toast(type: .info, message: "You are in Normal Mode", duration: 2)
+                                            toast = Toast(type: .info, message: "You are in Normal Mode", duration: 4)
                                         }
                                     }
                             )
