@@ -110,7 +110,7 @@ struct ToastModifier: ViewModifier {
         guard let toast = toast else { return }
 
         #if os(iOS)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        HapticEngine.trigger()
         #endif
 
         if toast.duration > 0 {

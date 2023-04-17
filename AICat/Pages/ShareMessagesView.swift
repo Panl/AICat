@@ -15,17 +15,17 @@ struct ShareMessagesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Spacer().frame(height: 16)
             Text(title)
-                .font(.manrope(size: 20, weight: .bold))
+                .font(.manrope(size: 18, weight: .bold))
                 .foregroundColor(.primaryColor)
                 .lineLimit(1)
                 .padding(.horizontal, 20)
+                .padding(.top)
             Text(prompt)
-                .font(.manrope(size: 12, weight: .regular))
+                .font(.manrope(size: 10, weight: .regular))
                 .foregroundColor(.gray.opacity(0.6))
                 .padding(.horizontal, 20)
-                .padding(.bottom, 12)
+                .padding(.bottom, 10)
                 .lineLimit(1)
             Rectangle()
                 .frame(height: 1)

@@ -128,6 +128,7 @@ struct ConversationView: View {
                                     },
                                     showActions: message.id == tappedMessageId
                                 ).onTapGesture {
+                                    HapticEngine.trigger()
                                     withAnimation {
                                         if tappedMessageId == message.id {
                                             tappedMessageId = nil
@@ -400,7 +401,9 @@ struct ConversationView: View {
             let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
             await appStateVM.saveMessage(chatMessage)
             await appStateVM.queryMessages(cid: conversation.id)
-            isAIGenerating = true
+            withAnimation {
+                isAIGenerating = true
+            }
             if let selectedPrompt {
                 await completeMessages([newMessage], selected: selectedPrompt, replyToId: chatMessage.id)
             } else {

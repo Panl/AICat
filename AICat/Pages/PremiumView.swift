@@ -110,7 +110,7 @@ struct PremiumPage: View {
         .task {
             await appStateVM.fetchPayWall()
         }
-        .background(.background)
+        .background(Color.background.ignoresSafeArea())
         .toast($toast)
     }
 

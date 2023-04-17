@@ -134,9 +134,13 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
         conversations = chats
     }
 
-    func queryMessages(cid: String) async {
+    func queryMessages(cid: String, animated: Bool = false) async {
         let queryMessages = (try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated)))
-        withAnimation {
+        if animated {
+            withAnimation {
+                messages = queryMessages
+            }
+        } else {
             messages = queryMessages
         }
     }
@@ -147,7 +151,7 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
 
     func saveMessage(_ message: ChatMessage) async {
         await db.upsert(model: message)
-        await queryMessages(cid: currentConversation.id)
+        await queryMessages(cid: currentConversation.id, animated: message.timeRemoved != 0)
     }
 
     func saveConversation(_ conversation: Conversation) async {

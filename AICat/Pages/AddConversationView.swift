@@ -55,6 +55,8 @@ struct AddConversationView: View {
                     .foregroundColor(.gray.opacity(0.1))
             }
             .padding(.horizontal, 20)
+            .onTapGesture {
+            }
 
             Spacer()
                 .frame(height: 20)
@@ -93,6 +95,8 @@ struct AddConversationView: View {
             .font(.manrope(size: 16, weight: .regular))
             .foregroundColor(.blackText.opacity(0.8))
             .padding(.horizontal, 20)
+            .onTapGesture {
+            }
 
             Spacer()
                 .frame(height: 36)
@@ -109,6 +113,10 @@ struct AddConversationView: View {
             Spacer(minLength: 56)
         }
         .font(.manrope(size: 16, weight: .regular))
+        .background(Color.background.ignoresSafeArea())
+        .onTapGesture {
+            endEditing(force: true)
+        }
     }
 
     func saveConversation() async {
