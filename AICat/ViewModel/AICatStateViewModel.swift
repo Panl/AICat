@@ -135,7 +135,10 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
     }
 
     func queryMessages(cid: String) async {
-        messages = (try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated)))
+        let queryMessages = (try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated)))
+        withAnimation {
+            messages = queryMessages
+        }
     }
 
     func queryMessage(mid: String) async -> ChatMessage? {
