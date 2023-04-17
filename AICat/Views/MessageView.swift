@@ -43,7 +43,7 @@ struct MineMessageView: View {
                     }
                 }
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-                .frame(minWidth: 60, minHeight: 40)
+                .frame(minWidth: 70, minHeight: 40)
                 .background(
                     LinearGradient(
                         colors: [.primaryColor, .primaryColor.opacity(0.7)],
@@ -116,7 +116,7 @@ struct AICatMessageView: View {
                     }
                 }
                 .padding(EdgeInsets.init(top: 10, leading: 16, bottom: 10, trailing: 16))
-                .frame(minWidth: 60, minHeight: 40)
+                .frame(minWidth: 70, minHeight: 40)
                 .background(Color.aiBubbleBg)
                 .clipShape(CornerRadiusShape(radius: 4, corners: .topLeft))
                 .clipShape(CornerRadiusShape(radius: 20, corners: [.bottomLeft, .bottomRight, .topRight]))

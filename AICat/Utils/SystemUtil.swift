@@ -35,14 +35,3 @@ enum SystemUtil {
         #endif
     }
 }
-
-enum HapticEngine {
-
-    static func trigger() {
-        #if os(iOS)
-        let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
-        #endif
-    }
-}

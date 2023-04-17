@@ -12,6 +12,7 @@
 		8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ED029CB53570011B4F7 /* View+Extension.swift */; };
 		8E2128DF29EBE2CF00D50ADC /* ShareMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */; };
 		8E2128E129EC04F500D50ADC /* ShareMessagesImageOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */; };
+		8E2128E329ED7E8800D50ADC /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128E229ED7E8800D50ADC /* HapticEngine.swift */; };
 		8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA229CC519D00EE0072 /* MarkdownUI */; };
 		8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */; };
 		8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA729CC6FF500EE0072 /* Splash */; };
@@ -59,6 +60,7 @@
 		8E0F0ED029CB53570011B4F7 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareMessagesView.swift; sourceTree = "<group>"; };
 		8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareMessagesImageOverlay.swift; sourceTree = "<group>"; };
+		8E2128E229ED7E8800D50ADC /* HapticEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticEngine.swift; sourceTree = "<group>"; };
 		8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extension.swift"; sourceTree = "<group>"; };
 		8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextOutputFormat.swift; sourceTree = "<group>"; };
 		8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashCodeSyntaxHighlighter.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				8E401DCF29DE59A000E2F403 /* SystemUtil.swift */,
+				8E2128E229ED7E8800D50ADC /* HapticEngine.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -380,6 +383,7 @@
 				8E64874429C715740029E14F /* ChatMessage.swift in Sources */,
 				8E2E5BAD29CC707B00EE0072 /* TextOutputFormat.swift in Sources */,
 				8E64874729C719460029E14F /* Date+Extension.swift in Sources */,
+				8E2128E329ED7E8800D50ADC /* HapticEngine.swift in Sources */,
 				8E64874229C713D30029E14F /* Conversation.swift in Sources */,
 				8EECA01129C896B20021A6A1 /* Database+Extension.swift in Sources */,
 				8E64873529C6E2660029E14F /* ConversationView.swift in Sources */,

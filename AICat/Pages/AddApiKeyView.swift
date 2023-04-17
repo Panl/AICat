@@ -44,7 +44,7 @@ struct AddApiKeyView: View {
                     }
                 }
                 .textFieldStyle(.plain)
-                .tint(.black.opacity(0.8))
+                .tint(.primary.opacity(0.8))
                 .font(.manrope(size: 18, weight: .regular))
                 .padding(.trailing, 32)
                 Button(action: {
@@ -61,25 +61,26 @@ struct AddApiKeyView: View {
                     .foregroundColor(.gray.opacity(0.1))
             }
             .padding(.horizontal, 40)
+            .onTapGesture {
+
+            }
 
             Text(LocalizedStringKey("[Where to get OpenAI API key?](https://platform.openai.com/account/api-keys)"))
             Spacer()
                 .frame(height: 60)
             Button(action: validateApiKey) {
                 if isValidating {
-                    LoadingIndocator()
+                    LoadingIndocator(themeColor: .whiteText)
                         .frame(width: 28, height: 28)
                         .frame(width: 260, height: 50)
-                        .background(apiKey.isEmpty ? .gray.opacity(0.1) : .black)
+                        .background(apiKey.isEmpty ? Color.primaryColor.opacity(0.1) : Color.primaryColor)
                         .cornerRadius(25)
-                        .tint(.white)
-
                 } else {
                     Text("Validate and Save")
                         .frame(width: 260, height: 50)
-                        .background(apiKey.isEmpty ? .gray.opacity(0.1) : .black)
+                        .background(apiKey.isEmpty ? Color.primaryColor.opacity(0.1) : Color.primaryColor)
                         .cornerRadius(25)
-                        .tint(.white)
+                        .tint(.whiteText)
                 }
 
             }
@@ -96,6 +97,10 @@ struct AddApiKeyView: View {
             Spacer(minLength: 56)
         }
         .font(.manrope(size: 16, weight: .medium))
+        .background(Color.background.ignoresSafeArea())
+        .onTapGesture {
+            endEditing(force: true)
+        }
     }
 
     func validateApiKey() {
@@ -113,12 +118,13 @@ struct AddApiKeyView: View {
             }
             isValidating = false
         }
-
     }
 }
 
 struct AddApiKeyView_Previews: PreviewProvider {
     static var previews: some View {
         AddApiKeyView(onValidateSuccess: {}, onSkip: {})
+            .background(Color.background)
+            .environment(\.colorScheme, .light)
     }
 }

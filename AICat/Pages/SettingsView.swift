@@ -209,7 +209,7 @@ struct SettingsView: View {
                             .font(.manrope(size: 12, weight: .regular))
                             .padding(12)
                             .gesture(
-                                LongPressGesture()
+                                LongPressGesture(minimumDuration: 5)
                                     .onEnded { _ in
                                         appStateVM.developMode.toggle()
                                         if appStateVM.developMode {
