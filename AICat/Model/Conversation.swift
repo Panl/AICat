@@ -14,7 +14,7 @@ struct Conversation: BlackbirdModel {
     @BlackbirdColumn var id: String = UUID().uuidString
     @BlackbirdColumn var title: String
     @BlackbirdColumn var prompt: String
-    @BlackbirdColumn var contextMessages: Int = 0
+    @BlackbirdColumn var contextMessages: Int = 5
     @BlackbirdColumn var temperature: Double = 0.7
     @BlackbirdColumn var model: String = "gpt-3.5-turbo"
     @BlackbirdColumn var maxTokens: Int = 2048

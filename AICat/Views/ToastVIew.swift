@@ -54,7 +54,7 @@ struct ToastView: View {
         .padding(.leading, 12)
         .padding(.trailing, 16)
         .padding(.vertical, 8)
-        .background(.primary.opacity(0.8))
+        .background(Color.primaryColor)
         .cornerRadius(8)
         .shadow(radius: 4)
     }
@@ -89,7 +89,7 @@ struct ToastModifier: ViewModifier {
                 ZStack {
                     mainToastView()
                         .offset(y: 16)
-                }.animation(.spring(response: 0.35), value: toast)
+                }.animation(.spring(response: 0.25), value: toast)
             )
             .onChange(of: toast) { value in
                 showToast()

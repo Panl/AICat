@@ -99,9 +99,9 @@ struct AddConversationView: View {
             Button(action: { Task { await saveConversation() } }) {
                 Text("Save")
                     .frame(width: 260, height: 50)
-                    .background(title.isEmpty ? .black.opacity(0.1) : .black)
+                    .background(title.isEmpty ? Color.primaryColor.opacity(0.1) : Color.primaryColor)
                     .cornerRadius(25)
-                    .tint(.white)
+                    .tint(.whiteText)
             }
             .buttonStyle(.borderless)
             .font(.manrope(size: 20, weight: .medium))
@@ -131,5 +131,8 @@ struct AddConversationView: View {
 struct AddConversationView_Previews: PreviewProvider {
     static var previews: some View {
         AddConversationView(onClose: {})
+            .background(Color.background)
+            .environmentObject(AICatStateViewModel())
+            .environment(\.colorScheme, .dark)
     }
 }

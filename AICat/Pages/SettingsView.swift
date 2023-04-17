@@ -169,7 +169,7 @@ struct SettingsView: View {
                             .labelStyle(.titleAndIcon)
                     }
                     Link(destination: URL(string: "https://github.com/f/awesome-chatgpt-prompts")!) {
-                        Label("Awesome chatgpt prompts", systemImage: "square.stack.3d.up")
+                        Label("Awesome prompts", systemImage: "square.stack.3d.up")
                             .labelStyle(.titleAndIcon)
                     }
                     Link(destination: URL(string: "mailto:iplay.coder@gmail.com")!){
