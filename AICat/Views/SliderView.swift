@@ -63,7 +63,7 @@ struct SliderView: View {
             }
         }
         .onPreferenceChange(SizePreferenceKey.self) { newValue in
-            progressWidth = valueToProgressWidth(slideWidth: newValue.width)
+            progressWidth = valueToProgressWidth(slideWidth: newValue.width - newValue.height)
             lastWidth = progressWidth
         }
     }

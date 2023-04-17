@@ -123,6 +123,7 @@ struct ConversationView: View {
                                     },
                                     onShare: {
                                         HapticEngine.trigger()
+                                        endEditing(force: true)
                                         appStateVM.shareMessage(message)
                                     },
                                     showActions: message.id == tappedMessageId
@@ -151,12 +152,17 @@ struct ConversationView: View {
                                 .id("Bottom")
                         }
                     }
-                    .gesture(DragGesture().onChanged { _ in
+                    .simultaneousGesture(DragGesture().onChanged { _ in
                         self.endEditing(force: true)
                     })
-                    .onChange(of: appStateVM.messages) { _ in
-                        withAnimation {
-                            proxy.scrollTo("Bottom")
+                    .onChange(of: appStateVM.messages) { [old = appStateVM.messages] newMessages in
+                        if old.count <= newMessages.count {
+                            Task {
+                                try await Task.sleep(nanoseconds: 100_000_000)
+                                withAnimation {
+                                    proxy.scrollTo("Bottom")
+                                }
+                            }
                         }
                     }
                     .onChange(of: isAIGenerating) { _ in
@@ -346,6 +352,9 @@ struct ConversationView: View {
         }
         .font(.manrope(size: 16, weight: .regular))
         .toast($toast)
+        .onTapGesture {
+            endEditing(force: true)
+        }
     }
 
     struct SizeKey: PreferenceKey {
