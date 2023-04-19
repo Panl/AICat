@@ -1,0 +1,69 @@
+/* 
+  Localizable.strings
+  AICat
+
+  Created by Lei Pan on 2023/4/19.
+  
+*/
+"Edit Prompt" = "프롬프트 편집";
+"Edit Model" = "모델 편집";
+"Clean Messages" = "메시지 지우기";
+"Are you sure to clean all messages?" = "모든 메시지를 지우시겠습니까?";
+"Sure" = "확인";
+"Cancel" = "취소";
+"Message content copied" = "메시지 내용이 복사되었습니다";
+"Say something" = "무엇이든 말해보세요";
+"Say something or enter 'space'" = "무언가를 말하거나 '스페이스'를 입력하세요";
+"AICat Premium" = "AICat 프리미엄";
+"CONVERSATIONS" = "대화";
+"New Chat" = "새 대화";
+"Delete" = "삭제";
+"Clear Conversations" = "대화 지우기";
+"Are you sure to clear all conversations" = "모든 대화를 지우시겠습니까?";
+"Updates & FAQ" = "업데이트 및 FAQ";
+"Settings" = "설정";
+"Edit Chat" = "대화 편집";
+"Chat Name" = "대화 이름";
+"Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )" = "프롬프트 (프롬프트 내용은 어시스턴트의 동작을 설정하는 데 도움이 됩니다. 예 : '당신은 애플의 창시자 스티브 잡스입니다')";
+"Save" = "저장";
+"Add OpenAI API Key" = "OpenAI API 키 추가";
+"Enter API Key" = "API 키 입력";
+"[Where to get OpenAI API key?](https://platform.openai.com/account/api-keys)" = "[OpenAI API 키를 얻을 수 있는 곳은 어디인가요?](https://platform.openai.com/account/api-keys)";
+"Validate and Save" = "검증 및 저장";
+"API Key deleted!" = "API 키가 삭제되었습니다!";
+"Validate Failed!" = "검증 실패!";
+"OK" = "확인";
+"Enter api host" = "API 호스트 입력";
+"Reset" = "재설정";
+"ApiHost reset sucessfully!" = "API 호스트 재설정 성공!";
+"support" = "지원";
+"Learn Prompting" = "프롬프트 작성 방법 배우기";
+"Awesome prompts" = "좋은 프롬프트 예시";
+"Contact Us" = "문의하기";
+"Privacy and Policy" = "개인 정보 보호 및 정책";
+"Source Code" = "소스 코드";
+"Social" = "소셜";
+"More App" = "더 많은 앱";
+"You are in Develper Mode, enter API key" = "개발자 모드입니다. API 키를 입력하세요";
+"You are in Normal Mode" = "일반 모드입니다";
+"Epoch - Guitar Tuner" = "Epoch - 기타 조율기";
+"Guitar, Bass, Ukulele tuner, Metronome Practice Tracker" = "기타, 베이스, 우쿨렐레 조율기, 매트로놈 연습 트래커";
+"Answers from GPT Model" = "GPT 모델에서의 답변";
+"Get accurate and relevant answers directly from the GPT Model." = "GPT 모델에서 직접 정확하고 관련성 높은 답변을 얻으세요.";
+"No limits for Dialogues" = "대화에 제한이 없습니다";
+"Engage in unlimited dialogues without any restrictions." = "어떠한 제한 없이 무제한 대화를 즐기세요.";
+"Higher word limit" = "더 높은 단어 제한";
+"Enjoy extended conversations with a higher word limit per message." = "각 메시지당 더 높은 단어 제한으로 대화를 확장하세요.";
+"Get new features first" = "새로운 기능을 가장 먼저 사용하세요";
+"Be the first to access and try out new and upcoming features." = "새로운 기능에 가장 먼저 액세스하고 시도해보세요.";
+"Restore Purchases" = "구매 복원";
+"Already Premium" = "이미 프리미엄입니다";
+"Auto renewal monthly, cancel at anytime" = "매월 자동 갱신, 언제든지 취소 가능";
+"Privacy Policy" = "개인 정보 보호 정책";
+"Terms of Use" = "이용 약관";
+"You get AICat Premium Now!" = "지금 AICat 프리미엄을 받으세요!";
+"Purchase failed!" = "구매 실패!";
+"You are not premium user!" = "프리미엄 사용자가 아닙니다!";
+"Context Messages" = "컨텍스트 메시지";
+"Model" = "모델";
+"Temperature" = "온도";

@@ -1,0 +1,71 @@
+/* 
+  Localizable.strings
+  AICat
+
+  Created by Lei Pan on 2023/4/19.
+  
+*/
+
+"Edit Prompt" = "编辑提示语";
+"Edit Model" = "编辑模型";
+"Clean Messages" = "清空消息";
+"Are you sure to clean all messages?" = "确定要清空所有消息吗？";
+"Sure" = "确定";
+"Cancel" = "取消";
+"Message content copied" = "消息内容已复制";
+"Say something" = "说点什么";
+"Say something or enter 'space'" = "说点什么或者输入 'space'";
+"AICat Premium" = "AICat高级版";
+"CONVERSATIONS" = "会话";
+"New Chat" = "新建会话";
+"Delete" = "删除";
+"Clear Conversations" = "清空会话";
+"Are you sure to clear all conversations" = "确定要清空所有会话吗？";
+"Updates & FAQ" = "更新和常见问题";
+"Settings" = "设置";
+"Edit Chat" = "编辑会话";
+"Chat Name" = "会话名称";
+"Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )" = "提示语（提示语内容有助于设置助手的行为。例如：'你是苹果的创始人史蒂夫·乔布斯'）";
+"Save" = "保存";
+"Add OpenAI API Key" = "添加 OpenAI API Key";
+"Enter API Key" = "输入 API Key";
+"Enter API Key" = "输入 API Key";
+"[Where to get OpenAI API key?](https://platform.openai.com/account/api-keys)" = "[在哪里获取 OpenAI API Key？](https://platform.openai.com/account/api-keys)";
+"Validate and Save" = "验证并保存";
+"API Key deleted!" = "API Key已删除！";
+"Validate Failed!" = "验证失败！";
+"OK" = "好的";
+"Enter api host" = "输入 API HOST";
+"Reset" = "重置";
+"ApiHost reset sucessfully!" = "API HOST 重置成功！";
+"support" = "支持";
+"Learn Prompting" = "学习如何写提示语";
+"Awesome prompts" = "优秀的提示语案例";
+"Contact Us" = "联系我们";
+"Privacy and Policy" = "隐私和政策";
+"Source Code" = "源代码";
+"Social" = "社交";
+"More App" = "更多应用";
+"You are in Develper Mode, enter API key" = "您处于开发者模式，请输入 API Key";
+"You are in Normal Mode" = "您处于普通模式";
+"Epoch - Guitar Tuner" = "Epoch - 吉他调音器";
+"Guitar, Bass, Ukulele tuner, Metronome Practice Tracker" = "吉他、贝斯、尤克里里调音器、节拍器, 练习记录";
+"Answers from GPT Model" = "来自ChatGPT的回答";
+"Get accurate and relevant answers directly from the GPT Model." = "直接从ChatGPT模型中获取准确和相关的答案。";
+"No limits for Dialogues" = "对话没有限制";
+"Engage in unlimited dialogues without any restrictions." = "无限制地参与对话，没有任何限制。";
+"Higher word limit" = "更高的字数限制";
+"Enjoy extended conversations with a higher word limit per message." = "享受更高字数限制的扩展对话。";
+"Get new features first" = "第一时间获取新功能";
+"Be the first to access and try out new and upcoming features." = "第一时间访问和尝试新的即将推出的功能。";
+"Restore Purchases" = "恢复购买";
+"Already Premium" = "已经是高级版";
+"Auto renewal monthly, cancel at anytime" = "每月自动续订，随时取消";
+"Privacy Policy" = "隐私政策";
+"Terms of Use" = "使用条款";
+"You get AICat Premium Now!" = "您现在获得了 AICat 高级版！";
+"Purchase failed!" = "购买失败！";
+"You are not premium user!" = "您不是高级版用户！";
+"Context Messages" = "上下文消息";
+"Model" = "模型";
+"Temperature" = "发散度";

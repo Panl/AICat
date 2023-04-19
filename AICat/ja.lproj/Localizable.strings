@@ -1,0 +1,71 @@
+/* 
+  Localizable.strings
+  AICat
+
+  Created by Lei Pan on 2023/4/19.
+  
+*/
+
+"Edit Prompt" = "プロンプトを編集する";
+"Edit Model" = "モデルを編集する";
+"Clean Messages" = "メッセージをクリアする";
+"Are you sure to clean all messages?" = "すべてのメッセージをクリアしてもよろしいですか？";
+"Sure" = "はい";
+"Cancel" = "キャンセル";
+"Message content copied" = "メッセージの内容がコピーされました";
+"Say something" = "何か言ってください";
+"Say something or enter 'space'" = "何か言ってくださいまたは 'space' を入力してください";
+"AICat Premium" = "AICatプレミアム";
+"CONVERSATIONS" = "会話";
+"New Chat" = "新しいチャット";
+"Delete" = "削除する";
+"Clear Conversations" = "会話をクリアする";
+"Are you sure to clear all conversations" = "すべての会話をクリアしてもよろしいですか？";
+"Updates & FAQ" = "アップデートとFAQ";
+"Settings" = "設定";
+"Edit Chat" = "チャットを編集する";
+"Chat Name" = "チャット名";
+"Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )" = "プロンプト（プロンプトの内容は、アシスタントの動作を設定するのに役立ちます。例：'あなたはAppleの創設者であるスティーブ・ジョブズです'）";
+"Save" = "保存する";
+"Add OpenAI API Key" = "OpenAI APIキーを追加する";
+"Enter API Key" = "APIキーを入力してください";
+"Enter API Key" = "APIキーを入力してください";
+"[Where to get OpenAI API key?](https://platform.openai.com/account/api-keys)" = "[OpenAI APIキーを入手するには？](https://platform.openai.com/account/api-keys)";
+"Validate and Save" = "検証して保存する";
+"API Key deleted!" = "APIキーが削除されました！";
+"Validate Failed!" = "検証に失敗しました！";
+"OK" = "OK";
+"Enter api host" = "APIホストを入力してください";
+"Reset" = "リセット";
+"ApiHost reset sucessfully!" = "API HOSTが正常にリセットされました！";
+"support" = "サポート";
+"Learn Prompting" = "プロンプティングの学習";
+"Awesome prompts" = "素晴らしいプロンプト例";
+"Contact Us" = "お問い合わせ";
+"Privacy and Policy" = "プライバシーとポリシー";
+"Source Code" = "ソースコード";
+"Social" = "ソーシャル";
+"More App" = "その他のアプリ";
+"You are in Develper Mode, enter API key" = "開発者モードです。APIキーを入力してください";
+"You are in Normal Mode" = "通常モードです";
+"Epoch - Guitar Tuner" = "Epoch - ギターチューナー";
+"Guitar, Bass, Ukulele tuner, Metronome Practice Tracker" = "ギター、ベース、ウクレレのチューナー、メトロノーム、練習トラッカー";
+"Answers from GPT Model" = "GPTモデルからの回答";
+"Get accurate and relevant answers directly from the GPT Model." = "GPTモデルから直接正確かつ関連性の高い回答を得ることができます。";
+"No limits for Dialogues" = "対話に制限はありません";
+"Engage in unlimited dialogues without any restrictions." = "制限なく無制限の対話に参加してください。";
+"Higher word limit" = "より高い単語制限";
+"Enjoy extended conversations with a higher word limit per message." = "メッセージあたりより高い単語制限で長時間の会話をお楽しみください。";
+"Get new features first" = "最新の機能を最初に入手する";
+"Be the first to access and try out new and upcoming features." = "新しい機能に最初にアクセスして試してください。";
+"Restore Purchases" = "購入を復元する";
+"Already Premium" = "すでにプレミアムです";
+"Auto renewal monthly, cancel at anytime" = "毎月自動更新、いつでもキャンセル可能";
+"Privacy Policy" = "プライバシーポリシー";
+"Terms of Use" = "利用規約";
+"You get AICat Premium Now!" = "今すぐAICatプレミアムを手に入れよう！";
+"Purchase failed!" = "購入に失敗しました！";
+"You are not premium user!" = "あなたはプレミアムユーザーではありません！";
+"Context Messages" = "コンテキストメッセージ";
+"Model" = "モデル";
+"Temperature" = "温度";

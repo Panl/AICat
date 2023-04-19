@@ -154,11 +154,11 @@ struct FeatureView: View {
             HStack {
                 Image(systemName: "crown.fill")
 
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(.manrope(size: 16, weight: .bold))
             }
 
-            Text(description)
+            Text(LocalizedStringKey(description))
                 .font(.manrope(size: 14, weight: .medium))
                 .foregroundColor(.gray)
                 .padding(.leading, 32)

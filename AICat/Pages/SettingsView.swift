@@ -81,7 +81,7 @@ struct SettingsView: View {
                             }
                         }
                         HStack(spacing: 8) {
-                            Button("Validate and save") {
+                            Button("Validate and Save") {
                                 validateApiKey()
                             }
                             if isValidating {
@@ -104,7 +104,7 @@ struct SettingsView: View {
                         })
                     }
                     .alert(
-                        "Validate Failed",
+                        "Validate Failed!",
                         isPresented: $showApiKeyAlert,
                         actions: {
                             Button("OK", action: { showApiKeyAlert = false })
@@ -129,7 +129,7 @@ struct SettingsView: View {
                             }
                         }
                         HStack(spacing: 8) {
-                            Button("Validate and save") {
+                            Button("Validate and Save") {
                                 validateApiHost()
                             }
                             if isValidatingApiHost {
@@ -153,7 +153,7 @@ struct SettingsView: View {
                         })
                     }
                     .alert(
-                        "Validate Failed",
+                        "Validate Failed!",
                         isPresented: $showApiHostAlert,
                         actions: {
                             Button("OK", action: { showApiHostAlert = false })

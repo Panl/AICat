@@ -221,7 +221,7 @@ struct ConversationView: View {
                     .background(Color.background)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .shadow(color: .primaryColor.opacity(0.1), radius: 12)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 16)
                 }
                 if let selectedPrompt {
                     HStack {
@@ -248,7 +248,13 @@ struct ConversationView: View {
 
                 HStack(alignment: .bottom, spacing: 4) {
                     TextEditView(text: $inputText) {
-                        Text("Say something" + (conversation.isMain ? " or enter 'space'" : ""))
+                        ZStack {
+                            if conversation.isMain {
+                                Text("Say something or enter 'space'")
+                            } else {
+                                Text("Say something")
+                            }
+                        }
                     }
                     .textFieldStyle(.plain)
                     .frame(minHeight: 26)
@@ -266,6 +272,7 @@ struct ConversationView: View {
                     .onSubmit {
                         completeMessage()
                     }
+                    .onTapGesture {}
                     if isSending {
                         Button(action: {
                             HapticEngine.trigger()
