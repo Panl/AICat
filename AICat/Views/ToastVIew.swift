@@ -47,7 +47,7 @@ struct ToastView: View {
         HStack {
             Image(systemName: toast.type.iconFileName)
                 .foregroundColor(toast.type.themeColor)
-            Text(toast.message)
+            Text(LocalizedStringKey(toast.message))
                 .foregroundColor(.whiteText)
                 .font(.manrope(size: 14, weight: .medium))
         }

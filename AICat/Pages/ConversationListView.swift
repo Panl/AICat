@@ -34,7 +34,7 @@ struct ConversationListView: View {
                 .padding(.top, 32)
             Spacer().frame(height: 32)
             HStack {
-                Text("Conversations".uppercased())
+                Text("CONVERSATIONS")
                     .font(.manrope(size: 14, weight: .semibold))
                     .foregroundColor(.blackText.opacity(0.4))
                 Spacer()
@@ -163,7 +163,7 @@ struct ConversationListView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 20, height: 20)
-                            Text(premiumText)
+                            Text(LocalizedStringKey(premiumText))
                             Spacer()
                         }
                         .padding(.vertical, 10)

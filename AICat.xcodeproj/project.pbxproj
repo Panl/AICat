@@ -13,6 +13,7 @@
 		8E2128DF29EBE2CF00D50ADC /* ShareMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */; };
 		8E2128E129EC04F500D50ADC /* ShareMessagesImageOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */; };
 		8E2128E329ED7E8800D50ADC /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128E229ED7E8800D50ADC /* HapticEngine.swift */; };
+		8E2128E629EEFB2700D50ADC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8E2128E829EEFB2700D50ADC /* Localizable.strings */; };
 		8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA229CC519D00EE0072 /* MarkdownUI */; };
 		8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */; };
 		8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA729CC6FF500EE0072 /* Splash */; };
@@ -61,6 +62,12 @@
 		8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareMessagesView.swift; sourceTree = "<group>"; };
 		8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareMessagesImageOverlay.swift; sourceTree = "<group>"; };
 		8E2128E229ED7E8800D50ADC /* HapticEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticEngine.swift; sourceTree = "<group>"; };
+		8E2128E729EEFB2700D50ADC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		8E2128E929EEFB2B00D50ADC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8E2128EA29EF0B9300D50ADC /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		8E2128EB29EF0BAE00D50ADC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8E2128EC29EF0BB800D50ADC /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8E2128ED29EF0BCF00D50ADC /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extension.swift"; sourceTree = "<group>"; };
 		8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextOutputFormat.swift; sourceTree = "<group>"; };
 		8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashCodeSyntaxHighlighter.swift; sourceTree = "<group>"; };
@@ -185,6 +192,7 @@
 				8E64873929C6FDD40029E14F /* Networking */,
 				8E64872629C6E1B00029E14F /* AICatApp.swift */,
 				8E64872A29C6E1B10029E14F /* Assets.xcassets */,
+				8E2128E829EEFB2700D50ADC /* Localizable.strings */,
 				8E64872C29C6E1B10029E14F /* Preview Content */,
 				8EDD4DD329DB0159009176A5 /* Credential.swift */,
 			);
@@ -330,6 +338,11 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
+				"zh-Hant",
+				ja,
+				ko,
+				"zh-HK",
 			);
 			mainGroup = 8E64871A29C6E1B00029E14F;
 			packageReferences = (
@@ -355,6 +368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E64872E29C6E1B10029E14F /* Preview Assets.xcassets in Resources */,
+				8E2128E629EEFB2700D50ADC /* Localizable.strings in Resources */,
 				8E64872B29C6E1B10029E14F /* Assets.xcassets in Resources */,
 				8E0F0ECD29CB3AF60011B4F7 /* Manrope.ttf in Resources */,
 			);
@@ -406,6 +420,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		8E2128E829EEFB2700D50ADC /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8E2128E729EEFB2700D50ADC /* zh-Hans */,
+				8E2128E929EEFB2B00D50ADC /* en */,
+				8E2128EA29EF0B9300D50ADC /* zh-Hant */,
+				8E2128EB29EF0BAE00D50ADC /* ja */,
+				8E2128EC29EF0BB800D50ADC /* ko */,
+				8E2128ED29EF0BCF00D50ADC /* zh-HK */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		8E64872F29C6E1B10029E14F /* Debug */ = {
@@ -533,7 +563,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -554,7 +584,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = app.epoch.AICat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -575,7 +605,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -596,7 +626,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = app.epoch.AICat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
