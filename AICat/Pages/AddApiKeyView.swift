@@ -73,17 +73,17 @@ struct AddApiKeyView: View {
                     LoadingIndocator(themeColor: .whiteText)
                         .frame(width: 28, height: 28)
                         .frame(width: 260, height: 50)
-                        .background(apiKey.isEmpty ? Color.primaryColor.opacity(0.1) : Color.primaryColor)
+                        .background(apiKey.isEmpty ? Color.primaryColor.opacity(0.4) : Color.primaryColor)
                         .cornerRadius(25)
                 } else {
                     Text("Validate and Save")
                         .frame(width: 260, height: 50)
-                        .background(apiKey.isEmpty ? Color.primaryColor.opacity(0.1) : Color.primaryColor)
+                        .background(apiKey.isEmpty ? Color.primaryColor.opacity(0.4) : Color.primaryColor)
                         .cornerRadius(25)
-                        .tint(.whiteText)
                 }
 
             }
+            .tint(.whiteText)
             .buttonStyle(.borderless)
             .font(.manrope(size: 20, weight: .medium))
             .disabled(apiKey.isEmpty)
@@ -125,6 +125,6 @@ struct AddApiKeyView_Previews: PreviewProvider {
     static var previews: some View {
         AddApiKeyView(onValidateSuccess: {}, onSkip: {})
             .background(Color.background)
-            .environment(\.colorScheme, .light)
+            .environment(\.colorScheme, .dark)
     }
 }
