@@ -103,16 +103,17 @@ struct AddConversationView: View {
             Button(action: { Task { await saveConversation() } }) {
                 Text("Save")
                     .frame(width: 260, height: 50)
-                    .background(title.isEmpty ? Color.primaryColor.opacity(0.1) : Color.primaryColor)
+                    .background(title.isEmpty ? Color.primaryColor.opacity(0.4) : Color.primaryColor)
                     .cornerRadius(25)
-                    .tint(.whiteText)
             }
+            .tint(.whiteText)
             .buttonStyle(.borderless)
             .font(.manrope(size: 20, weight: .medium))
             .disabled(title.isEmpty)
             Spacer(minLength: 56)
         }
         .font(.manrope(size: 16, weight: .regular))
+        .frame(maxWidth: 600)
         .background(Color.background.ignoresSafeArea())
         .onTapGesture {
             endEditing(force: true)

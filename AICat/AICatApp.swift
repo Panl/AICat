@@ -65,7 +65,7 @@ struct AICatApp: App {
                     .background(Color.background.ignoresSafeArea())
             },
             label: {
-                Image("chatgpt_logo_menu")
+                Image(systemName: "bubble.left.and.bubble.right")
                     .renderingMode(.template)
                     .foregroundColor(.primaryColor)
             }

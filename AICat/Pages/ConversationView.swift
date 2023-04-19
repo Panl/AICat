@@ -168,8 +168,9 @@ struct ConversationView: View {
                     })
                     .onChange(of: appStateVM.messages) { [old = appStateVM.messages] newMessages in
                         if old.count <= newMessages.count {
-                            Task {
-                                try await Task.sleep(nanoseconds: 100_000_000)
+                            if old.isEmpty {
+                                proxy.scrollTo("Bottom")
+                            } else {
                                 withAnimation {
                                     proxy.scrollTo("Bottom")
                                 }
