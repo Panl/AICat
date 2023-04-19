@@ -21,10 +21,10 @@
     {
       "identity" : "apphudsdk",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apphud/ApphudSDK",
+      "location" : "https://github.com/Panl/ApphudSDK.git",
       "state" : {
-        "revision" : "3cbd746021b20dd0f7eb4c6875e3cde7a5ea32e7",
-        "version" : "3.0.1"
+        "branch" : "master",
+        "revision" : "fe07e18107c00f6696df0f5bdc5b41ab62abc4e9"
       }
     },
     {

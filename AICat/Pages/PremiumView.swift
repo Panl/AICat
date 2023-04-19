@@ -35,7 +35,9 @@ struct PremiumPage: View {
                         .resizable()
                         .frame(width: 16, height: 16)
                         .padding(16)
-                }.tint(.primaryColor)
+                }
+                .tint(.primaryColor)
+                .buttonStyle(.borderless)
             }
             Spacer()
             Text("AICat Premium")
@@ -59,6 +61,7 @@ struct PremiumPage: View {
                     .underline()
                     .foregroundColor(.blue)
             }
+            .buttonStyle(.borderless)
             Button(action: {
                 Task {
                     await subscribeNow()
@@ -81,6 +84,7 @@ struct PremiumPage: View {
                 }
 
             }
+            .buttonStyle(.borderless)
             Text("Auto renewal monthly, cancel at anytime")
                 .foregroundColor(.gray.opacity(0.6))
                 .font(.manrope(size: 12, weight: .regular))

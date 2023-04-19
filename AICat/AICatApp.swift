@@ -36,10 +36,6 @@ struct AICatApp: App {
                     await appStateVM.queryConversations()
                 }
                 .background(Color.background.ignoresSafeArea())
-                .toast($appStateVM.saveImageToast)
-                .overlay {
-                   ShareMessagesImageOverlay()
-                }
                 .environmentObject(appStateVM)
         }
         #elseif os(macOS)
