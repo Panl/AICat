@@ -15,10 +15,19 @@ struct ShareMessagesImageOverlay: View {
             if let shareMessagesSnapshot = appStateVM.shareMessagesSnapshot {
                 Color.black.opacity(0.816)
                     .ignoresSafeArea()
-                VStack(spacing: 10) {
+                VStack(spacing: 0) {
+                    #if os(iOS)
                     Image(uiImage: shareMessagesSnapshot)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
+                        .padding(16)
+                    #elseif os(macOS)
+                    Image(nsImage: shareMessagesSnapshot)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 560)
+                        .padding(16)
+                    #endif
                     HStack(spacing: 20) {
                         Button(action: {
                             appStateVM.shareMessagesSnapshot = nil
@@ -27,6 +36,7 @@ struct ShareMessagesImageOverlay: View {
                                 .resizable()
                                 .frame(width: 36, height: 36)
                         }
+                        .buttonStyle(.borderless)
                         Button(
                             action: {
                                 appStateVM.saveImageToAlbum(image: shareMessagesSnapshot)
@@ -36,6 +46,8 @@ struct ShareMessagesImageOverlay: View {
                                 .resizable()
                                 .frame(width: 36, height: 36)
                         }
+                        .buttonStyle(.borderless)
+                        #if os(iOS)
                         Button(action: {
                             SystemUtil.shareImage(shareMessagesSnapshot)
                         }) {
@@ -43,6 +55,8 @@ struct ShareMessagesImageOverlay: View {
                                 .resizable()
                                 .frame(width: 36, height: 36)
                         }
+                        .buttonStyle(.borderless)
+                        #endif
                     }
                     .padding(.bottom, 16)
                     .tint(.white)

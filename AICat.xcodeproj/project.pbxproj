@@ -20,9 +20,10 @@
 		8E2E5BAD29CC707B00EE0072 /* TextOutputFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */; };
 		8E2E5BAE29CC707B00EE0072 /* SplashCodeSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */; };
 		8E2E5BB029CCC60700EE0072 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAF29CCC60700EE0072 /* MainView.swift */; };
+		8E2EF25929F02E4900E25C9A /* ApphudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2EF25829F02E4900E25C9A /* ApphudSDK */; };
+		8E2EF25D29F04D7500E25C9A /* ImageRenderer+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2EF25C29F04D7500E25C9A /* ImageRenderer+Extension.swift */; };
 		8E3DA87D29DC6E6800327A2A /* LoadingIndocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3DA87C29DC6E6800327A2A /* LoadingIndocator.swift */; };
 		8E401DD029DE59A000E2F403 /* SystemUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E401DCF29DE59A000E2F403 /* SystemUtil.swift */; };
-		8E401DD329E6E7DB00E2F403 /* ApphudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8E401DD229E6E7DB00E2F403 /* ApphudSDK */; };
 		8E401DD529E7171100E2F403 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E401DD429E7171100E2F403 /* PremiumView.swift */; };
 		8E401DD729EA9E9A00E2F403 /* SKProduct+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E401DD629EA9E9A00E2F403 /* SKProduct+Extension.swift */; };
 		8E401DD929EAC9F900E2F403 /* ToastVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E401DD829EAC9F900E2F403 /* ToastVIew.swift */; };
@@ -72,6 +73,7 @@
 		8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextOutputFormat.swift; sourceTree = "<group>"; };
 		8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashCodeSyntaxHighlighter.swift; sourceTree = "<group>"; };
 		8E2E5BAF29CCC60700EE0072 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		8E2EF25C29F04D7500E25C9A /* ImageRenderer+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageRenderer+Extension.swift"; sourceTree = "<group>"; };
 		8E3DA87C29DC6E6800327A2A /* LoadingIndocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingIndocator.swift; sourceTree = "<group>"; };
 		8E401DCD29DCB66200E2F403 /* AICat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AICat.entitlements; sourceTree = "<group>"; };
 		8E401DCF29DE59A000E2F403 /* SystemUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemUtil.swift; sourceTree = "<group>"; };
@@ -113,7 +115,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */,
-				8E401DD329E6E7DB00E2F403 /* ApphudSDK in Frameworks */,
+				8E2EF25929F02E4900E25C9A /* ApphudSDK in Frameworks */,
 				8EF5A5E329D92DBF00981A38 /* AppCenterCrashes in Frameworks */,
 				8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */,
 				8E64873829C6FBD90029E14F /* Alamofire in Frameworks */,
@@ -235,6 +237,7 @@
 				8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */,
 				8EE9264629D49B29005E6FB7 /* Bundle+Extension.swift */,
 				8E401DD629EA9E9A00E2F403 /* SKProduct+Extension.swift */,
+				8E2EF25C29F04D7500E25C9A /* ImageRenderer+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -310,7 +313,7 @@
 				8E2E5BA729CC6FF500EE0072 /* Splash */,
 				8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */,
 				8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */,
-				8E401DD229E6E7DB00E2F403 /* ApphudSDK */,
+				8E2EF25829F02E4900E25C9A /* ApphudSDK */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -351,7 +354,7 @@
 				8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */,
 				8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
-				8E401DD129E6E7DB00E2F403 /* XCRemoteSwiftPackageReference "ApphudSDK" */,
+				8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -397,6 +400,7 @@
 				8E64874429C715740029E14F /* ChatMessage.swift in Sources */,
 				8E2E5BAD29CC707B00EE0072 /* TextOutputFormat.swift in Sources */,
 				8E64874729C719460029E14F /* Date+Extension.swift in Sources */,
+				8E2EF25D29F04D7500E25C9A /* ImageRenderer+Extension.swift in Sources */,
 				8E2128E329ED7E8800D50ADC /* HapticEngine.swift in Sources */,
 				8E64874229C713D30029E14F /* Conversation.swift in Sources */,
 				8EECA01129C896B20021A6A1 /* Database+Extension.swift in Sources */,
@@ -678,12 +682,12 @@
 				version = 0.16.0;
 			};
 		};
-		8E401DD129E6E7DB00E2F403 /* XCRemoteSwiftPackageReference "ApphudSDK" */ = {
+		8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apphud/ApphudSDK";
+			repositoryURL = "https://github.com/Panl/ApphudSDK.git";
 			requirement = {
-				kind = exactVersion;
-				version = 3.0.1;
+				branch = master;
+				kind = branch;
 			};
 		};
 		8E64873629C6FBD90029E14F /* XCRemoteSwiftPackageReference "Alamofire" */ = {
@@ -723,9 +727,9 @@
 			package = 8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */;
 			productName = Splash;
 		};
-		8E401DD229E6E7DB00E2F403 /* ApphudSDK */ = {
+		8E2EF25829F02E4900E25C9A /* ApphudSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8E401DD129E6E7DB00E2F403 /* XCRemoteSwiftPackageReference "ApphudSDK" */;
+			package = 8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */;
 			productName = ApphudSDK;
 		};
 		8E64873729C6FBD90029E14F /* Alamofire */ = {

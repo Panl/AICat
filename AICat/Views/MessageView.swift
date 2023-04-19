@@ -62,11 +62,13 @@ struct MineMessageView: View {
                             .resizable()
                             .frame(width: 20, height: 20)
                     }
+                    .buttonStyle(.borderless)
                     Button(action: { onDelete?() }) {
                         Image(systemName: "trash.circle.fill")
                             .resizable()
                             .frame(width: 20, height: 20)
                     }
+                    .buttonStyle(.borderless)
 //                    Button(action: { onShare?() }) {
 //                        Image(systemName: "arrowshape.turn.up.right.circle.fill")
 //                            .resizable()
@@ -137,16 +139,19 @@ struct AICatMessageView: View {
                     .resizable()
                     .frame(width: 20, height: 20)
             }
+            .buttonStyle(.borderless)
             Button(action: { onDelete?() }) {
                 Image(systemName: "trash.circle.fill")
                     .resizable()
                     .frame(width: 20, height: 20)
             }
+            .buttonStyle(.borderless)
             Button(action: { onShare?() }) {
                 Image(systemName: "arrowshape.turn.up.right.circle.fill")
                     .resizable()
                     .frame(width: 20, height: 20)
             }
+            .buttonStyle(.borderless)
         }
     }
 

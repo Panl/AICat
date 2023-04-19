@@ -23,6 +23,7 @@ struct ConversationView: View {
     @FocusState var isFocused: Bool
     @State var toast: Toast?
     @State var tappedMessageId: String?
+    @State var size: CGSize = .zero
 
     let conversation: Conversation
 
@@ -124,7 +125,7 @@ struct ConversationView: View {
                                     onShare: {
                                         HapticEngine.trigger()
                                         endEditing(force: true)
-                                        appStateVM.shareMessage(message)
+                                        appStateVM.shareMessage(message, imageWidth: size.width)
                                     },
                                     showActions: message.id == tappedMessageId
                                 ).onTapGesture {
@@ -134,6 +135,15 @@ struct ConversationView: View {
                                             tappedMessageId = nil
                                         } else {
                                             tappedMessageId = message.id
+                                        }
+                                    }
+                                }
+                                .onHover { isHover in
+                                    withAnimation {
+                                        if isHover {
+                                            tappedMessageId = message.id
+                                        } else {
+                                            tappedMessageId = nil
                                         }
                                     }
                                 }
@@ -334,9 +344,11 @@ struct ConversationView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
             }
-        }.task {
+        }
+        .task {
             await appStateVM.queryMessages(cid: conversation.id)
-        }.onChange(of: conversation.id) { newValue in
+        }
+        .onChange(of: conversation.id) { newValue in
             selectedPrompt = nil
             inputText = ""
             error = nil
@@ -358,11 +370,23 @@ struct ConversationView: View {
                 ParamsEditView(conversation: conversation)
             }
         }
+        .background {
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear {
+                        size = proxy.size
+                    }
+            }
+        }
         .font(.manrope(size: 16, weight: .regular))
         .toast($toast)
         .onTapGesture {
             endEditing(force: true)
         }
+        .overlay {
+           ShareMessagesImageOverlay()
+        }
+        .toast($appStateVM.saveImageToast)
     }
 
     struct SizeKey: PreferenceKey {

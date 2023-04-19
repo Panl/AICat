@@ -12,6 +12,12 @@ import UIKit
 import AppKit
 #endif
 
+#if os(iOS)
+typealias ImageType = UIImage
+#elseif os(macOS)
+typealias ImageType = NSImage
+#endif
+
 enum SystemUtil {
     static func copyToPasteboard(content: String) {
         #if os(iOS)
@@ -26,12 +32,14 @@ enum SystemUtil {
         return url.absoluteString.lowercased().contains("sandbox")
     }
 
-    static func shareImage(_ image: UIImage) {
+    static func shareImage(_ image: ImageType) {
         #if os(iOS)
         let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             windowScene.windows.first?.rootViewController?.present(activityViewController, animated: true, completion: nil)
         }
+        #elseif os(macOS)
+        //TODO: show NSSharingServicePicker
         #endif
     }
 }

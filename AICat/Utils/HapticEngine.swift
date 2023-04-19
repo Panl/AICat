@@ -5,9 +5,9 @@
 //  Created by Lei Pan on 2023/4/17.
 //
 
+#if os(iOS)
 import UIKit
-
-public enum HapticEngine {
+public enum UIHapticEngine {
 
   private static let lightImpactGenerator = UIImpactFeedbackGenerator(style: .light)
 
@@ -68,4 +68,14 @@ public enum HapticEngine {
       (generator as? UINotificationFeedbackGenerator)?.notificationOccurred(.error)
     }
   }
+}
+#endif
+
+public enum HapticEngine {
+
+    public static func trigger() {
+        #if os(iOS)
+        UIHapticEngine.trigger()
+        #endif
+    }
 }

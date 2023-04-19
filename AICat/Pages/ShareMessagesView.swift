@@ -68,7 +68,6 @@ struct ShareMessagesView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .shadow(radius: 1)
         .padding()
-        .frame(width: screenSize().width)
         .ignoresSafeArea()
     }
 }
