@@ -16,6 +16,8 @@ struct ConversationListView: View {
     @EnvironmentObject var appStateVM: AICatStateViewModel
     @State var showClearAllChatAlert = false
     @State var showSettingsView = false
+    @State var showAddAIPKeyView = false
+    @State var showPremuimPage = false
 
     var premiumText: String {
         if appStateVM.isPremium {
@@ -123,7 +125,7 @@ struct ConversationListView: View {
                     }
                 }
                 if appStateVM.developMode {
-                    Button(action: { appStateVM.showAddAPIKeySheet = true }) {
+                    Button(action: { showAddAIPKeyView = true }) {
                         HStack {
                             Image(systemName: "key.viewfinder")
                             Text("OpenAI API Key")
@@ -156,7 +158,7 @@ struct ConversationListView: View {
                 .tint(.blackText.opacity(0.5))
                 if !appStateVM.developMode {
                     Button(
-                        action: { appStateVM.showPremumPage = true }
+                        action: { showPremuimPage = true }
                     ) {
                         HStack {
                             Image(systemName: "crown")
@@ -196,6 +198,15 @@ struct ConversationListView: View {
         }
         .ignoresSafeArea(.keyboard)
         .font(.manrope(size: 16, weight: .medium))
+        .sheet(isPresented: $showAddAIPKeyView) {
+            AddApiKeyView(
+                onValidateSuccess: { showAddAIPKeyView = false },
+                onSkip: { showAddAIPKeyView = false }
+            )
+        }
+        .sheet(isPresented: $showPremuimPage) {
+            PremiumPage(showPremium: $showPremuimPage)
+        }
     }
 
     func deleteConversation(_ conversation: Conversation) {

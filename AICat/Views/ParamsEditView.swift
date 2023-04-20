@@ -26,14 +26,28 @@ struct ParamsEditView: View {
 
     @State var conversation: Conversation
     @State var temperature: Double = 0.7
+    @Binding var show: Bool
 
-    init(conversation: Conversation) {
+    init(conversation: Conversation, showing: Binding<Bool>) {
         self.conversation = conversation
+        self._show = showing
     }
 
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
+            #if os(macOS)
+            HStack {
+                Spacer()
+                Button(action: {
+                    show = false
+                }) {
+                    Image(systemName: "xmark")
+                        .padding(.horizontal)
+                }
+                .buttonStyle(.plain)
+            }
+            #endif
             HStack {
                 Text("Context Messages")
                     .padding(.leading, 10)
@@ -133,7 +147,7 @@ struct ParamsEditView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
             Color.background.ignoresSafeArea()
-            ParamsEditView(conversation: Conversation(title: "Main", prompt: ""))
+            ParamsEditView(conversation: Conversation(title: "Main", prompt: ""), showing: .constant(false))
         }.environment(\.colorScheme, .light)
     }
 }

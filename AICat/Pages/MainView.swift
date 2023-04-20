@@ -9,13 +9,6 @@ import SwiftUI
 import Blackbird
 
 struct MainView: View {
-
-    
-    @EnvironmentObject var appStateVM: AICatStateViewModel
-
-    @AppStorage("openApiKey")
-    var apiKey: String?
-
     var body: some View {
         GeometryReader { proxy in
             if proxy.size.width > 560 {
@@ -23,15 +16,6 @@ struct MainView: View {
             } else {
                 CompactView()
             }
-        }
-        .sheet(isPresented: $appStateVM.showAddAPIKeySheet) {
-            AddApiKeyView(
-                onValidateSuccess: { appStateVM.showAddAPIKeySheet = false },
-                onSkip: { appStateVM.showAddAPIKeySheet = false }
-            )
-        }
-        .sheet(isPresented: $appStateVM.showPremumPage) {
-            PremiumPage()
         }
     }
 }
