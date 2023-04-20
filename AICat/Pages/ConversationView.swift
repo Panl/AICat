@@ -24,6 +24,7 @@ struct ConversationView: View {
     @State var toast: Toast?
     @State var tappedMessageId: String?
     @State var size: CGSize = .zero
+    @State var showPremuimPage = false
 
     let conversation: Conversation
 
@@ -364,11 +365,11 @@ struct ConversationView: View {
             }
         }.sheet(isPresented: $showParamEditSheetView) {
             if #available(iOS 16, *) {
-                ParamsEditView(conversation: conversation)
+                ParamsEditView(conversation: conversation, showing: $showParamEditSheetView)
                     .presentationDetents([.height(480)])
                     .presentationDragIndicator(.visible)
             } else {
-                ParamsEditView(conversation: conversation)
+                ParamsEditView(conversation: conversation, showing: $showParamEditSheetView)
             }
         }
         .background {
@@ -378,6 +379,9 @@ struct ConversationView: View {
                         size = proxy.size
                     }
             }
+        }
+        .sheet(isPresented: $showPremuimPage) {
+            PremiumPage(showPremium: $showPremuimPage)
         }
         .font(.manrope(size: 16, weight: .regular))
         .toast($toast)
@@ -421,6 +425,7 @@ struct ConversationView: View {
 
     func completeMessage() {
         if appStateVM.needBuyPremium() {
+            showPremuimPage = true
             return
         }
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)

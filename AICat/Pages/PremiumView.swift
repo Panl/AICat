@@ -22,6 +22,8 @@ struct PremiumPage: View {
 
     @State var isPurchasing: Bool = false
 
+    @Binding var showPremium: Bool
+
     @State var toast: Toast?
 
     var body: some View {
@@ -29,7 +31,7 @@ struct PremiumPage: View {
             HStack {
                 Spacer()
                 Button(action: {
-                    appStateVM.showPremumPage = false
+                    showPremium = false
                 }) {
                     Image(systemName: "xmark")
                         .resizable()
@@ -172,7 +174,7 @@ struct FeatureView: View {
 
 struct PremiumPage_Previews: PreviewProvider {
     static var previews: some View {
-        PremiumPage()
+        PremiumPage(showPremium: .constant(false))
             .background(.background)
             .environment(\.colorScheme, .dark)
             .environmentObject(AICatStateViewModel())

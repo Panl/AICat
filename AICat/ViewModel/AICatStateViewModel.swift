@@ -24,8 +24,6 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
     @Published private(set) var conversations: [Conversation] = [mainConversation]
     @Published private(set) var currentConversation = mainConversation
     @Published private(set) var messages: [ChatMessage] = []
-    @Published var showAddAPIKeySheet: Bool = false
-    @Published var showPremumPage: Bool = false
     @Published var monthlyPremium: ApphudProduct?
 
     @Published private(set) var main = mainConversation
@@ -178,7 +176,6 @@ fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", t
 
     func needBuyPremium() -> Bool {
         if !isPremium && sentMessageCount >= freeMessageCount {
-            showPremumPage = true
             return true
         }
         return false
