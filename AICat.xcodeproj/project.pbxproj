@@ -39,6 +39,7 @@
 		8E64874429C715740029E14F /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874329C715740029E14F /* ChatMessage.swift */; };
 		8E64874729C719460029E14F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874629C719460029E14F /* Date+Extension.swift */; };
 		8E64874C29C788640029E14F /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874B29C788640029E14F /* ConversationListView.swift */; };
+		8E811E9C29F1A05E0007A386 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 8E811E9B29F1A05E0007A386 /* ComposableArchitecture */; };
 		8EDD4DD429DB0159009176A5 /* Credential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDD4DD329DB0159009176A5 /* Credential.swift */; };
 		8EE9264729D49B29005E6FB7 /* Bundle+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE9264629D49B29005E6FB7 /* Bundle+Extension.swift */; };
 		8EE9264C29D6FAB5005E6FB7 /* AICatStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE9264B29D6FAB5005E6FB7 /* AICatStateViewModel.swift */; };
@@ -120,6 +121,7 @@
 				8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */,
 				8E64873829C6FBD90029E14F /* Alamofire in Frameworks */,
 				8EF5A5E129D92DBF00981A38 /* AppCenterAnalytics in Frameworks */,
+				8E811E9C29F1A05E0007A386 /* ComposableArchitecture in Frameworks */,
 				8E64873F29C70FD00029E14F /* Blackbird in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -314,6 +316,7 @@
 				8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */,
 				8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */,
 				8E2EF25829F02E4900E25C9A /* ApphudSDK */,
+				8E811E9B29F1A05E0007A386 /* ComposableArchitecture */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -355,6 +358,7 @@
 				8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */,
 				8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
 				8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */,
+				8E811E9A29F1A05E0007A386 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -706,6 +710,14 @@
 				kind = branch;
 			};
 		};
+		8E811E9A29F1A05E0007A386 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.52.0;
+			};
+		};
 		8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/microsoft/appcenter-sdk-apple.git";
@@ -741,6 +753,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */;
 			productName = Blackbird;
+		};
+		8E811E9B29F1A05E0007A386 /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E811E9A29F1A05E0007A386 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
 		};
 		8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
