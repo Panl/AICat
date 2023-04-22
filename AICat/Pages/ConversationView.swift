@@ -6,500 +6,586 @@
 //
 
 import SwiftUI
-import Blackbird
 import Alamofire
+import ComposableArchitecture
+import Blackbird
+import Foundation
+
+struct ConversationFeature: ReducerProtocol {
+    struct State: Equatable {
+        var conversation: Conversation = mainConversation
+        var messages: [ChatMessage] = []
+        var inputText: String = ""
+        var isSending = false
+        var error: NSError?
+        var showAddConversation = false
+        var showClearMessageAlert = false
+        var showParamEditSheetView = false
+        var isAIGenerating = false
+        var showCommands = false
+        var toast: Toast?
+        var tappedMessageId: String?
+        var showPremiumPage = false
+        var selectedPrompt: Conversation?
+        var prompts: [Conversation] = []
+
+        var promptText: String {
+            selectedPrompt?.prompt ?? conversation.prompt
+        }
+
+        var filterdPrompts: [Conversation] {
+            let query = inputText.lowercased().trimmingCharacters(in: .whitespaces)
+            return prompts.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
+        }
+    }
+
+    enum Action: Equatable {
+        case queryMessages(cid: String)
+        case queriedMessage([ChatMessage])
+        case saveMessage(ChatMessage)
+        case deleteMessage(ChatMessage)
+        case sendMessage
+        case setSending(Bool)
+        case textChanged(String)
+        case clearInputText
+        case selectPrompt(Conversation?)
+        case setAIGenerating(Bool)
+        case setCompleteError(NSError?)
+        case tapMessage(ChatMessage)
+        case toggleAddConversation(Bool)
+        case toggleClearMessageAlert(Bool)
+        case toggleParamEditSheetView(Bool)
+        case toggleShowPremiumPage(Bool)
+        case hoverMessage(ChatMessage?)
+        case setToast(Toast?)
+        case cleanMessages([ChatMessage])
+        case toggleShowCommands(Bool)
+    }
+
+    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+        switch action {
+        case .queryMessages(let cid):
+            state.messages.removeAll()
+            return .task {
+                let messages = await queryMessages(cid: cid)
+                return .queriedMessage(messages)
+            }
+        case .queriedMessage(let messages):
+            state.messages = messages
+            return .none
+        case .saveMessage(let message):
+            if let index = state.messages.firstIndex(where: { $0.id == message.id }) {
+                state.messages[index] = message
+            } else {
+                state.messages.append(message)
+            }
+            return .none
+        case .deleteMessage(let message):
+            state.messages.removeAll(where: { $0.id == message.id })
+            Task {
+                await deleteMessage(message)
+            }
+            return .none
+        case .sendMessage:
+            //TODO: check premium state
+            return .run { [state] send in
+                await complete(state: state, send: send)
+            }
+        case .textChanged(let text):
+            state.inputText = text
+            return .none
+        case .setSending(let isSending):
+            state.isSending = isSending
+            return .none
+        case .clearInputText:
+            state.inputText = ""
+            return .none
+        case .selectPrompt(let prompt):
+            state.selectedPrompt = prompt
+            return .none
+        case .setAIGenerating(let isGenerating):
+            state.isAIGenerating = isGenerating
+            return .none
+        case .setCompleteError(let error):
+            state.error = error
+            return .none
+        case .tapMessage(let message):
+            if state.tappedMessageId == message.id {
+                state.tappedMessageId = nil
+            } else {
+                state.tappedMessageId = message.id
+            }
+            return .none
+        case .toggleAddConversation(let show):
+            state.showAddConversation = show
+            return .none
+        case .toggleClearMessageAlert(let show):
+            state.showClearMessageAlert = show
+            return .none
+        case .toggleParamEditSheetView(let show):
+            state.showParamEditSheetView = show
+            return .none
+        case .toggleShowPremiumPage(let show):
+            state.showPremiumPage = show
+            return .none
+        case .hoverMessage(let message):
+            state.tappedMessageId = message?.id
+            return .none
+        case .setToast(let toast):
+            state.toast = toast
+            return .none
+        case .cleanMessages(let messages):
+            return .task {
+                await cleanMessages(messages)
+                return .queriedMessage([])
+            }
+        case .toggleShowCommands(let show):
+            state.showCommands = show
+            return .none
+        }
+
+    }
+
+    func saveMessage(_ message: ChatMessage) async {
+        await db.upsert(model: message)
+    }
+
+    func deleteMessage(_ message: ChatMessage) async {
+        var messageToRemove = message
+        messageToRemove.timeRemoved = Date.now.timeInSecond
+        await db.upsert(model: messageToRemove)
+    }
+
+    func cleanMessages(_ messages: [ChatMessage]) async {
+        for var message in messages {
+            message.timeRemoved = Date.now.timeInSecond
+            await db.upsert(model: message)
+        }
+    }
+
+    func queryMessages(cid: String) async -> [ChatMessage] {
+        try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated))
+    }
+
+    func complete(state: State, send: Send<Action>) async {
+        let text = state.inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let conversation = state.conversation
+        guard !text.isEmpty, !state.isSending else { return }
+        await send(.setSending(true))
+        let sendText = text
+        await send(.clearInputText)
+        let newMessage = Message(role: "user", content: sendText)
+        let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
+        await saveMessage(chatMessage)
+        await send(.saveMessage(chatMessage))
+        await send(.setAIGenerating(true))
+        do {
+            var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
+            responseMessage.replyToId = chatMessage.id
+            let stream: AsyncThrowingStream<(String, StreamResponse.Delta), Error>
+            if let selectedPrompt = state.selectedPrompt {
+                stream = try await CatApi.completeMessageStream(messages: [newMessage], conversation: selectedPrompt)
+            } else {
+                let messagesToSend = state.messages.suffix(conversation.contextMessages).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
+                stream = try await CatApi.completeMessageStream(messages: messagesToSend, conversation: conversation)
+            }
+            for try await (model, delta) in stream {
+                if let role = delta.role {
+                    responseMessage.role = role
+                }
+                if let content = delta.content {
+                    responseMessage.content += content
+                }
+                responseMessage.model = model
+                await saveMessage(responseMessage)
+                await send(.saveMessage(responseMessage))
+                await send(.setAIGenerating(false))
+            }
+            await send(.setSending(false))
+            // TODO: incrementSentMessageCount
+        } catch {
+            let err = error as NSError
+            if err.code != -999 {
+                await send(.setCompleteError(err))
+                await deleteMessage(chatMessage)
+            }
+            await send(.setAIGenerating(false))
+            await send(.setSending(false))
+        }
+    }
+
+
+}
 
 struct ConversationView: View {
-    @EnvironmentObject var appStateVM: AICatStateViewModel
-    @State var inputText: String = ""
-    @State var isSending = false
-    @State var error: NSError?
-    @State var showAddConversation = false
-    @State var showClearMesssageAlert = false
-    @State var showParamEditSheetView = false
-    @State var isAIGenerating = false
-    @State var showCommands = false
     @State var commnadCardHeight: CGFloat = 0
     @FocusState var isFocused: Bool
-    @State var toast: Toast?
-    @State var tappedMessageId: String?
     @State var size: CGSize = .zero
-    @State var showPremuimPage = false
 
-    let conversation: Conversation
-
-    var filterdPrompts: [Conversation] {
-        let query = inputText.lowercased().trimmingCharacters(in: .whitespaces)
-        return appStateVM.conversations.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
-    }
-
-    @State var selectedPrompt: Conversation?
-
-    var promptText: String {
-        selectedPrompt?.prompt ?? conversation.prompt
-    }
-
-    var contextMessages: Int {
-        conversation.contextMessages
-    }
-
+    let store: StoreOf<ConversationFeature>
     let onChatsClick: () -> Void
 
-    init(conversation: Conversation, onChatsClick: @escaping () -> Void) {
-        self.conversation = conversation
+    init(store: StoreOf<ConversationFeature>, onChatsClick: @escaping () -> Void) {
         self.onChatsClick = onChatsClick
+        self.store = store
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            VStack {
-                HStack(spacing: 18) {
-                    Button(action: {
-                        isFocused = false
-                        onChatsClick()
-                    }) {
-                        Image(systemName: "bubble.left.and.bubble.right")
-                            .tint(.primaryColor)
-                            .frame(width: 24, height: 24)
-                    }.buttonStyle(.borderless)
-                    Spacer()
-                    VStack(spacing: 0) {
-                        Text(conversation.title)
-                            .font(.manrope(size: 16, weight: .heavy))
-                            .lineLimit(1)
-                        if !promptText.isEmpty {
-                            Text(promptText)
-                                .font(.manrope(size: 12, weight: .regular))
-                                .opacity(0.4)
+        WithViewStore(store, observe: { $0 }) { viewStore in
+            ZStack(alignment: .bottom) {
+                VStack {
+                    HStack(spacing: 18) {
+                        Button(action: {
+                            isFocused = false
+                            onChatsClick()
+                        }) {
+                            Image(systemName: "bubble.left.and.bubble.right")
+                                .tint(.primaryColor)
+                                .frame(width: 24, height: 24)
+                        }.buttonStyle(.borderless)
+                        Spacer()
+                        VStack(spacing: 0) {
+                            Text(viewStore.conversation.title)
+                                .font(.manrope(size: 16, weight: .heavy))
                                 .lineLimit(1)
-                        }
-                    }
-                    Spacer()
-                    Menu {
-                        if !conversation.isMain {
-                            Button(action: editConversation) {
-                                Label("Edit Prompt", systemImage: "note.text")
+                            if !viewStore.promptText.isEmpty {
+                                Text(viewStore.promptText)
+                                    .font(.manrope(size: 12, weight: .regular))
+                                    .opacity(0.4)
+                                    .lineLimit(1)
                             }
                         }
-                        Button(action: { showParamEditSheetView = true }) {
-                            Label("Edit Model", systemImage: "rectangle.and.pencil.and.ellipsis")
+                        Spacer()
+                        Menu(content: {
+                            if !viewStore.conversation.isMain {
+                                Button(action: {
+                                    viewStore.send(.toggleAddConversation(true))
+                                }) {
+                                    Label("Edit Prompt", systemImage: "note.text")
+                                }
+                            }
+                            Button(action: {
+                                viewStore.send(.toggleParamEditSheetView(true))
+                            }) {
+                                Label("Edit Model", systemImage: "rectangle.and.pencil.and.ellipsis")
+                            }
+                            Button(role: .destructive, action: {
+                                viewStore.send(.toggleClearMessageAlert(true))
+                            }) {
+                                Label("Clean Messages", systemImage: "trash")
+                            }
+                        }, label: {
+                            Image(systemName: "ellipsis")
+                                .frame(width: 24, height: 24)
+                                .clipShape(Rectangle())
+                        })
+                        .frame(width: 24)
+                        .alert("Are you sure to clean all messages?", isPresented: viewStore.binding(get: \.showClearMessageAlert, send: ConversationFeature.Action.toggleClearMessageAlert)) {
+                            Button("Sure", role: .destructive) {
+                                viewStore.send(.cleanMessages(viewStore.messages))
+                            }
+                            Button("Cancel", role: .cancel) {
+                                viewStore.send(.toggleClearMessageAlert(false))
+                            }
                         }
-                        Button(role: .destructive, action: { showClearMesssageAlert = true }) {
-                            Label("Clean Messages", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .frame(width: 24, height: 24)
-                            .clipShape(Rectangle())
+                        .tint(.primaryColor)
                     }
-                    .menuStyle(.borderlessButton)
-                    .frame(width: 24)
-                    .alert("Are you sure to clean all messages?", isPresented: $showClearMesssageAlert) {
-                        Button("Sure", role: .destructive) {
-                            cleanMessages()
-                        }
-                        Button("Cancel", role: .cancel) {
-                            showClearMesssageAlert = false
-                        }
-                    }
-                    .tint(.primaryColor)
-                }
-                .padding(.horizontal, 20)
-                .frame(height: 44)
-                Spacer(minLength: 0)
-                ScrollViewReader { proxy in
-                    ScrollView(showsIndicators: false) {
-                        LazyVStack(alignment: .leading, spacing: 16) {
-                            Spacer().frame(height: 4)
-                                .id("Top")
-                            ForEach(appStateVM.messages, id: \.id) { message in
-                                MessageView(
-                                    message: message,
-                                    onDelete: {
+                    .padding(.horizontal, 20)
+                    .frame(height: 44)
+                    Spacer(minLength: 0)
+                    ScrollViewReader { proxy in
+                        ScrollView(showsIndicators: false) {
+                            LazyVStack(alignment: .leading, spacing: 16) {
+                                Spacer().frame(height: 4)
+                                    .id("Top")
+                                ForEach(viewStore.messages, id: \.id) { message in
+                                    MessageView(
+                                        message: message,
+                                        onDelete: {
+                                            HapticEngine.trigger()
+                                            //TODO: Delete Message
+                                            viewStore.send(.deleteMessage(message))
+                                        },
+                                        onCopy: {
+                                            SystemUtil.copyToPasteboard(content: message.content)
+                                            let toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
+                                            viewStore.send(.setToast(toast))
+                                        },
+                                        onShare: {
+                                            HapticEngine.trigger()
+                                            endEditing(force: true)
+                                            // TODO: share messages
+                                            // appStateVM.shareMessage(message, imageWidth: size.width)
+                                        },
+                                        showActions: message.id == viewStore.tappedMessageId
+                                    ).onTapGesture {
                                         HapticEngine.trigger()
-                                        deleteMessage(message)
-                                    },
-                                    onCopy: {
-                                        SystemUtil.copyToPasteboard(content: message.content)
-                                        toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
-                                    },
-                                    onShare: {
-                                        HapticEngine.trigger()
-                                        endEditing(force: true)
-                                        appStateVM.shareMessage(message, imageWidth: size.width)
-                                    },
-                                    showActions: message.id == tappedMessageId
-                                ).onTapGesture {
-                                    HapticEngine.trigger()
-                                    withAnimation {
-                                        if tappedMessageId == message.id {
-                                            tappedMessageId = nil
-                                        } else {
-                                            tappedMessageId = message.id
-                                        }
+                                        viewStore.send(.tapMessage(message), animation: .default)
+                                    }
+                                    .onHover { isHover in
+                                        viewStore.send(.hoverMessage(isHover ? message : nil), animation: .default)
+                                    }
+                                    .id(message.id)
+                                }
+                                if let error = viewStore.error {
+                                    ErrorMessageView(errorMessage: error.localizedDescription) {
+                                        // TODO: retryComplete()
+                                    } clear: {
+                                        viewStore.send(.setCompleteError(nil))
                                     }
                                 }
-                                .onHover { isHover in
+                                if viewStore.isAIGenerating && viewStore.isSending {
+                                    InputingMessageView().id("generating")
+                                }
+                                Spacer().frame(height: 80)
+                                    .id("Bottom")
+                            }
+                        }
+                        .simultaneousGesture(DragGesture().onChanged { _ in
+                            self.endEditing(force: true)
+                        })
+                        .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
+                            print("--message changed: \(old.count)")
+                            if old.count <= newMessages.count {
+                                if old.isEmpty {
+                                    proxy.scrollTo("Bottom")
+                                } else {
                                     withAnimation {
-                                        if isHover {
-                                            tappedMessageId = message.id
-                                        } else {
-                                            tappedMessageId = nil
-                                        }
+                                        proxy.scrollTo("Bottom")
                                     }
                                 }
-                                .id(message.id)
                             }
-                            if let error {
-                                ErrorMessageView(errorMessage: error.localizedDescription) {
-                                    retryComplete()
-                                } clear: {
-                                    self.error = nil
-                                }
-                            }
-                            if isAIGenerating && isSending {
-                                InputingMessageView().id("generating")
-                            }
-                            Spacer().frame(height: 80)
-                                .id("Bottom")
                         }
-                    }
-                    .simultaneousGesture(DragGesture().onChanged { _ in
-                        self.endEditing(force: true)
-                    })
-                    .onChange(of: appStateVM.messages) { [old = appStateVM.messages] newMessages in
-                        if old.count <= newMessages.count {
-                            if old.isEmpty {
+                        .onChange(of: viewStore.isAIGenerating) { _ in
+                            withAnimation {
                                 proxy.scrollTo("Bottom")
-                            } else {
+                            }
+                        }
+                        .onChange(of: isFocused) { _ in
+                            Task {
+                                try await Task.sleep(nanoseconds: 300_000_000)
                                 withAnimation {
                                     proxy.scrollTo("Bottom")
                                 }
                             }
                         }
-                    }
-                    .onChange(of: isAIGenerating) { _ in
-                        withAnimation {
-                            proxy.scrollTo("Bottom")
-                        }
-                    }
-                    .onChange(of: isFocused) { _ in
-                        Task {
-                            try await Task.sleep(nanoseconds: 300_000_000)
-                            withAnimation {
-                                proxy.scrollTo("Bottom")
-                            }
-                        }
-                    }
-                }.padding(.bottom, 36)
-            }
-            VStack {
-                if showCommands, !filterdPrompts.isEmpty {
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 0) {
-                            Spacer().frame(height: 4)
-                            ForEach(filterdPrompts) { prompt in
-                                Button(action: {
-                                    selectedPrompt = prompt
-                                    inputText = ""
-                                }) {
-                                    HStack {
-                                        Text(prompt.title)
-                                            .lineLimit(1)
-                                        Spacer()
+                    }.padding(.bottom, 36)
+                }
+                VStack {
+                    if viewStore.showCommands, !viewStore.filterdPrompts.isEmpty {
+                        ScrollView(showsIndicators: false) {
+                            VStack(spacing: 0) {
+                                Spacer().frame(height: 4)
+                                ForEach(viewStore.filterdPrompts) { prompt in
+                                    Button(action: {
+                                        viewStore.send(.selectPrompt(prompt))
+                                        viewStore.send(.clearInputText)
+                                    }) {
+                                        HStack {
+                                            Text(prompt.title)
+                                                .lineLimit(1)
+                                            Spacer()
+                                        }
+                                        .background(Color.background)
                                     }
-                                    .background(Color.background)
+                                    .buttonStyle(.borderless)
+                                    .font(.manrope(size: 14, weight: .medium))
+                                    .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                    .tint(.blackText.opacity(0.5))
+                                    if prompt != viewStore.filterdPrompts.last {
+                                        Divider().foregroundColor(.gray)
+                                    }
+                                }
+                                Spacer().frame(height: 4)
+                            }
+                            .background {
+                                GeometryReader { proxy in
+                                    Color.clear.preference(key: SizeKey.self, value: proxy.size)
+                                }.onPreferenceChange(SizeKey.self) {
+                                    commnadCardHeight = $0.height
+                                }
+                            }
+
+                        }
+                        .frame(maxHeight: min(commnadCardHeight, 180))
+                        .background(Color.background)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .shadow(color: .primaryColor.opacity(0.1), radius: 12)
+                        .padding(.horizontal, 16)
+                    }
+                    if let selectedPrompt = viewStore.selectedPrompt {
+                        HStack {
+                            Spacer(minLength: 0)
+                            HStack(spacing: 4) {
+                                Text(selectedPrompt.title)
+                                    .lineLimit(1)
+                                    .font(.manrope(size: 14, weight: .semibold))
+                                    .foregroundColor(.blackText.opacity(0.7))
+                                Button(action: {
+                                    viewStore.send(.selectPrompt(nil))
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
                                 }
                                 .buttonStyle(.borderless)
-                                .font(.manrope(size: 14, weight: .medium))
-                                .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                .tint(.blackText.opacity(0.5))
-                                if prompt != filterdPrompts.last {
-                                    Divider().foregroundColor(.gray)
+                                .tint(.blackText.opacity(0.8))
+                            }
+                            .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 6))
+                            .background(Color.background)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: .primaryColor.opacity(0.1), radius: 12)
+                        }.padding(.horizontal, 20)
+                    }
+
+                    HStack(alignment: .bottom, spacing: 4) {
+                        TextEditView(text: viewStore.binding(get: \.inputText, send: ConversationFeature.Action.textChanged)) {
+                            ZStack {
+                                if viewStore.conversation.isMain {
+                                    Text("Say something or enter 'space'")
+                                } else {
+                                    Text("Say something")
                                 }
                             }
-                            Spacer().frame(height: 4)
                         }
-                        .background {
-                            GeometryReader { proxy in
-                                Color.clear.preference(key: SizeKey.self, value: proxy.size)
-                            }.onPreferenceChange(SizeKey.self) {
-                                commnadCardHeight = $0.height
+                        .textFieldStyle(.plain)
+                        .frame(minHeight: 26)
+                        .focused($isFocused)
+                        .tint(.blackText.opacity(0.8))
+                        .onChange(of: viewStore.inputText) { newValue in
+                            if viewStore.conversation.isMain {
+                                if newValue.starts(with: " ") {
+                                    viewStore.send(.toggleShowCommands(true))
+                                } else {
+                                    viewStore.send(.toggleShowCommands(false))
+                                }
                             }
                         }
-
-                    }
-                    .frame(maxHeight: min(commnadCardHeight, 180))
-                    .background(Color.background)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(color: .primaryColor.opacity(0.1), radius: 12)
-                    .padding(.horizontal, 16)
-                }
-                if let selectedPrompt {
-                    HStack {
-                        Spacer(minLength: 0)
-                        HStack(spacing: 4) {
-                            Text(selectedPrompt.title)
-                                .lineLimit(1)
-                                .font(.manrope(size: 14, weight: .semibold))
-                                .foregroundColor(.blackText.opacity(0.7))
+                        .onSubmit {
+                            viewStore.send(.sendMessage)
+                        }
+                        .onTapGesture {}
+                        if viewStore.isSending {
                             Button(action: {
-                                self.selectedPrompt = nil
+                                HapticEngine.trigger()
+                                //TODO: move to reducer
+                                CatApi.cancelMessageStream()
                             }) {
-                                Image(systemName: "xmark.circle.fill")
+                                Rectangle()
+                                    .foregroundColor(.primaryColor)
+                                    .frame(width: 17, height: 17)
+                                    .cornerRadius(2)
+                                    .opacity(0.5)
                             }
+                            .frame(width: 26, height: 26)
                             .buttonStyle(.borderless)
-                            .tint(.blackText.opacity(0.8))
                         }
-                        .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 6))
-                        .background(Color.background)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: .primaryColor.opacity(0.1), radius: 12)
-                    }.padding(.horizontal, 20)
-                }
-
-                HStack(alignment: .bottom, spacing: 4) {
-                    TextEditView(text: $inputText) {
-                        ZStack {
-                            if conversation.isMain {
-                                Text("Say something or enter 'space'")
+                        Button(
+                            action: {
+                                viewStore.send(.sendMessage)
+                                HapticEngine.trigger()
+                            }
+                        ) {
+                            if viewStore.isSending {
+                                LoadingIndocator()
+                                    .frame(width: 20, height: 20)
                             } else {
-                                Text("Say something")
+                                if #available(iOS 16.0, *) {
+                                    Image(systemName: "paperplane.circle.fill")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 26, height: 26)
+                                        .tint(
+                                            LinearGradient(
+                                                colors: [.primaryColor.opacity(0.9), .primaryColor.opacity(0.6)],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing)
+                                        )
+                                } else {
+                                    Image(systemName: "paperplane.circle.fill")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 26, height: 26)
+                                        .tint(
+                                            .primaryColor.opacity(0.8)
+                                        )
+                                }
                             }
                         }
-                    }
-                    .textFieldStyle(.plain)
-                    .frame(minHeight: 26)
-                    .focused($isFocused)
-                    .tint(.blackText.opacity(0.8))
-                    .onChange(of: inputText) { newValue in
-                        if conversation.isMain {
-                            if newValue.starts(with: " ") {
-                                showCommands = true
-                            } else {
-                                showCommands = false
-                            }
-                        }
-                    }
-                    .onSubmit {
-                        completeMessage()
-                    }
-                    .onTapGesture {}
-                    if isSending {
-                        Button(action: {
-                            HapticEngine.trigger()
-                            CatApi.cancelMessageStream()
-                        }) {
-                            Rectangle()
-                                .foregroundColor(.primaryColor)
-                                .frame(width: 17, height: 17)
-                                .cornerRadius(2)
-                                .opacity(0.5)
-                        }
+                        .keyboardShortcut(KeyEquivalent.return, modifiers: [.command])
                         .frame(width: 26, height: 26)
                         .buttonStyle(.borderless)
+                        .disabled(viewStore.inputText.isEmpty)
                     }
-                    Button(
-                        action: {
-                            completeMessage()
-                            HapticEngine.trigger()
-                        }
-                    ) {
-                        if isSending {
-                            LoadingIndocator()
-                                .frame(width: 20, height: 20)
-                        } else {
-                            if #available(iOS 16.0, *) {
-                                Image(systemName: "paperplane.circle.fill")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 26, height: 26)
-                                    .tint(
-                                        LinearGradient(
-                                            colors: [.primaryColor.opacity(0.9), .primaryColor.opacity(0.6)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing)
-                                    )
-                            } else {
-                                Image(systemName: "paperplane.circle.fill")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 26, height: 26)
-                                    .tint(
-                                        .primaryColor.opacity(0.8)
-                                    )
-                            }
-                        }
-                    }
-                    .keyboardShortcut(KeyEquivalent.return, modifiers: [.command])
-                    .frame(width: 26, height: 26)
-                    .buttonStyle(.borderless)
-                    .disabled(inputText.isEmpty)
+                    .padding(.vertical, 12)
+                    .frame(minHeight: 50)
+                    .padding(.leading, 16)
+                    .padding(.trailing, 12)
+                    .background(Color.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .shadow(color: .primaryColor.opacity(0.1), radius: 4)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
                 }
-                .padding(.vertical, 12)
-                .frame(minHeight: 50)
-                .padding(.leading, 16)
-                .padding(.trailing, 12)
-                .background(Color.background)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .shadow(color: .primaryColor.opacity(0.1), radius: 4)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
             }
-        }
-        .task {
-            await appStateVM.queryMessages(cid: conversation.id)
-        }
-        .onChange(of: conversation.id) { newValue in
-            selectedPrompt = nil
-            inputText = ""
-            error = nil
-            appStateVM.resetMessages()
-            showCommands = false
-            Task {
-                await appStateVM.queryMessages(cid: newValue)
+            .onAppear {
+                viewStore.send(.queryMessages(cid: viewStore.conversation.id))
             }
-        }.sheet(isPresented: $showAddConversation) {
-            AddConversationView(conversation: conversation) {
-                showAddConversation = false
+            .onChange(of: viewStore.conversation.id) { newValue in
+                viewStore.send(.selectPrompt(nil))
+                viewStore.send(.clearInputText)
+                viewStore.send(.setCompleteError(nil))
+                viewStore.send(.toggleShowCommands(false))
+                viewStore.send(.queryMessages(cid: viewStore.conversation.id))
+            }.sheet(isPresented: viewStore.binding(get: \.showAddConversation, send: ConversationFeature.Action.toggleAddConversation)) {
+                AddConversationView(conversation: viewStore.conversation) {
+                    viewStore.send(.toggleAddConversation(true))
+                }
+            }.sheet(isPresented: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView)) {
+                if #available(iOS 16, *) {
+                    ParamsEditView(conversation: viewStore.conversation, showing: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView))
+                        .presentationDetents([.height(480)])
+                        .presentationDragIndicator(.visible)
+                } else {
+                    ParamsEditView(conversation: viewStore.conversation, showing: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView))
+                }
             }
-        }.sheet(isPresented: $showParamEditSheetView) {
-            if #available(iOS 16, *) {
-                ParamsEditView(conversation: conversation, showing: $showParamEditSheetView)
-                    .presentationDetents([.height(480)])
-                    .presentationDragIndicator(.visible)
-            } else {
-                ParamsEditView(conversation: conversation, showing: $showParamEditSheetView)
+            .background {
+                GeometryReader { proxy in
+                    Color.clear
+                        .onAppear {
+                            size = proxy.size
+                        }
+                }
             }
-        }
-        .background {
-            GeometryReader { proxy in
-                Color.clear
-                    .onAppear {
-                        size = proxy.size
-                    }
+            .sheet(isPresented: viewStore.binding(get: \.showPremiumPage, send: ConversationFeature.Action.toggleShowPremiumPage)) {
+                PremiumPage(showPremium: viewStore.binding(get: \.showPremiumPage, send: ConversationFeature.Action.toggleShowPremiumPage))
             }
+            .font(.manrope(size: 16, weight: .regular))
+            .toast(viewStore.binding(get: \.toast, send: ConversationFeature.Action.setToast))
+            .onTapGesture {
+                endEditing(force: true)
+            }
+            .overlay {
+               ShareMessagesImageOverlay()
+            }
+            // TODO: saveImageToast
+            // .toast($appStateVM.saveImageToast)
         }
-        .sheet(isPresented: $showPremuimPage) {
-            PremiumPage(showPremium: $showPremuimPage)
-        }
-        .font(.manrope(size: 16, weight: .regular))
-        .toast($toast)
-        .onTapGesture {
-            endEditing(force: true)
-        }
-        .overlay {
-           ShareMessagesImageOverlay()
-        }
-        .toast($appStateVM.saveImageToast)
     }
 
     struct SizeKey: PreferenceKey {
         static var defaultValue = CGSize.zero
         static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
     }
-
-    func editConversation() {
-        showAddConversation = true
-    }
-
-    func cleanMessages() {
-        let timeRemoved = Date.now.timeInSecond
-        Task {
-            for var message in appStateVM.messages {
-                message.timeRemoved = timeRemoved
-                await appStateVM.saveMessage(message)
-            }
-            await appStateVM.queryMessages(cid: conversation.id)
-        }
-    }
-
-    func deleteMessage(_ message: ChatMessage) {
-        Task {
-            var messageToRemove = message
-            messageToRemove.timeRemoved = Date.now.timeInSecond
-            await appStateVM.saveMessage(messageToRemove)
-            await appStateVM.queryMessages(cid: conversation.id)
-        }
-    }
-
-    func completeMessage() {
-        if appStateVM.needBuyPremium() {
-            showPremuimPage = true
-            return
-        }
-        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty, !isSending else { return }
-        isSending = true
-        let sendText = text
-        inputText = ""
-        let newMessage = Message(role: "user", content: sendText)
-        Task {
-            let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
-            await appStateVM.saveMessage(chatMessage)
-            await appStateVM.queryMessages(cid: conversation.id)
-            withAnimation {
-                isAIGenerating = true
-            }
-            if let selectedPrompt {
-                await completeMessages([newMessage], selected: selectedPrompt, replyToId: chatMessage.id)
-            } else {
-                let messagesToSend = appStateVM.messages.suffix(contextMessages).map({ Message(role: $0.role, content: $0.content) }) + [newMessage]
-                await completeMessages(messagesToSend, replyToId: chatMessage.id)
-            }
-        }
-    }
-
-    func retryComplete() {
-        error = nil
-        isSending = true
-        let messagesToSend = appStateVM.messages.suffix(contextMessages + 1).map({ Message(role: $0.role, content: $0.content) })
-        let replyToId = appStateVM.messages.last?.id ?? ""
-        Task {
-            isAIGenerating = true
-            if let selectedPrompt {
-                await completeMessages(messagesToSend.suffix(1), selected: selectedPrompt, replyToId: replyToId)
-            } else {
-                await completeMessages(messagesToSend, replyToId: replyToId)
-            }
-        }
-    }
-
-    func completeMessages(_ messages: [Message], selected: Conversation? = nil, replyToId: String) async {
-        var chatMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
-        chatMessage.replyToId = replyToId
-        do {
-            let stream = try await CatApi.completeMessageStream(messages: messages, conversation: selected ?? conversation)
-            for try await (model, delta) in stream {
-                if let role = delta.role {
-                    chatMessage.role = role
-                }
-                if let content = delta.content {
-                    chatMessage.content += content
-                }
-                chatMessage.model = model
-                await appStateVM.saveMessage(chatMessage)
-                isAIGenerating = false
-            }
-            isSending = false
-            appStateVM.incrementSentMessageCount()
-        } catch {
-            let err = error as NSError
-            if err.code != -999 {
-                self.error = err
-                deleteMessage(chatMessage)
-            }
-            isAIGenerating = false
-            isSending = false
-
-        }
-    }
 }
 
 struct ConversationView_Previews: PreviewProvider {
+
+    static let store = Store(initialState: ConversationFeature.State(), reducer: ConversationFeature())
+
     static var previews: some View {
+
         ConversationView(
-            conversation: Conversation(title: "Mini Chat", prompt: "hello hello hello hello hello hello hello hello hello hello "),
+            store: store,
             onChatsClick: { }
         ).environmentObject(AICatStateViewModel())
     }
