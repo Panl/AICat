@@ -17,10 +17,10 @@ import AppKit
 #endif
 
 fileprivate let dbPath = "\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])/db.sqlite"
-fileprivate let mainConversation = Conversation(id: "AICat.Conversation.Main", title: "AICat Main", prompt: "")
+let mainConversation = Conversation(id: "AICat.Conversation.Main", title: "AICat Main", prompt: "")
+let db = try! Blackbird.Database(path: dbPath, options: [])
 
 @MainActor class AICatStateViewModel: NSObject, ObservableObject {
-    var db = try! Blackbird.Database(path: dbPath, options: .debugPrintEveryQuery)
     @Published private(set) var conversations: [Conversation] = [mainConversation]
     @Published private(set) var currentConversation = mainConversation
     @Published private(set) var messages: [ChatMessage] = []

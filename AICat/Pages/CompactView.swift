@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Blackbird
+import ComposableArchitecture
 
 struct CompactView: View {
 
@@ -43,7 +44,7 @@ struct CompactView: View {
             ).frame(width: 300)
 
             ConversationView(
-                conversation: appStateVM.currentConversation,
+                store: Store(initialState: ConversationFeature.State(conversation: appStateVM.currentConversation), reducer: ConversationFeature()),
                 onChatsClick: {
                     withAnimation(.easeInOut(duration: openDrawerDuration)) {
                         if lastTranslationX == 300 {

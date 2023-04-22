@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 struct SplitView: View {
     @EnvironmentObject var appStateVM: AICatStateViewModel
@@ -37,7 +38,7 @@ struct SplitView: View {
                 .foregroundColor(.gray.opacity(0.2))
                 .opacity(sideBarWidth == 300 ? 1 : 0)
             ConversationView(
-                conversation: appStateVM.currentConversation,
+                store: Store(initialState: ConversationFeature.State(conversation: appStateVM.currentConversation), reducer: ConversationFeature()),
                 onChatsClick: {
                     withAnimation(.easeOut(duration: 0.2)) {
                         if sideBarWidth == 300 {
