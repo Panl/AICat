@@ -128,11 +128,19 @@ let db = try! Blackbird.Database(path: dbPath, options: [])
         }
     }
 
-    func queryConversations() async {
-        await writeMainToDBIfNeeded()
-        await migrateConversationParamsIfNeeded()
+    func queryMainConversation() async -> Conversation {
+        if let dbMain = try! await Conversation.read(from: db, id: mainConversation.id) {
+            return dbMain
+        } else {
+            await saveConversation(mainConversation)
+            return mainConversation
+        }
+    }
+
+    func queryConversations() async -> (Conversation, [Conversation]) {
+        let mainChat = await queryMainConversation()
         let chats = try! await Conversation.read(from: db, matching: \.$timeRemoved == 0 && \.$id != mainConversation.id, orderBy: .descending(\.$timeCreated))
-        conversations = chats
+        return (mainChat, chats)
     }
 
     func queryMessages(cid: String, animated: Bool = false) async {
