@@ -10,6 +10,12 @@ import Alamofire
 import ComposableArchitecture
 import Blackbird
 import Foundation
+#if canImport(UIKit)
+import UIKit
+#endif
+#if canImport(AppKit)
+import AppKit
+#endif
 
 struct ConversationFeature: ReducerProtocol {
     struct State: Equatable {
@@ -28,6 +34,8 @@ struct ConversationFeature: ReducerProtocol {
         var showPremiumPage = false
         var selectedPrompt: Conversation?
         var prompts: [Conversation] = []
+        var shareSnapshot: ImageType?
+        var saveImageToast: Toast?
 
         var promptText: String {
             selectedPrompt?.prompt ?? conversation.prompt
@@ -39,7 +47,7 @@ struct ConversationFeature: ReducerProtocol {
         }
     }
 
-    enum Action: Equatable {
+    enum Action {
         case queryMessages(cid: String)
         case updateMessages([ChatMessage])
         case saveMessage(ChatMessage)
@@ -60,6 +68,10 @@ struct ConversationFeature: ReducerProtocol {
         case setToast(Toast?)
         case cleanMessages([ChatMessage])
         case toggleShowCommands(Bool)
+        case updateShareSnapshot(ImageType?)
+        case shareMessage((ChatMessage, CGFloat))
+        case saveToAlbum(ImageType)
+        case setSaveImageToast(Toast?)
     }
 
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -142,6 +154,25 @@ struct ConversationFeature: ReducerProtocol {
         case .toggleShowCommands(let show):
             state.showCommands = show
             return .none
+        case .updateShareSnapshot(let snapshot):
+            state.shareSnapshot = snapshot
+            return .none
+        case .shareMessage(let (message, width)):
+            return .task { [chat = state.conversation] in
+                let snapsot = await generateMessageSnapshot(message, imageWidth: width, conversation: chat)
+                return .updateShareSnapshot(snapsot)
+            }
+        case .saveToAlbum(let image):
+            do {
+                try saveImageToAlbum(image: image)
+                state.saveImageToast = Toast(type: .success, message: "Image saved!")
+            } catch {
+                state.saveImageToast = Toast(type: .error, message: "Image saved falied!")
+            }
+            return .none
+        case .setSaveImageToast(let toast):
+            state.saveImageToast = toast
+            return .none
         }
 
     }
@@ -214,6 +245,59 @@ struct ConversationFeature: ReducerProtocol {
         }
     }
 
+    func queryMessage(mid: String) async -> ChatMessage? {
+        try! await ChatMessage.read(from: db, id: mid)
+    }
+
+    func generateMessageSnapshot(_ message: ChatMessage, imageWidth: CGFloat, conversation: Conversation) async -> ImageType {
+        let replyToId = message.replyToId
+        let replyToMessage = await queryMessage(mid: replyToId)
+        let shareMessagesView = await MainActor.run {
+            var messages = [message]
+            if let replyToMessage {
+                messages = [replyToMessage, message]
+            }
+            let title = conversation.title
+            var prompt = conversation.prompt
+            if prompt.isEmpty {
+                prompt = "Your ultimate AI assistant"
+            }
+            let width = min(560, imageWidth)
+            return ShareMessagesView(title: title, prompt: prompt, messages: messages).frame(width: width)
+        }
+        return await shareMessagesView.snapshot()
+    }
+
+    func saveImageToAlbum(image: ImageType) throws {
+        #if os(iOS)
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        #elseif os(macOS)
+        if let url = showSavePanel()  {
+            try savePNG(image: image, path: url)
+        }
+        #endif
+    }
+
+    #if os(macOS)
+    func showSavePanel() -> URL? {
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.png]
+        savePanel.canCreateDirectories = true
+        savePanel.isExtensionHidden = false
+        savePanel.title = "Save your image"
+        savePanel.message = "Choose a folder and a name to store the image."
+        savePanel.nameFieldLabel = "Image file name:"
+
+        let response = savePanel.runModal()
+        return response == .OK ? savePanel.url : nil
+    }
+
+    func savePNG(image: NSImage, path: URL) throws {
+        let imageRepresentation = NSBitmapImageRep(data: image.tiffRepresentation!)
+        let pngData = imageRepresentation?.representation(using: .png, properties: [:])
+        try pngData!.write(to: path)
+    }
+    #endif
 
 }
 
@@ -303,7 +387,6 @@ struct ConversationView: View {
                                         message: message,
                                         onDelete: {
                                             HapticEngine.trigger()
-                                            //TODO: Delete Message
                                             viewStore.send(.deleteMessage(message))
                                         },
                                         onCopy: {
@@ -314,8 +397,7 @@ struct ConversationView: View {
                                         onShare: {
                                             HapticEngine.trigger()
                                             endEditing(force: true)
-                                            // TODO: share messages
-                                            // appStateVM.shareMessage(message, imageWidth: size.width)
+                                            viewStore.send(.shareMessage((message, size.width)))
                                         },
                                         showActions: message.id == viewStore.tappedMessageId
                                     ).onTapGesture {
@@ -345,7 +427,6 @@ struct ConversationView: View {
                             self.endEditing(force: true)
                         })
                         .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
-                            print("--message changed: \(old.count)")
                             if old.count <= newMessages.count {
                                 if old.isEmpty {
                                     proxy.scrollTo("Bottom")
@@ -565,10 +646,17 @@ struct ConversationView: View {
                 endEditing(force: true)
             }
             .overlay {
-               ShareMessagesImageOverlay()
+                ShareMessagesImageOverlay(
+                    shareMessageSnapshot: viewStore.shareSnapshot,
+                    onClose: {
+                        viewStore.send(.updateShareSnapshot(nil))
+                    },
+                    onSave: { image in
+                        viewStore.send(.saveToAlbum(image))
+                    }
+                )
             }
-            // TODO: saveImageToast
-            // .toast($appStateVM.saveImageToast)
+            .toast(viewStore.binding(get: \.saveImageToast, send: ConversationFeature.Action.setSaveImageToast))
         }
     }
 
