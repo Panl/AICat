@@ -10,9 +10,6 @@ import Blackbird
 import ComposableArchitecture
 
 struct CompactView: View {
-
-    @EnvironmentObject var appStateVM: AICatStateViewModel
-
     @State var translationX: CGFloat = 0
     @State var showAddConversationSheet = false
     @State var lastTranslationX: CGFloat = 0
@@ -30,9 +27,6 @@ struct CompactView: View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             ZStack(alignment: .topLeading) {
                 ConversationListView(
-                    onAddChat: {
-                        showAddConversationSheet = true
-                    },
                     onChatChanged: { chat in
                         viewStore.send(.selectChat(chat))
                         withAnimation(.easeInOut(duration: openDrawerDuration)) {
@@ -102,15 +96,6 @@ struct CompactView: View {
                             }
 
                         }
-                )
-            }.sheet(
-                isPresented: $showAddConversationSheet,
-                onDismiss: {}
-            ) {
-                AddConversationView(
-                    onClose: {
-                        showAddConversationSheet = false
-                    }
                 )
             }.onAppear {
                 viewStore.send(.queryConversations)

@@ -72,6 +72,7 @@ struct ConversationFeature: ReducerProtocol {
         case shareMessage((ChatMessage, CGFloat))
         case saveToAlbum(ImageType)
         case setSaveImageToast(Toast?)
+        case updateConversation(Conversation)
     }
 
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -172,6 +173,8 @@ struct ConversationFeature: ReducerProtocol {
             return .none
         case .setSaveImageToast(let toast):
             state.saveImageToast = toast
+            return .none
+        case .updateConversation:
             return .none
         }
 
@@ -318,139 +321,9 @@ struct ConversationView: View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             ZStack(alignment: .bottom) {
                 VStack {
-                    HStack(spacing: 18) {
-                        Button(action: {
-                            isFocused = false
-                            onChatsClick()
-                        }) {
-                            Image(systemName: "bubble.left.and.bubble.right")
-                                .tint(.primaryColor)
-                                .frame(width: 24, height: 24)
-                        }.buttonStyle(.borderless)
-                        Spacer()
-                        VStack(spacing: 0) {
-                            Text(viewStore.conversation.title)
-                                .font(.manrope(size: 16, weight: .heavy))
-                                .lineLimit(1)
-                            if !viewStore.promptText.isEmpty {
-                                Text(viewStore.promptText)
-                                    .font(.manrope(size: 12, weight: .regular))
-                                    .opacity(0.4)
-                                    .lineLimit(1)
-                            }
-                        }
-                        Spacer()
-                        Menu(content: {
-                            if !viewStore.conversation.isMain {
-                                Button(action: {
-                                    viewStore.send(.toggleAddConversation(true))
-                                }) {
-                                    Label("Edit Prompt", systemImage: "note.text")
-                                }
-                            }
-                            Button(action: {
-                                viewStore.send(.toggleParamEditSheetView(true))
-                            }) {
-                                Label("Edit Model", systemImage: "rectangle.and.pencil.and.ellipsis")
-                            }
-                            Button(role: .destructive, action: {
-                                viewStore.send(.toggleClearMessageAlert(true))
-                            }) {
-                                Label("Clean Messages", systemImage: "trash")
-                            }
-                        }, label: {
-                            Image(systemName: "ellipsis")
-                                .frame(width: 24, height: 24)
-                                .clipShape(Rectangle())
-                        })
-                        .frame(width: 24)
-                        .alert("Are you sure to clean all messages?", isPresented: viewStore.binding(get: \.showClearMessageAlert, send: ConversationFeature.Action.toggleClearMessageAlert)) {
-                            Button("Sure", role: .destructive) {
-                                viewStore.send(.cleanMessages(viewStore.messages))
-                            }
-                            Button("Cancel", role: .cancel) {
-                                viewStore.send(.toggleClearMessageAlert(false))
-                            }
-                        }
-                        .tint(.primaryColor)
-                    }
-                    .padding(.horizontal, 20)
-                    .frame(height: 44)
+                    toolbar(viewStore: viewStore)
                     Spacer(minLength: 0)
-                    ScrollViewReader { proxy in
-                        ScrollView(showsIndicators: false) {
-                            LazyVStack(alignment: .leading, spacing: 16) {
-                                Spacer().frame(height: 4)
-                                    .id("Top")
-                                ForEach(viewStore.messages, id: \.id) { message in
-                                    MessageView(
-                                        message: message,
-                                        onDelete: {
-                                            HapticEngine.trigger()
-                                            viewStore.send(.deleteMessage(message))
-                                        },
-                                        onCopy: {
-                                            SystemUtil.copyToPasteboard(content: message.content)
-                                            let toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
-                                            viewStore.send(.setToast(toast))
-                                        },
-                                        onShare: {
-                                            HapticEngine.trigger()
-                                            endEditing(force: true)
-                                            viewStore.send(.shareMessage((message, size.width)))
-                                        },
-                                        showActions: message.id == viewStore.tappedMessageId
-                                    ).onTapGesture {
-                                        HapticEngine.trigger()
-                                        viewStore.send(.tapMessage(message), animation: .default)
-                                    }
-                                    .onHover { isHover in
-                                        viewStore.send(.hoverMessage(isHover ? message : nil), animation: .default)
-                                    }
-                                    .id(message.id)
-                                }
-                                if let error = viewStore.error {
-                                    ErrorMessageView(errorMessage: error.localizedDescription) {
-                                        // TODO: retryComplete()
-                                    } clear: {
-                                        viewStore.send(.setCompleteError(nil))
-                                    }
-                                }
-                                if viewStore.isAIGenerating && viewStore.isSending {
-                                    InputingMessageView().id("generating")
-                                }
-                                Spacer().frame(height: 80)
-                                    .id("Bottom")
-                            }
-                        }
-                        .simultaneousGesture(DragGesture().onChanged { _ in
-                            self.endEditing(force: true)
-                        })
-                        .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
-                            if old.count <= newMessages.count {
-                                if old.isEmpty {
-                                    proxy.scrollTo("Bottom")
-                                } else {
-                                    withAnimation {
-                                        proxy.scrollTo("Bottom")
-                                    }
-                                }
-                            }
-                        }
-                        .onChange(of: viewStore.isAIGenerating) { _ in
-                            withAnimation {
-                                proxy.scrollTo("Bottom")
-                            }
-                        }
-                        .onChange(of: isFocused) { _ in
-                            Task {
-                                try await Task.sleep(nanoseconds: 300_000_000)
-                                withAnimation {
-                                    proxy.scrollTo("Bottom")
-                                }
-                            }
-                        }
-                    }.padding(.bottom, 36)
+                    messageList(viewStore: viewStore)
                 }
                 VStack {
                     if viewStore.showCommands, !viewStore.filterdPrompts.isEmpty {
@@ -617,16 +490,34 @@ struct ConversationView: View {
                 viewStore.send(.toggleShowCommands(false))
                 viewStore.send(.queryMessages(cid: viewStore.conversation.id))
             }.sheet(isPresented: viewStore.binding(get: \.showAddConversation, send: ConversationFeature.Action.toggleAddConversation)) {
-                AddConversationView(conversation: viewStore.conversation) {
-                    viewStore.send(.toggleAddConversation(true))
-                }
+                AddConversationView(
+                    conversation: viewStore.conversation,
+                    onClose: {
+                        viewStore.send(.toggleAddConversation(true))
+                    },
+                    onSave: { chat in
+                        viewStore.send(.updateConversation(chat))
+                    }
+                )
             }.sheet(isPresented: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView)) {
                 if #available(iOS 16, *) {
-                    ParamsEditView(conversation: viewStore.conversation, showing: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView))
-                        .presentationDetents([.height(480)])
-                        .presentationDragIndicator(.visible)
+                    ParamsEditView(
+                        conversation: viewStore.conversation,
+                        showing: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView),
+                        onUpdate: { chat in
+                            viewStore.send(.updateConversation(chat))
+                        }
+                    )
+                    .presentationDetents([.height(480)])
+                    .presentationDragIndicator(.visible)
                 } else {
-                    ParamsEditView(conversation: viewStore.conversation, showing: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView))
+                    ParamsEditView(
+                        conversation: viewStore.conversation,
+                        showing: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView),
+                        onUpdate: { chat in
+                            viewStore.send(.updateConversation(chat))
+                        }
+                    )
                 }
             }
             .background {
@@ -660,6 +551,144 @@ struct ConversationView: View {
         }
     }
 
+    func toolbar(viewStore: ViewStoreOf<ConversationFeature>) -> some View {
+        HStack(spacing: 18) {
+            Button(action: {
+                isFocused = false
+                onChatsClick()
+            }) {
+                Image(systemName: "bubble.left.and.bubble.right")
+                    .tint(.primaryColor)
+                    .frame(width: 24, height: 24)
+            }.buttonStyle(.borderless)
+            Spacer()
+            VStack(spacing: 0) {
+                Text(viewStore.conversation.title)
+                    .font(.manrope(size: 16, weight: .heavy))
+                    .lineLimit(1)
+                if !viewStore.promptText.isEmpty {
+                    Text(viewStore.promptText)
+                        .font(.manrope(size: 12, weight: .regular))
+                        .opacity(0.4)
+                        .lineLimit(1)
+                }
+            }
+            Spacer()
+            Menu(content: {
+                if !viewStore.conversation.isMain {
+                    Button(action: {
+                        viewStore.send(.toggleAddConversation(true))
+                    }) {
+                        Label("Edit Prompt", systemImage: "note.text")
+                    }
+                }
+                Button(action: {
+                    viewStore.send(.toggleParamEditSheetView(true))
+                }) {
+                    Label("Edit Model", systemImage: "rectangle.and.pencil.and.ellipsis")
+                }
+                Button(role: .destructive, action: {
+                    viewStore.send(.toggleClearMessageAlert(true))
+                }) {
+                    Label("Clean Messages", systemImage: "trash")
+                }
+            }, label: {
+                Image(systemName: "ellipsis")
+                    .frame(width: 24, height: 24)
+                    .clipShape(Rectangle())
+            })
+            .frame(width: 24)
+            .alert("Are you sure to clean all messages?", isPresented: viewStore.binding(get: \.showClearMessageAlert, send: ConversationFeature.Action.toggleClearMessageAlert)) {
+                Button("Sure", role: .destructive) {
+                    viewStore.send(.cleanMessages(viewStore.messages))
+                }
+                Button("Cancel", role: .cancel) {
+                    viewStore.send(.toggleClearMessageAlert(false))
+                }
+            }
+            .tint(.primaryColor)
+        }
+        .padding(.horizontal, 20)
+        .frame(height: 44)
+    }
+
+    func messageList(viewStore: ViewStoreOf<ConversationFeature>) -> some View {
+        ScrollViewReader { proxy in
+            ScrollView(showsIndicators: false) {
+                LazyVStack(alignment: .leading, spacing: 16) {
+                    Spacer().frame(height: 4)
+                        .id("Top")
+                    ForEach(viewStore.messages, id: \.id) { message in
+                        MessageView(
+                            message: message,
+                            onDelete: {
+                                HapticEngine.trigger()
+                                viewStore.send(.deleteMessage(message))
+                            },
+                            onCopy: {
+                                SystemUtil.copyToPasteboard(content: message.content)
+                                let toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
+                                viewStore.send(.setToast(toast))
+                            },
+                            onShare: {
+                                HapticEngine.trigger()
+                                endEditing(force: true)
+                                viewStore.send(.shareMessage((message, size.width)))
+                            },
+                            showActions: message.id == viewStore.tappedMessageId
+                        ).onTapGesture {
+                            HapticEngine.trigger()
+                            viewStore.send(.tapMessage(message), animation: .default)
+                        }
+                        .onHover { isHover in
+                            viewStore.send(.hoverMessage(isHover ? message : nil), animation: .default)
+                        }
+                        .id(message.id)
+                    }
+                    if let error = viewStore.error {
+                        ErrorMessageView(errorMessage: error.localizedDescription) {
+                            // TODO: retryComplete()
+                        } clear: {
+                            viewStore.send(.setCompleteError(nil))
+                        }
+                    }
+                    if viewStore.isAIGenerating && viewStore.isSending {
+                        InputingMessageView().id("generating")
+                    }
+                    Spacer().frame(height: 80)
+                        .id("Bottom")
+                }
+            }
+            .simultaneousGesture(DragGesture().onChanged { _ in
+                self.endEditing(force: true)
+            })
+            .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
+                if old.count <= newMessages.count {
+                    if old.isEmpty {
+                        proxy.scrollTo("Bottom")
+                    } else {
+                        withAnimation {
+                            proxy.scrollTo("Bottom")
+                        }
+                    }
+                }
+            }
+            .onChange(of: viewStore.isAIGenerating) { _ in
+                withAnimation {
+                    proxy.scrollTo("Bottom")
+                }
+            }
+            .onChange(of: isFocused) { _ in
+                Task {
+                    try await Task.sleep(nanoseconds: 300_000_000)
+                    withAnimation {
+                        proxy.scrollTo("Bottom")
+                    }
+                }
+            }
+        }.padding(.bottom, 36)
+    }
+
     struct SizeKey: PreferenceKey {
         static var defaultValue = CGSize.zero
         static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
@@ -671,10 +700,9 @@ struct ConversationView_Previews: PreviewProvider {
     static let store = Store(initialState: ConversationFeature.State(), reducer: ConversationFeature())
 
     static var previews: some View {
-
         ConversationView(
             store: store,
             onChatsClick: { }
-        ).environmentObject(AICatStateViewModel())
+        )
     }
 }

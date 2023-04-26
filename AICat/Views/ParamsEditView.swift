@@ -22,15 +22,15 @@ let models = [
 
 struct ParamsEditView: View {
 
-    @EnvironmentObject var appStateVM: AICatStateViewModel
-
     @State var conversation: Conversation
-    @State var temperature: Double = 0.7
     @Binding var show: Bool
 
-    init(conversation: Conversation, showing: Binding<Bool>) {
+    let onUpdate: (Conversation) -> Void
+
+    init(conversation: Conversation, showing: Binding<Bool>, onUpdate: @escaping (Conversation) -> Void) {
         self.conversation = conversation
         self._show = showing
+        self.onUpdate = onUpdate
     }
 
     var body: some View {
@@ -136,9 +136,7 @@ struct ParamsEditView: View {
         .font(.manrope(size: 16, weight: .medium))
         .foregroundColor(.blackText)
         .onChange(of: conversation) { newValue in
-            Task {
-                await appStateVM.saveConversation(newValue)
-            }
+            onUpdate(newValue)
         }
     }
 }
@@ -147,7 +145,7 @@ struct ParamsEditView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
             Color.background.ignoresSafeArea()
-            ParamsEditView(conversation: Conversation(title: "Main", prompt: ""), showing: .constant(false))
+            ParamsEditView(conversation: Conversation(title: "Main", prompt: ""), showing: .constant(false), onUpdate: { _ in })
         }.environment(\.colorScheme, .light)
     }
 }
