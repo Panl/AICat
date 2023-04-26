@@ -41,7 +41,7 @@ struct ConversationFeature: ReducerProtocol {
 
     enum Action: Equatable {
         case queryMessages(cid: String)
-        case queriedMessage([ChatMessage])
+        case updateMessages([ChatMessage])
         case saveMessage(ChatMessage)
         case deleteMessage(ChatMessage)
         case sendMessage
@@ -68,9 +68,9 @@ struct ConversationFeature: ReducerProtocol {
             state.messages.removeAll()
             return .task {
                 let messages = await queryMessages(cid: cid)
-                return .queriedMessage(messages)
+                return .updateMessages(messages)
             }
-        case .queriedMessage(let messages):
+        case .updateMessages(let messages):
             state.messages = messages
             return .none
         case .saveMessage(let message):
@@ -137,7 +137,7 @@ struct ConversationFeature: ReducerProtocol {
         case .cleanMessages(let messages):
             return .task {
                 await cleanMessages(messages)
-                return .queriedMessage([])
+                return .updateMessages([])
             }
         case .toggleShowCommands(let show):
             state.showCommands = show

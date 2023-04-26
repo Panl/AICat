@@ -15,8 +15,6 @@ import ApphudSDK
 
 @main
 struct AICatApp: App {
-    @StateObject var appStateVM = AICatStateViewModel()
-    
     init() {
         AppCenter.start(
             withAppSecret: appCenterSecretKey,
@@ -32,36 +30,23 @@ struct AICatApp: App {
         #if os(iOS)
         WindowGroup {
             MainView()
-                .task {
-                    await appStateVM.queryConversations()
-                }
                 .background(Color.background.ignoresSafeArea())
-                .environmentObject(appStateVM)
         }
         #elseif os(macOS)
         WindowGroup {
             MainView()
-                .task {
-                    await appStateVM.queryConversations()
-                }
-                .environmentObject(appStateVM)
                 .background(Color.background.ignoresSafeArea())
         }
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified(showsTitle: false))
         Settings {
             SettingsView(onClose: {})
-                .environmentObject(appStateVM)
         }
 
         MenuBarExtra(
             content: {
                 MainView()
                     .frame(width: 375, height: 720)
-                    .task {
-                        await appStateVM.queryConversations()
-                    }
-                    .environmentObject(appStateVM)
                     .background(Color.background.ignoresSafeArea())
             },
             label: {
