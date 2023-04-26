@@ -40,6 +40,7 @@
 		8E64874729C719460029E14F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874629C719460029E14F /* Date+Extension.swift */; };
 		8E64874C29C788640029E14F /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874B29C788640029E14F /* ConversationListView.swift */; };
 		8E811E9C29F1A05E0007A386 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 8E811E9B29F1A05E0007A386 /* ComposableArchitecture */; };
+		8EC0742429F979DD00606DE9 /* OpenAISettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */; };
 		8EDD4DD429DB0159009176A5 /* Credential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDD4DD329DB0159009176A5 /* Credential.swift */; };
 		8EE9264729D49B29005E6FB7 /* Bundle+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE9264629D49B29005E6FB7 /* Bundle+Extension.swift */; };
 		8EE9264C29D6FAB5005E6FB7 /* AICatStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE9264B29D6FAB5005E6FB7 /* AICatStateViewModel.swift */; };
@@ -94,6 +95,7 @@
 		8E64874929C759970029E14F /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 		8E64874A29C75A1C0029E14F /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		8E64874B29C788640029E14F /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
+		8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAISettingsView.swift; sourceTree = "<group>"; };
 		8EDD4DD329DB0159009176A5 /* Credential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credential.swift; sourceTree = "<group>"; };
 		8EE9264629D49B29005E6FB7 /* Bundle+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extension.swift"; sourceTree = "<group>"; };
 		8EE9264B29D6FAB5005E6FB7 /* AICatStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AICatStateViewModel.swift; sourceTree = "<group>"; };
@@ -275,6 +277,7 @@
 				8E401DD429E7171100E2F403 /* PremiumView.swift */,
 				8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */,
 				8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */,
+				8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */,
 			);
 			path = Pages;
 			sourceTree = "<group>";
@@ -413,6 +416,7 @@
 				8EECA00629C8097E0021A6A1 /* UerDefaults+Extension.swift in Sources */,
 				8EF5A5DE29D8527000981A38 /* SplitView.swift in Sources */,
 				8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */,
+				8EC0742429F979DD00606DE9 /* OpenAISettingsView.swift in Sources */,
 				8EFE2AB029E14F9C00C64B7C /* TextEditView.swift in Sources */,
 				8E64874C29C788640029E14F /* ConversationListView.swift in Sources */,
 				8EF5A5E929E0651A00981A38 /* SliderView.swift in Sources */,

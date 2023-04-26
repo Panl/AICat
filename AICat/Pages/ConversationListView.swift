@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import ApphudSDK
 
 struct ConversationListReducer: ReducerProtocol {
     struct State: Equatable {
@@ -16,6 +17,7 @@ struct ConversationListReducer: ReducerProtocol {
         var showSettingsView = false
         var showAddAPIKeyView = false
         var showPremiumPage = false
+        var showAddConversation = false
     }
 
     enum Action {
@@ -23,8 +25,10 @@ struct ConversationListReducer: ReducerProtocol {
         case toggleShowSettings(Bool)
         case toggleShowAddAPIKey(Bool)
         case toggleShowPremiumPage(Bool)
+        case toggleShowAddConversation(Bool)
         case deleteConversation(Conversation)
         case clearConversations([Conversation])
+        case saveConversation(Conversation)
     }
 
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -38,29 +42,21 @@ struct ConversationListReducer: ReducerProtocol {
         case .toggleShowPremiumPage(let show):
             state.showPremiumPage = show
             return .none
+        case .toggleShowAddConversation(let show):
+            state.showAddConversation = show
+            return .none
         case .toggleShowClearAllChats(let show):
             state.showClearAllChatsAlert = show
             return .none
-        case .deleteConversation, .clearConversations:
+        case .deleteConversation, .clearConversations, .saveConversation:
             return .none
         }
     }
 }
 
 struct ConversationListView: View {
-    let onAddChat: () -> Void
     let onChatChanged: (Conversation) -> Void
-
-    @EnvironmentObject var appStateVM: AICatStateViewModel
     let store: StoreOf<ConversationListReducer>
-    
-    var premiumText: String {
-        if appStateVM.isPremium {
-            return "AICat Premium"
-        } else {
-            return "AICat Premium(\(appStateVM.sentMessageCount)/\(appStateVM.freeMessageCount))"
-        }
-    }
 
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
@@ -80,7 +76,7 @@ struct ConversationListView: View {
                 ScrollView(showsIndicators: false) {
                     LazyVStack {
                         Spacer().frame(height: 10)
-                        Button(action: onAddChat) {
+                        Button(action: { viewStore.send(.toggleShowAddConversation(true)) }) {
                             HStack {
                                 Image(systemName: "plus.bubble")
                                     .aspectRatio(contentMode: .fit)
@@ -161,20 +157,6 @@ struct ConversationListView: View {
                             viewStore.send(.toggleShowClearAllChats(false))
                         }
                     }
-                    if appStateVM.developMode {
-                        Button(action: { viewStore.send(.toggleShowAddAPIKey(true)) }) {
-                            HStack {
-                                Image(systemName: "key.viewfinder")
-                                Text("OpenAI API Key")
-                                    .lineLimit(1)
-                                Spacer()
-                            }
-                            .padding(.vertical, 10)
-                        }
-                        .buttonStyle(.borderless)
-                        .tint(.blackText.opacity(0.5))
-                        .padding(.horizontal, 20)
-                    }
                     Button(action: {
                         #if os(iOS)
                         UIApplication.shared.open(URL(string: "https://help.openai.com/en/collections/3742473-chatgpt")!)
@@ -193,24 +175,22 @@ struct ConversationListView: View {
                     .buttonStyle(.borderless)
                     .padding(.horizontal, 20)
                     .tint(.blackText.opacity(0.5))
-                    if !appStateVM.developMode {
-                        Button(
-                            action: { viewStore.send(.toggleShowPremiumPage(true)) }
-                        ) {
-                            HStack {
-                                Image(systemName: "crown")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 20, height: 20)
-                                Text(LocalizedStringKey(premiumText))
-                                Spacer()
-                            }
-                            .padding(.vertical, 10)
+                    Button(
+                        action: { viewStore.send(.toggleShowPremiumPage(true)) }
+                    ) {
+                        HStack {
+                            Image(systemName: "crown")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                            Text("AICat Premium")
+                            Spacer()
                         }
-                        .buttonStyle(.borderless)
-                        .padding(.horizontal, 20)
-                        .tint(.blackText.opacity(0.5))
+                        .padding(.vertical, 10)
                     }
+                    .buttonStyle(.borderless)
+                    .padding(.horizontal, 20)
+                    .tint(.blackText.opacity(0.5))
                     #if os(iOS)
                     Button(action: { viewStore.send(.toggleShowSettings(true)) }) {
                         HStack {
@@ -244,6 +224,20 @@ struct ConversationListView: View {
             .sheet(isPresented: viewStore.binding(get: \.showPremiumPage, send: ConversationListReducer.Action.toggleShowPremiumPage)) {
                 PremiumPage(showPremium: viewStore.binding(get: \.showPremiumPage, send: ConversationListReducer.Action.toggleShowPremiumPage))
             }
+            .sheet(
+                isPresented: viewStore.binding(get: \.showAddConversation, send: ConversationListReducer.Action.toggleShowAddConversation),
+                onDismiss: {}
+            ) {
+                AddConversationView(
+                    onClose: {
+                        viewStore.send(.toggleShowAddConversation(false))
+                    },
+                    onSave: { chat in
+                        viewStore.send(.saveConversation(chat))
+                        viewStore.send(.toggleShowAddConversation(false))
+                    }
+                )
+            }
         }
     }
 }
@@ -251,7 +245,7 @@ struct ConversationListView: View {
 struct ConversationListView_Previews: PreviewProvider {
     static var previews: some View {
         ConversationListView(
-            onAddChat: {}, onChatChanged: { _ in }, store: Store(initialState: ConversationListReducer.State(), reducer: ConversationListReducer())
-        ).environmentObject(AICatStateViewModel())
+            onChatChanged: { _ in }, store: Store(initialState: ConversationListReducer.State(), reducer: ConversationListReducer())
+        )
     }
 }

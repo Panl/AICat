@@ -11,16 +11,16 @@ struct AddConversationView: View {
 
     let conversation: Conversation?
     let onClose: () -> Void
+    let onSave: (Conversation) -> Void
     @State var title: String
     @State var prompt: String
-    @EnvironmentObject var appStateVM: AICatStateViewModel
-    @AppStorage("currentChat.id") var chatId: String?
 
-    init(conversation: Conversation? = nil, onClose: @escaping () -> Void) {
+    init(conversation: Conversation? = nil, onClose: @escaping () -> Void, onSave: @escaping (Conversation) -> Void) {
         self.conversation = conversation
         self.onClose = onClose
         self.title = conversation?.title ?? ""
         self.prompt = conversation?.prompt ?? ""
+        self.onSave = onSave
     }
 
     var body: some View {
@@ -125,13 +125,10 @@ struct AddConversationView: View {
         if var conversation {
             conversation.title = title
             conversation.prompt = prompt
-            await appStateVM.saveConversation(conversation)
-            onClose()
+            onSave(conversation)
         } else {
             let conversation = Conversation(title: title, prompt: prompt)
-            await appStateVM.saveConversation(conversation)
-            chatId = conversation.id
-            onClose()
+            onSave(conversation)
         }
     }
 }
@@ -139,9 +136,8 @@ struct AddConversationView: View {
 
 struct AddConversationView_Previews: PreviewProvider {
     static var previews: some View {
-        AddConversationView(onClose: {})
+        AddConversationView(onClose: {}, onSave: { _ in })
             .background(Color.background)
-            .environmentObject(AICatStateViewModel())
             .environment(\.colorScheme, .dark)
     }
 }

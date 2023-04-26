@@ -18,6 +18,10 @@ struct AppReducer: ReducerProtocol {
         var conversationMessages = ConversationFeature.State()
         var mainChat: Conversation = mainConversation
         var conversations: [Conversation] = []
+
+        var allConversations: [Conversation] {
+            [mainChat] + conversations
+        }
     }
 
     enum Action {
@@ -39,11 +43,11 @@ struct AppReducer: ReducerProtocol {
                 }
             case .addChat(let chat):
                 state.conversations.insert(chat, at: 0)
-                state.conversationList.conversations = [state.mainChat] + state.conversations
+                state.conversationList.conversations = state.allConversations
                 state.conversationMessages.prompts = state.conversations
                 state.conversationList.selectedChat = chat
                 state.conversationMessages.conversation = chat
-                return .run { [chat] _ in
+                return .run { _ in
                     chatId = chat.id
                 }
             case .selectChat(let chat):
@@ -61,8 +65,24 @@ struct AppReducer: ReducerProtocol {
                 state.conversationList.selectedChat = selected
                 state.conversationMessages.conversation = selected
                 return .none
-            case .conversationMessagesAction:
-                return .none
+            case .conversationMessagesAction(let action):
+                switch action {
+                case .updateConversation(let chat):
+                    if chat.id == state.mainChat.id {
+                        state.mainChat = chat
+                    } else if let index = state.conversations.firstIndex(where: { $0.id == chat.id }) {
+                        state.conversations[index] = chat
+                    }
+                    state.conversationList.selectedChat = chat
+                    state.conversationList.conversations = state.allConversations
+                    state.conversationMessages.prompts = state.conversations
+                    state.conversationMessages.conversation = chat
+                    return .run { _ in
+                        await saveConversation(chat)
+                    }
+                default:
+                    return .none
+                }
             case .conversationListAction(let action):
                 switch action {
                 case .deleteConversation(let chat):
@@ -77,6 +97,12 @@ struct AppReducer: ReducerProtocol {
                         let removeIds = chats.map(\.id)
                         let newChats = conversations.filter { !removeIds.contains($0.id) }
                         return .updateConversations((main, newChats))
+                    }
+                case .saveConversation(let chat):
+                    return .run { send in
+                        await saveConversation(chat)
+                        await send(.addChat(chat))
+                        await send(.selectChat(chat))
                     }
                 default:
                     return .none
@@ -128,7 +154,7 @@ struct MainView: View {
 
     @StateObject var appStateVM = AICatStateViewModel()
 
-    let store = Store(initialState: AppReducer.State(), reducer: AppReducer()._printChanges())
+    let store = Store(initialState: AppReducer.State(), reducer: AppReducer())
 
     var body: some View {
         GeometryReader { proxy in

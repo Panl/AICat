@@ -9,9 +9,6 @@ import SwiftUI
 import ComposableArchitecture
 
 struct SplitView: View {
-    @EnvironmentObject var appStateVM: AICatStateViewModel
-    @State var showAddConversationSheet = false
-    @AppStorage("currentChat.id") var chatId: String?
     @State var sideBarWidth: CGFloat = 300
 
     var size: CGSize = .zero
@@ -22,9 +19,6 @@ struct SplitView: View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             HStack(spacing: 0) {
                 ConversationListView(
-                    onAddChat: {
-                        showAddConversationSheet = true
-                    },
                     onChatChanged: { chat in
                         viewStore.send(.selectChat(chat))
                     },
@@ -49,16 +43,7 @@ struct SplitView: View {
                             }
                         }
                     }
-                ).sheet(
-                    isPresented: $showAddConversationSheet,
-                    onDismiss: {}
-                ) {
-                    AddConversationView(
-                        onClose: {
-                            showAddConversationSheet = false
-                        }
-                    )
-                }
+                )
             }.onAppear {
                 viewStore.send(.queryConversations)
             }
