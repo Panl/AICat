@@ -13,6 +13,8 @@ struct ShareMessagesImageOverlay: View {
     let onClose: () -> Void
     let onSave: (ImageType) -> Void
 
+    @State var isSharing = false
+
     var body: some View {
         ZStack {
             if let shareMessageSnapshot {
@@ -55,13 +57,16 @@ struct ShareMessagesImageOverlay: View {
                         .buttonStyle(.borderless)
                         #if os(iOS)
                         Button(action: {
-                            SystemUtil.shareImage(shareMessageSnapshot)
+                            isSharing = true
                         }) {
                             Image(systemName: "square.and.arrow.up.circle.fill")
                                 .resizable()
                                 .frame(width: 36, height: 36)
                         }
                         .buttonStyle(.borderless)
+                        .sheet(isPresented: $isSharing) {
+                            ShareSheet(activityItems: [shareMessageSnapshot])
+                        }
                         #endif
                     }
                     .padding(.bottom, 16)

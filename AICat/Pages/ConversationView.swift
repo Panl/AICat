@@ -19,6 +19,7 @@ import AppKit
 #endif
 
 struct ConversationFeature: ReducerProtocol {
+
     struct State: Equatable {
         var conversation: Conversation = mainConversation
         var messages: [ChatMessage] = []
@@ -94,6 +95,7 @@ struct ConversationFeature: ReducerProtocol {
         case setSaveImageToast(Toast?)
         case updateConversation(Conversation)
         case incrementSentMessageCount
+        case  exportToMD
     }
 
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -211,6 +213,9 @@ struct ConversationFeature: ReducerProtocol {
             let keyValueStore = NSUbiquitousKeyValueStore.default
             keyValueStore.set(state.sentMessageCount, forKey: "AICat.sentMessageCount")
             keyValueStore.synchronize()
+            return .none
+        case .exportToMD:
+            exportToMD(state: state)
             return .none
         }
     }
@@ -331,6 +336,18 @@ struct ConversationFeature: ReducerProtocol {
         #endif
     }
 
+    func exportToMD(state: State) {
+        #if os(macOS)
+        if let folder = showSaveMDPanel() {
+            _ = SystemUtil.exportToMarkDown(messages: state.messages, fileUrl: folder)
+        }
+        #elseif os(iOS)
+        if let url = SystemUtil.saveMessageAsMD(messages: state.messages, title: state.conversation.title) {
+            DocumentPicker.shared.export(file: url)
+        }
+        #endif
+    }
+
     #if os(macOS)
     func showSavePanel() -> URL? {
         let savePanel = NSSavePanel()
@@ -340,6 +357,20 @@ struct ConversationFeature: ReducerProtocol {
         savePanel.title = "Save your image"
         savePanel.message = "Choose a folder and a name to store the image."
         savePanel.nameFieldLabel = "Image file name:"
+
+        let response = savePanel.runModal()
+        return response == .OK ? savePanel.url : nil
+    }
+
+    func showSaveMDPanel() -> URL? {
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.text]
+        savePanel.canCreateDirectories = true
+        savePanel.isExtensionHidden = false
+        savePanel.title = "Save your messages"
+        savePanel.message = "Choose a folder and a name to store the Markdown file."
+        savePanel.nameFieldLabel = "Markdown file name:"
+        savePanel.nameFieldStringValue = "Untitled.md"
 
         let response = savePanel.runModal()
         return response == .OK ? savePanel.url : nil
@@ -558,6 +589,7 @@ struct ConversationView: View {
                             viewStore.send(.updateConversation(chat))
                         }
                     )
+                    .frame(minWidth: 350)
                     .presentationDetents([.height(480)])
                     .presentationDragIndicator(.visible)
                 } else {
@@ -568,6 +600,7 @@ struct ConversationView: View {
                             viewStore.send(.updateConversation(chat))
                         }
                     )
+                    .frame(minWidth: 350)
                 }
             }
             .background {
@@ -638,6 +671,11 @@ struct ConversationView: View {
                     viewStore.send(.toggleParamEditSheetView(true))
                 }) {
                     Label("Edit Model", systemImage: "rectangle.and.pencil.and.ellipsis")
+                }
+                Button(action: {
+                    viewStore.send(.exportToMD)
+                }) {
+                    Label("Export to Markdown", systemImage: "m.square")
                 }
                 Button(role: .destructive, action: {
                     viewStore.send(.toggleClearMessageAlert(true))

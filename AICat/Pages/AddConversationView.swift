@@ -106,7 +106,6 @@ struct AddConversationView: View {
                     .background(title.isEmpty ? Color.primaryColor.opacity(0.4) : Color.primaryColor)
                     .cornerRadius(25)
             }
-            .padding(.horizontal, 40)
             .tint(.whiteText)
             .buttonStyle(.borderless)
             .font(.manrope(size: 20, weight: .medium))
@@ -114,7 +113,7 @@ struct AddConversationView: View {
             Spacer(minLength: 56)
         }
         .font(.manrope(size: 16, weight: .regular))
-        .frame(maxWidth: 600)
+        .frame(minWidth: 400, maxWidth: 600)
         .background(Color.background.ignoresSafeArea())
         .onTapGesture {
             endEditing(force: true)

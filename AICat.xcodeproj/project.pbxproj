@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E00BAF529FC2E9100193F6B /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E00BAF429FC2E9100193F6B /* DocumentPicker.swift */; };
+		8E00BAF729FC3CCC00193F6B /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E00BAF629FC3CCC00193F6B /* SharePickerView.swift */; };
 		8E0F0ECD29CB3AF60011B4F7 /* Manrope.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */; };
 		8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */; };
 		8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ED029CB53570011B4F7 /* View+Extension.swift */; };
@@ -58,6 +60,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8E00BAF429FC2E9100193F6B /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
+		8E00BAF629FC3CCC00193F6B /* SharePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePickerView.swift; sourceTree = "<group>"; };
 		8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Manrope.ttf; sourceTree = "<group>"; };
 		8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
 		8E0F0ED029CB53570011B4F7 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -159,6 +163,7 @@
 			children = (
 				8E401DCF29DE59A000E2F403 /* SystemUtil.swift */,
 				8E2128E229ED7E8800D50ADC /* HapticEngine.swift */,
+				8E00BAF429FC2E9100193F6B /* DocumentPicker.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -280,6 +285,7 @@
 				8EF5A5EA29E0729B00981A38 /* ParamsEditView.swift */,
 				8EFE2AAF29E14F9C00C64B7C /* TextEditView.swift */,
 				8E401DD829EAC9F900E2F403 /* ToastVIew.swift */,
+				8E00BAF629FC3CCC00193F6B /* SharePickerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -383,10 +389,12 @@
 				8EF5A5EB29E0729B00981A38 /* ParamsEditView.swift in Sources */,
 				8E64872929C6E1B00029E14F /* CompactView.swift in Sources */,
 				8E2128E129EC04F500D50ADC /* ShareMessagesImageOverlay.swift in Sources */,
+				8E00BAF729FC3CCC00193F6B /* SharePickerView.swift in Sources */,
 				8EE9264729D49B29005E6FB7 /* Bundle+Extension.swift in Sources */,
 				8E3DA87D29DC6E6800327A2A /* LoadingIndocator.swift in Sources */,
 				8EECA00A29C82E9D0021A6A1 /* AddConversationView.swift in Sources */,
 				8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */,
+				8E00BAF529FC2E9100193F6B /* DocumentPicker.swift in Sources */,
 				8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */,
 				8E401DD029DE59A000E2F403 /* SystemUtil.swift in Sources */,
 				8E401DD929EAC9F900E2F403 /* ToastVIew.swift in Sources */,

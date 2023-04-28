@@ -35,14 +35,40 @@ enum SystemUtil {
         return url.absoluteString.lowercased().contains("sandbox")
     }
 
-    static func shareImage(_ image: ImageType) {
-        #if os(iOS)
-        let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            windowScene.windows.first?.rootViewController?.present(activityViewController, animated: true, completion: nil)
+    static func exportToMarkDown(messages: [ChatMessage], fileUrl: URL) -> Bool {
+        guard let content = messagesToMDContent(messages: messages) else { return false }
+        do {
+            try content.write(to: fileUrl)
+            return true
+        } catch {
+            print("saveFailed: \(error)")
+            return false
         }
-        #elseif os(macOS)
-        //TODO: show NSSharingServicePicker
-        #endif
+    }
+
+    
+    static func saveMessageAsMD(messages: [ChatMessage], title: String) -> URL? {
+        guard let content = messagesToMDContent(messages: messages) else { return nil }
+        guard let downloadsFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            print("无法获取Downloads文件夹路径")
+            return nil
+        }
+
+        let fileName = "\(title).md"
+
+        let fileURL = downloadsFolderURL.appendingPathComponent(fileName)
+
+        do {
+            try content.write(to: fileURL)
+            return fileURL
+        } catch {
+            print("保存文件错误: \(error)")
+            return nil
+        }
+    }
+
+    static func messagesToMDContent(messages: [ChatMessage]) -> Data? {
+        let content = messages.map { "**[\($0.role)]:** \($0.content)" }.joined(separator: "\n\n")
+        return content.data(using: .utf8)
     }
 }
