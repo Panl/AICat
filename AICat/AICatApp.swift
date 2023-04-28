@@ -13,6 +13,10 @@ import AppCenterCrashes
 import AppCenterAnalytics
 import ApphudSDK
 
+fileprivate let dbPath = "\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])/db.sqlite"
+let mainConversation = Conversation(id: "AICat.Conversation.Main", title: "AICat Main", prompt: "")
+let db = try! Blackbird.Database(path: dbPath, options: [])
+
 @main
 struct AICatApp: App {
     init() {

@@ -83,8 +83,6 @@ struct ShareMessagesView_Previews: PreviewProvider {
                 ChatMessage(role: "user", content: "hello world", conversationId: "id"),
                 ChatMessage(role: "ot", content: "hello world hello world hello world hello world hello world", conversationId: "id")
             ]
-        )
-        .environmentObject(AICatStateViewModel())
-            .environment(\.colorScheme, .light)
+        ).environment(\.colorScheme, .light)
     }
 }
