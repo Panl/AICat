@@ -47,8 +47,9 @@ struct ParamsEditView: View {
                 .buttonStyle(.plain)
                 .padding(.top, 16)
             }
-            #endif
+            #elseif os(iOS)
             Spacer()
+            #endif
             HStack {
                 Text("Context Messages")
                     .padding(.leading, 10)
