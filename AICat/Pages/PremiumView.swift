@@ -38,7 +38,7 @@ struct PremuimPageReducer: ReducerProtocol {
         switch action {
         case .onAppear:
             return .task {
-                let product = await fetchPayWall()
+                let product = await fetchMonthlyProduct()
                 return .updateProduct(product)
             }
         case .updateProduct(let product):
@@ -85,11 +85,9 @@ struct PremuimPageReducer: ReducerProtocol {
         }
     }
 
-    func fetchPayWall() async -> ApphudProduct? {
-        if let payWall = await Apphud.paywalls().first, let product = payWall.products.first {
-            return product
-        }
-        return nil
+    func fetchMonthlyProduct() async -> ApphudProduct? {
+        let payWall = await Apphud.paywalls().first
+        return payWall?.products.first(where: { $0.productId == monthlyPremiumId })
     }
 }
 

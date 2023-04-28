@@ -8,6 +8,7 @@
 import SwiftUI
 import Foundation
 import Alamofire
+import ApphudSDK
 
 struct SettingsView: View {
     var appVersion: String {
@@ -20,6 +21,9 @@ struct SettingsView: View {
 
     let onClose: () -> Void
 
+    @State var isPurcahsing = false
+    @State var toast: Toast?
+
     var body: some View {
         NavigationView {
             List {
@@ -27,6 +31,18 @@ struct SettingsView: View {
                     NavigationLink(destination: OpenAISettingsView()) {
                         Label("Custom API", systemImage: "hammer")
                             .labelStyle(.titleAndIcon)
+                    }.tint(.primaryColor)
+                }.tint(.primaryColor)
+                Section("Donate") {
+                    Button(action: { Task { await buyCatFood() } }) {
+                        HStack {
+                            Label("Buy me a can of cat food", systemImage: "fish")
+                                .labelStyle(.titleAndIcon)
+                            Spacer()
+                            if isPurcahsing {
+                                LoadingIndocator().frame(width: 20, height: 20)
+                            }
+                        }
                     }.tint(.primaryColor)
                 }.tint(.primaryColor)
                 Section("support") {
@@ -52,12 +68,16 @@ struct SettingsView: View {
                         Label("AICat News", image: "telegram_icon")
                             .labelStyle(.titleAndIcon)
                     }
-                    Link(destination: URL(string: "https://github.com/Panl")!){
-                        Label("Panl", image: "github_icon")
+                    Link(destination: URL(string: "https://okjk.co/Cvz2JY")!){
+                        Label("潘磊Rego", image: "jike-logo")
                             .labelStyle(.titleAndIcon)
                     }
                     Link(destination: URL(string: "https://twitter.com/panlei106")!){
                         Label("Rego", image: "twitter_circled")
+                            .labelStyle(.titleAndIcon)
+                    }
+                    Link(destination: URL(string: "https://www.producthunt.com/products/aicat-ai-assistant-powered-by-chatgpt#aicat-ai-assistant-powered-by-chatgpt")!){
+                        Label("Upvote on Product Hunt", image: "product-hunt-logo")
                             .labelStyle(.titleAndIcon)
                     }
                 }.tint(.primaryColor)
@@ -113,6 +133,28 @@ struct SettingsView: View {
         }
         .background(Color.background)
         .font(.manrope(size: 16, weight: .medium))
+        .toast($toast)
+    }
+
+    func buyCatFood() async {
+        if SystemUtil.maybeFromTestFlight {
+            toast = Toast(type: .info, message: "😿 Please use the app store version for donations.")
+            return
+        }
+        guard !isPurcahsing else { return }
+        isPurcahsing = true
+        let payWall = await Apphud.paywalls().first
+        if let catFood = payWall?.products.first(where: { $0.productId == catFoodId }) {
+            let result = await Apphud.purchase(catFood)
+            if let _ = result.error {
+                toast = Toast(type: .error, message: "Buy food failed! 😿")
+            } else {
+                toast = Toast(type: .success, message: "Thank you for your food 😻")
+            }
+        } else {
+            toast = Toast(type: .error, message: "Buy food failed! 😿")
+        }
+        isPurcahsing = false
     }
 }
 
