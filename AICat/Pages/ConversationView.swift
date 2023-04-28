@@ -10,6 +10,7 @@ import Alamofire
 import ComposableArchitecture
 import Blackbird
 import Foundation
+import ApphudSDK
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -36,6 +37,7 @@ struct ConversationFeature: ReducerProtocol {
         var prompts: [Conversation] = []
         var shareSnapshot: ImageType?
         var saveImageToast: Toast?
+        var sentMessageCount: Int64 =  NSUbiquitousKeyValueStore.default.longLong(forKey: "AICat.sentMessageCount")
 
         var promptText: String {
             selectedPrompt?.prompt ?? conversation.prompt
@@ -44,6 +46,25 @@ struct ConversationFeature: ReducerProtocol {
         var filterdPrompts: [Conversation] {
             let query = inputText.lowercased().trimmingCharacters(in: .whitespaces)
             return prompts.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
+        }
+
+        var freeMessageCount: Int64 {
+            #if DEBUG
+            return 5
+            #else
+            return 20
+            #endif
+        }
+
+        var isPremium: Bool {
+            UserDefaults.openApiKey != nil || Apphud.hasPremiumAccess()
+        }
+
+        var needBuyPremium: Bool {
+            if !isPremium && sentMessageCount >= freeMessageCount {
+                return true
+            }
+            return false
         }
     }
 
@@ -73,6 +94,7 @@ struct ConversationFeature: ReducerProtocol {
         case saveToAlbum(ImageType)
         case setSaveImageToast(Toast?)
         case updateConversation(Conversation)
+        case incrementSentMessageCount
     }
 
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -100,7 +122,10 @@ struct ConversationFeature: ReducerProtocol {
             }
             return .none
         case .sendMessage:
-            //TODO: check premium state
+            if state.needBuyPremium {
+                state.showPremiumPage = true
+                return .none
+            }
             return .run { [state] send in
                 await complete(state: state, send: send)
             }
@@ -176,6 +201,15 @@ struct ConversationFeature: ReducerProtocol {
             return .none
         case .updateConversation:
             return .none
+        case .incrementSentMessageCount:
+            state.sentMessageCount += 1
+            if state.sentMessageCount > state.freeMessageCount {
+                state.sentMessageCount = state.freeMessageCount
+            }
+            let keyValueStore = NSUbiquitousKeyValueStore.default
+            keyValueStore.set(state.sentMessageCount, forKey: "AICat.sentMessageCount")
+            keyValueStore.synchronize()
+            return .none
         }
 
     }
@@ -236,7 +270,7 @@ struct ConversationFeature: ReducerProtocol {
                 await send(.setAIGenerating(false))
             }
             await send(.setSending(false))
-            // TODO: incrementSentMessageCount
+            await send(.incrementSentMessageCount)
         } catch {
             let err = error as NSError
             if err.code != -999 {
@@ -529,7 +563,9 @@ struct ConversationView: View {
                 }
             }
             .sheet(isPresented: viewStore.binding(get: \.showPremiumPage, send: ConversationFeature.Action.toggleShowPremiumPage)) {
-                PremiumPage(showPremium: viewStore.binding(get: \.showPremiumPage, send: ConversationFeature.Action.toggleShowPremiumPage))
+                PremiumPage(onClose: {
+                    viewStore.send(.toggleShowPremiumPage(false))
+                })
             }
             .font(.manrope(size: 16, weight: .regular))
             .toast(viewStore.binding(get: \.toast, send: ConversationFeature.Action.setToast))
@@ -664,13 +700,7 @@ struct ConversationView: View {
             })
             .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
                 if old.count <= newMessages.count {
-                    if old.isEmpty {
-                        proxy.scrollTo("Bottom")
-                    } else {
-                        withAnimation {
-                            proxy.scrollTo("Bottom")
-                        }
-                    }
+                    proxy.scrollTo("Bottom")
                 }
             }
             .onChange(of: viewStore.isAIGenerating) { _ in

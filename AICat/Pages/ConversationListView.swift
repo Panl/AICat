@@ -222,7 +222,9 @@ struct ConversationListView: View {
                 )
             }
             .sheet(isPresented: viewStore.binding(get: \.showPremiumPage, send: ConversationListReducer.Action.toggleShowPremiumPage)) {
-                PremiumPage(showPremium: viewStore.binding(get: \.showPremiumPage, send: ConversationListReducer.Action.toggleShowPremiumPage))
+                PremiumPage(
+                    onClose: { viewStore.send(.toggleShowPremiumPage(false)) }
+                )
             }
             .sheet(
                 isPresented: viewStore.binding(get: \.showAddConversation, send: ConversationListReducer.Action.toggleShowAddConversation),
