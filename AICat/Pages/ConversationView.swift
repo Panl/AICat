@@ -74,6 +74,7 @@ struct ConversationFeature: ReducerProtocol {
         case saveMessage(ChatMessage)
         case deleteMessage(ChatMessage)
         case sendMessage
+        case retrySend
         case setSending(Bool)
         case textChanged(String)
         case clearInputText
@@ -129,6 +130,13 @@ struct ConversationFeature: ReducerProtocol {
             return .run { [state] send in
                 await complete(state: state, send: send)
             }
+        case .retrySend:
+            if let message = state.messages.last {
+                return .run { [state] send in
+                    await retry(message: message, state: state, send: send)
+                }
+            }
+            return .none
         case .textChanged(let text):
             state.inputText = text
             return .none
@@ -247,9 +255,22 @@ struct ConversationFeature: ReducerProtocol {
         await saveMessage(chatMessage)
         await send(.saveMessage(chatMessage))
         await send(.setAIGenerating(true))
+        await completeMessage(newMessage: newMessage, state: state, send: send, replyToId: chatMessage.id)
+    }
+
+    func retry(message: ChatMessage, state: State, send: Send<Action>) async {
+        await send(.setCompleteError(nil))
+        await send(.setSending(true))
+        await send(.setAIGenerating(true))
+        let newMessage = Message(role: message.role, content: message.content)
+        await completeMessage(newMessage: newMessage, state: state, send: send, replyToId: message.id)
+    }
+
+    func completeMessage(newMessage: Message, state: State, send: Send<Action>, replyToId: String) async {
+        let conversation = state.conversation
+        var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
+        responseMessage.replyToId = replyToId
         do {
-            var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
-            responseMessage.replyToId = chatMessage.id
             let stream: AsyncThrowingStream<(String, StreamResponse.Delta), Error>
             if let selectedPrompt = state.selectedPrompt {
                 stream = try await CatApi.completeMessageStream(messages: [newMessage], conversation: selectedPrompt)
@@ -265,9 +286,9 @@ struct ConversationFeature: ReducerProtocol {
                     responseMessage.content += content
                 }
                 responseMessage.model = model
+                await send(.setAIGenerating(false))
                 await saveMessage(responseMessage)
                 await send(.saveMessage(responseMessage))
-                await send(.setAIGenerating(false))
             }
             await send(.setSending(false))
             await send(.incrementSentMessageCount)
@@ -275,7 +296,7 @@ struct ConversationFeature: ReducerProtocol {
             let err = error as NSError
             if err.code != -999 {
                 await send(.setCompleteError(err))
-                await deleteMessage(chatMessage)
+                await send(.deleteMessage(responseMessage))
             }
             await send(.setAIGenerating(false))
             await send(.setSending(false))
@@ -683,7 +704,7 @@ struct ConversationView: View {
                     }
                     if let error = viewStore.error {
                         ErrorMessageView(errorMessage: error.localizedDescription) {
-                            // TODO: retryComplete()
+                            viewStore.send(.retrySend)
                         } clear: {
                             viewStore.send(.setCompleteError(nil))
                         }
@@ -700,7 +721,13 @@ struct ConversationView: View {
             })
             .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
                 if old.count <= newMessages.count {
-                    proxy.scrollTo("Bottom")
+                    if old.isEmpty {
+                        proxy.scrollTo("Bottom")
+                    } else {
+                        withAnimation {
+                            proxy.scrollTo("Bottom")
+                        }
+                    }
                 }
             }
             .onChange(of: viewStore.isAIGenerating) { _ in

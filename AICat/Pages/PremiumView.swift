@@ -69,7 +69,7 @@ struct PremuimPageReducer: ReducerProtocol {
                 await send(.setIsPurchasing(false))
             }
         case .restore:
-            guard !state.isPurchasing else { return .none }
+            guard !state.isPurchasing, state.product != nil else { return .none }
             return .run { send in
                 await send(.setIsPurchasing(true))
                 let _ = await Apphud.restorePurchases()

@@ -152,8 +152,6 @@ struct AppReducer: ReducerProtocol {
 
 struct MainView: View {
 
-    @StateObject var appStateVM = AICatStateViewModel()
-
     let store = Store(initialState: AppReducer.State(), reducer: AppReducer())
 
     var body: some View {
@@ -163,7 +161,7 @@ struct MainView: View {
             } else {
                 CompactView(store: store)
             }
-        }.environmentObject(appStateVM)
+        }
     }
 }
 
