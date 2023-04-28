@@ -679,9 +679,14 @@ struct ConversationView: View {
                                 viewStore.send(.deleteMessage(message), animation: .default)
                             },
                             onCopy: {
-                                SystemUtil.copyToPasteboard(content: message.content)
-                                let toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
-                                viewStore.send(.setToast(toast))
+                                if SystemUtil.copyToPasteboard(content: message.content) {
+                                    let toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
+                                    viewStore.send(.setToast(toast))
+                                } else {
+                                    let toast = Toast(type: .error, message: "Copy content failed", duration: 1.5)
+                                    viewStore.send(.setToast(toast))
+                                }
+
                             },
                             onShare: {
                                 HapticEngine.trigger()
