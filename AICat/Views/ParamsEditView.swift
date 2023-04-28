@@ -35,7 +35,6 @@ struct ParamsEditView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Spacer()
             #if os(macOS)
             HStack {
                 Spacer()
@@ -46,8 +45,10 @@ struct ParamsEditView: View {
                         .padding(.horizontal)
                 }
                 .buttonStyle(.plain)
+                .padding(.top, 16)
             }
             #endif
+            Spacer()
             HStack {
                 Text("Context Messages")
                     .padding(.leading, 10)
@@ -66,7 +67,7 @@ struct ParamsEditView: View {
                     .stroke(lineWidth: 1)
                     .foregroundColor(.gray.opacity(0.4))
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 16)
             HStack {
                 Text("Model")
                     .padding(.leading, 10)
@@ -85,7 +86,7 @@ struct ParamsEditView: View {
                     .stroke(lineWidth: 1)
                     .foregroundColor(.gray.opacity(0.4))
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 16)
             .padding(.bottom, 8)
             VStack(spacing: 12) {
                 HStack {
@@ -96,7 +97,7 @@ struct ParamsEditView: View {
                 .padding(.horizontal, 12)
                 SliderView(value: $conversation.temperature, sliderRange: 0...2)
                     .frame(height: 20)
-            }.padding(.horizontal, 10)
+            }.padding(.horizontal, 14)
 
             VStack(spacing: 12) {
                 HStack {
@@ -107,7 +108,7 @@ struct ParamsEditView: View {
                 .padding(.horizontal, 12)
                 SliderView(value: $conversation.topP, sliderRange: 0...1)
                     .frame(height: 20)
-            }.padding(.horizontal, 10)
+            }.padding(.horizontal, 14)
 
             VStack(spacing: 12) {
                 HStack {
@@ -118,7 +119,7 @@ struct ParamsEditView: View {
                 .padding(.horizontal, 12)
                 SliderView(value: $conversation.frequencyPenalty, sliderRange: -2...2)
                     .frame(height: 20)
-            }.padding(.horizontal, 10)
+            }.padding(.horizontal, 14)
 
             VStack(spacing: 12) {
                 HStack {
@@ -129,10 +130,9 @@ struct ParamsEditView: View {
                 .padding(.horizontal, 12)
                 SliderView(value: $conversation.presencePenalty, sliderRange: -2...2)
                     .frame(height: 20)
-            }.padding(.horizontal, 10)
+            }.padding(.horizontal, 14)
             Spacer()
         }
-        .padding(.horizontal, 20)
         .font(.manrope(size: 16, weight: .medium))
         .foregroundColor(.blackText)
         .onChange(of: conversation) { newValue in

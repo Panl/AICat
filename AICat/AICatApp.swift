@@ -39,6 +39,7 @@ struct AICatApp: App {
         #elseif os(macOS)
         WindowGroup {
             MainView()
+                .frame(minWidth: 800, minHeight: 620)
                 .background(Color.background.ignoresSafeArea())
         }
         .windowStyle(.hiddenTitleBar)

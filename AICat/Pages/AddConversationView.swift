@@ -106,6 +106,7 @@ struct AddConversationView: View {
                     .background(title.isEmpty ? Color.primaryColor.opacity(0.4) : Color.primaryColor)
                     .cornerRadius(25)
             }
+            .padding(.horizontal, 40)
             .tint(.whiteText)
             .buttonStyle(.borderless)
             .font(.manrope(size: 20, weight: .medium))
