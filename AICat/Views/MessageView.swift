@@ -76,7 +76,9 @@ struct AICatMessageView: View {
     var showActions = false
 
     var body: some View {
-        if containsCodeBlock(content: message.content) {
+        if message.content.isEmpty {
+            InputingMessageView()
+        } else if containsCodeBlock(content: message.content) {
             VStack(alignment: .leading, spacing: 0) {
                 Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                    .textSelection(.enabled)

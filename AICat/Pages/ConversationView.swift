@@ -28,7 +28,6 @@ struct ConversationFeature: ReducerProtocol {
         var showAddConversation = false
         var showClearMessageAlert = false
         var showParamEditSheetView = false
-        var isAIGenerating = false
         var showCommands = false
         var toast: Toast?
         var tappedMessageId: String?
@@ -79,7 +78,6 @@ struct ConversationFeature: ReducerProtocol {
         case textChanged(String)
         case clearInputText
         case selectPrompt(Conversation?)
-        case setAIGenerating(Bool)
         case setCompleteError(NSError?)
         case tapMessage(ChatMessage)
         case toggleAddConversation(Bool)
@@ -101,7 +99,6 @@ struct ConversationFeature: ReducerProtocol {
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
         case .queryMessages(let cid):
-            state.messages.removeAll()
             return .task {
                 let messages = await queryMessages(cid: cid)
                 return .updateMessages(messages)
@@ -148,9 +145,6 @@ struct ConversationFeature: ReducerProtocol {
             return .none
         case .selectPrompt(let prompt):
             state.selectedPrompt = prompt
-            return .none
-        case .setAIGenerating(let isGenerating):
-            state.isAIGenerating = isGenerating
             return .none
         case .setCompleteError(let error):
             state.error = error
@@ -219,7 +213,6 @@ struct ConversationFeature: ReducerProtocol {
             keyValueStore.synchronize()
             return .none
         }
-
     }
 
     func saveMessage(_ message: ChatMessage) async {
@@ -253,15 +246,13 @@ struct ConversationFeature: ReducerProtocol {
         let newMessage = Message(role: "user", content: sendText)
         let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
         await saveMessage(chatMessage)
-        await send(.saveMessage(chatMessage))
-        await send(.setAIGenerating(true))
+        await send(.saveMessage(chatMessage), animation: .default)
         await completeMessage(newMessage: newMessage, state: state, send: send, replyToId: chatMessage.id)
     }
 
     func retry(message: ChatMessage, state: State, send: Send<Action>) async {
         await send(.setCompleteError(nil))
         await send(.setSending(true))
-        await send(.setAIGenerating(true))
         let newMessage = Message(role: message.role, content: message.content)
         await completeMessage(newMessage: newMessage, state: state, send: send, replyToId: message.id)
     }
@@ -270,6 +261,8 @@ struct ConversationFeature: ReducerProtocol {
         let conversation = state.conversation
         var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         responseMessage.replyToId = replyToId
+        await saveMessage(responseMessage)
+        await send(.saveMessage(responseMessage), animation: .default)
         do {
             let stream: AsyncThrowingStream<(String, StreamResponse.Delta), Error>
             if let selectedPrompt = state.selectedPrompt {
@@ -286,7 +279,6 @@ struct ConversationFeature: ReducerProtocol {
                     responseMessage.content += content
                 }
                 responseMessage.model = model
-                await send(.setAIGenerating(false))
                 await saveMessage(responseMessage)
                 await send(.saveMessage(responseMessage))
             }
@@ -297,8 +289,11 @@ struct ConversationFeature: ReducerProtocol {
             if err.code != -999 {
                 await send(.setCompleteError(err))
                 await send(.deleteMessage(responseMessage))
+            } else {
+                if responseMessage.content.isEmpty {
+                    await send(.deleteMessage(responseMessage))
+                }
             }
-            await send(.setAIGenerating(false))
             await send(.setSending(false))
         }
     }
@@ -680,7 +675,7 @@ struct ConversationView: View {
                             message: message,
                             onDelete: {
                                 HapticEngine.trigger()
-                                viewStore.send(.deleteMessage(message))
+                                viewStore.send(.deleteMessage(message), animation: .default)
                             },
                             onCopy: {
                                 SystemUtil.copyToPasteboard(content: message.content)
@@ -709,9 +704,6 @@ struct ConversationView: View {
                             viewStore.send(.setCompleteError(nil))
                         }
                     }
-                    if viewStore.isAIGenerating && viewStore.isSending {
-                        InputingMessageView().id("generating")
-                    }
                     Spacer().frame(height: 80)
                         .id("Bottom")
                 }
@@ -720,7 +712,7 @@ struct ConversationView: View {
                 self.endEditing(force: true)
             })
             .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
-                if old.count <= newMessages.count {
+                if old.last != newMessages.last {
                     if old.isEmpty {
                         proxy.scrollTo("Bottom")
                     } else {
@@ -728,11 +720,6 @@ struct ConversationView: View {
                             proxy.scrollTo("Bottom")
                         }
                     }
-                }
-            }
-            .onChange(of: viewStore.isAIGenerating) { _ in
-                withAnimation {
-                    proxy.scrollTo("Bottom")
                 }
             }
             .onChange(of: isFocused) { _ in
