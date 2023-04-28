@@ -146,10 +146,10 @@ struct PremiumPage: View {
                             .foregroundColor(.white)
                             .padding(.vertical, 12)
                             .padding(.horizontal, 40)
-                            .opacity((viewStore.product == nil || viewStore.isPurchasing) ? 0 : 1)
+                            .opacity((viewStore.isPurchasing) ? 0 : 1)
                             .background(Color.blue)
                             .cornerRadius(8)
-                        if viewStore.product == nil || viewStore.isPurchasing {
+                        if viewStore.isPurchasing {
                             LoadingIndocator(themeColor: .white)
                                 .frame(width: 20, height: 20)
                                 .environment(\.colorScheme, .dark)

@@ -543,7 +543,7 @@ struct ConversationView: View {
                 AddConversationView(
                     conversation: viewStore.conversation,
                     onClose: {
-                        viewStore.send(.toggleAddConversation(true))
+                        viewStore.send(.toggleAddConversation(false))
                     },
                     onSave: { chat in
                         viewStore.send(.updateConversation(chat))
@@ -649,6 +649,7 @@ struct ConversationView: View {
                     .frame(width: 24, height: 24)
                     .clipShape(Rectangle())
             })
+            .menuStyle(.borderlessButton)
             .frame(width: 24)
             .alert("Are you sure to clean all messages?", isPresented: viewStore.binding(get: \.showClearMessageAlert, send: ConversationFeature.Action.toggleClearMessageAlert)) {
                 Button("Sure", role: .destructive) {

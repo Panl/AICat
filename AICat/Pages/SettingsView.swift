@@ -95,8 +95,10 @@ struct SettingsView: View {
                         }.tint(.primaryColor)
                     }
             }
+            .frame(minWidth: 350)
             .navigationTitle("Settings")
             .toolbar {
+                #if os(iOS)
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: onClose) {
                         Image(systemName: "xmark")
@@ -106,6 +108,7 @@ struct SettingsView: View {
                     }
                     .tint(.primaryColor)
                 }
+                #endif
             }
         }
         .background(Color.background)

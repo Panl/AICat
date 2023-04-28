@@ -28,7 +28,7 @@ struct ShareMessagesImageOverlay: View {
                         .aspectRatio(contentMode: .fit)
                         .padding(16)
                     #elseif os(macOS)
-                    Image(nsImage: shareMessagesSnapshot)
+                    Image(nsImage: shareMessageSnapshot)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: 560)
