@@ -146,13 +146,13 @@ struct SettingsView: View {
         let payWall = await Apphud.paywalls().first
         if let catFood = payWall?.products.first(where: { $0.productId == catFoodId }) {
             let result = await Apphud.purchase(catFood)
-            if let _ = result.error {
-                toast = Toast(type: .error, message: "Buy food failed! 😿")
+            if let error = result.error {
+                toast = Toast(type: .error, message: "Buy food failed! 😿 \(error)")
             } else {
                 toast = Toast(type: .success, message: "Thank you for your food 😻")
             }
         } else {
-            toast = Toast(type: .error, message: "Buy food failed! 😿")
+            toast = Toast(type: .error, message: "Buy food failed! 😿 (nil)")
         }
         isPurcahsing = false
     }

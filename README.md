@@ -29,7 +29,7 @@
 - [x] Use your own OpenAI API Key
 - [x] Custom API Host
 - [x] Share message as image
-- [ ] Export messages as Markdown
+- [x] Export messages as Markdown
 - [ ] Copy code block
 - [ ] iCloud Sync
 
