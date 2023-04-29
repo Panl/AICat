@@ -11,7 +11,7 @@ import Alamofire
 struct OpenAISettingsView: View {
 
     @State var apiKey = UserDefaults.openApiKey ?? ""
-    @State var apiHost = UserDefaults.apiHost
+    @State var apiHost = UserDefaults.customApiHost
     @State var isValidating = false
     @State var error: AFError?
     @State var showApiKeyAlert = false
@@ -43,6 +43,7 @@ struct OpenAISettingsView: View {
                     Button("Validate and Save") {
                         validateApiKey()
                     }
+                    .disabled(apiKey.isEmpty)
                     if isValidating {
                         LoadingIndocator()
                             .frame(width: 24, height: 14)
@@ -91,6 +92,7 @@ struct OpenAISettingsView: View {
                     Button("Validate and Save") {
                         validateApiHost()
                     }
+                    .disabled(apiKey.isEmpty)
                     if isValidatingApiHost {
                         LoadingIndocator()
                             .frame(width: 24, height: 14)
@@ -108,7 +110,7 @@ struct OpenAISettingsView: View {
                 Button("Reset", action: {
                     apiHost = "https://api.openai.com"
                     UserDefaults.resetApiHost()
-                    toast = Toast(type: .success, message: "ApiHost reset sucessfully!")
+                    toast = Toast(type: .success, message: "ApiHost reset sucessful!")
                 })
             }
             .alert(
@@ -152,7 +154,7 @@ struct OpenAISettingsView: View {
         isValidatingApiHost = true
         isValidatedApiHost = false
         Task {
-            let result = await CatApi.validate(apiHost: apiHost)
+            let result = await CatApi.validate(apiHost: apiHost, apiKey: apiKey)
             switch result {
             case .success(_):
                 UserDefaults.apiHost = apiHost

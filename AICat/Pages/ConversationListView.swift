@@ -15,7 +15,6 @@ struct ConversationListReducer: ReducerProtocol {
         var conversations: [Conversation] = []
         var showClearAllChatsAlert = false
         var showSettingsView = false
-        var showAddAPIKeyView = false
         var showPremiumPage = false
         var showAddConversation = false
     }
@@ -23,7 +22,6 @@ struct ConversationListReducer: ReducerProtocol {
     enum Action {
         case toggleShowClearAllChats(Bool)
         case toggleShowSettings(Bool)
-        case toggleShowAddAPIKey(Bool)
         case toggleShowPremiumPage(Bool)
         case toggleShowAddConversation(Bool)
         case deleteConversation(Conversation)
@@ -33,9 +31,6 @@ struct ConversationListReducer: ReducerProtocol {
 
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
-        case .toggleShowAddAPIKey(let show):
-            state.showAddAPIKeyView = show
-            return .none
         case .toggleShowSettings(let show):
             state.showSettingsView = show
             return .none
@@ -215,12 +210,6 @@ struct ConversationListView: View {
             }
             .ignoresSafeArea(.keyboard)
             .font(.manrope(size: 16, weight: .medium))
-            .sheet(isPresented: viewStore.binding(get: \.showAddAPIKeyView, send: ConversationListReducer.Action.toggleShowAddAPIKey)) {
-                AddApiKeyView(
-                    onValidateSuccess: { viewStore.send(.toggleShowAddAPIKey(false)) },
-                    onSkip: { viewStore.send(.toggleShowAddAPIKey(false)) }
-                )
-            }
             .sheet(isPresented: viewStore.binding(get: \.showPremiumPage, send: ConversationListReducer.Action.toggleShowPremiumPage)) {
                 PremiumPage(
                     onClose: { viewStore.send(.toggleShowPremiumPage(false)) }

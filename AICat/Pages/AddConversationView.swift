@@ -113,7 +113,7 @@ struct AddConversationView: View {
             Spacer(minLength: 56)
         }
         .font(.manrope(size: 16, weight: .regular))
-        .frame(minWidth: 400, maxWidth: 600)
+        .frame(minWidth: 375, maxWidth: 600)
         .background(Color.background.ignoresSafeArea())
         .onTapGesture {
             endEditing(force: true)

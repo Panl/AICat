@@ -112,21 +112,19 @@ enum CatApi {
     }
 
     static func complete(apiHost: String? = nil, apiKey: String? = nil, messages: [Message]) async -> Result<CompleteResponse, AFError> {
-        let host = apiHost ?? UserDefaults.apiHost
-        let key = apiKey ?? UserDefaults.openApiKey ?? openAIKey
+        let host = apiHost ?? UserDefaults.customApiHost
+        let key = apiKey ?? UserDefaults.openApiKey ?? ""
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Authorization": "Bearer \(key)"
         ]
-        let temperature = UserDefaults.temperature
-        let model = UserDefaults.model
         return await AF.request(
             "\(host)/v1/chat/completions",
             method: .post,
             parameters: CompleteParams(
-                model: model,
+                model: "gpt-3.5-turbo",
                 messages: messages,
-                temperature: temperature,
+                temperature: 0.7,
                 stream: false,
                 topP: 1,
                 frequencyPenalty: 0,
@@ -150,8 +148,8 @@ enum CatApi {
         await complete(apiKey: apiKey, messages: [Message(role: "user", content: "say this is a test")])
     }
 
-    static func validate(apiHost: String) async -> Result<CompleteResponse, AFError> {
-        await complete(apiHost: apiHost, messages: [Message(role: "user", content: "say this is a test")])
+    static func validate(apiHost: String, apiKey: String) async -> Result<CompleteResponse, AFError> {
+        await complete(apiHost: apiHost, apiKey: apiKey, messages: [Message(role: "user", content: "say this is a test")])
     }
 }
 

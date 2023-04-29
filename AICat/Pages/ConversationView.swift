@@ -101,6 +101,7 @@ struct ConversationFeature: ReducerProtocol {
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
         case .queryMessages(let cid):
+            state.messages = []
             return .task {
                 let messages = await queryMessages(cid: cid)
                 return .updateMessages(messages)
@@ -197,7 +198,7 @@ struct ConversationFeature: ReducerProtocol {
                 try saveImageToAlbum(image: image)
                 state.saveImageToast = Toast(type: .success, message: "Image saved!")
             } catch {
-                state.saveImageToast = Toast(type: .error, message: "Image saved falied!")
+                state.saveImageToast = Toast(type: .error, message: "Save image falied!")
             }
             return .none
         case .setSaveImageToast(let toast):
@@ -367,9 +368,9 @@ struct ConversationFeature: ReducerProtocol {
         savePanel.allowedContentTypes = [.text]
         savePanel.canCreateDirectories = true
         savePanel.isExtensionHidden = false
-        savePanel.title = "Save your messages"
+        savePanel.title = "Export your messages"
         savePanel.message = "Choose a folder and a name to store the Markdown file."
-        savePanel.nameFieldLabel = "Markdown file name:"
+        savePanel.nameFieldLabel = "Messages file name:"
         savePanel.nameFieldStringValue = "Untitled.md"
 
         let response = savePanel.runModal()
@@ -578,6 +579,7 @@ struct ConversationView: View {
                     },
                     onSave: { chat in
                         viewStore.send(.updateConversation(chat))
+                        viewStore.send(.toggleAddConversation(false))
                     }
                 )
             }.sheet(isPresented: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView)) {
@@ -758,19 +760,21 @@ struct ConversationView: View {
             .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
                 if old.last != newMessages.last {
                     if old.isEmpty {
-                        proxy.scrollTo("Bottom")
+                        proxy.scrollTo("Bottom", anchor: .bottom)
                     } else {
                         withAnimation {
-                            proxy.scrollTo("Bottom")
+                            proxy.scrollTo("Bottom", anchor: .bottom)
                         }
                     }
                 }
             }
-            .onChange(of: isFocused) { _ in
-                Task {
-                    try await Task.sleep(nanoseconds: 300_000_000)
-                    withAnimation {
-                        proxy.scrollTo("Bottom")
+            .onChange(of: isFocused) { value in
+                if value {
+                    Task {
+                        try await Task.sleep(nanoseconds: 300_000_000)
+                        withAnimation {
+                            proxy.scrollTo("Bottom", anchor: .bottom)
+                        }
                     }
                 }
             }

@@ -6,21 +6,35 @@
 //
 
 import SwiftUI
+import ApphudSDK
 
 let contextCounts: [Int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 50, 100]
-
-let models = [
-    "gpt-3.5-turbo",
-    "gpt-3.5-turbo-0301",
-    "gpt-4",
-    "gpt-4-0314",
-    "gpt-4-32k",
-    "gpt-4-32k-0314"
-]
 
 // https://platform.openai.com/docs/api-reference/completions/create
 
 struct ParamsEditView: View {
+
+    var isPremium: Bool {
+        UserDefaults.openApiKey != nil || Apphud.hasActiveSubscription()
+    }
+
+    var models: [String] {
+        if isPremium {
+            return [
+                "gpt-3.5-turbo",
+                "gpt-3.5-turbo-0301",
+                "gpt-4",
+                "gpt-4-0314",
+                "gpt-4-32k",
+                "gpt-4-32k-0314"
+            ]
+        } else {
+            return [
+                "gpt-3.5-turbo",
+                "gpt-3.5-turbo-0301"
+            ]
+        }
+    }
 
     @State var conversation: Conversation
     @Binding var show: Bool
