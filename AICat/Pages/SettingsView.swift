@@ -120,7 +120,7 @@ struct SettingsView: View {
                         }.tint(.primaryColor)
                     }
             }
-            .frame(minWidth: 350)
+            .frame(minWidth: 300)
             .navigationTitle("Settings")
             .toolbar {
                 #if os(iOS)

@@ -16,10 +16,6 @@ struct OpenAISettingsView: View {
     @State var error: AFError?
     @State var showApiKeyAlert = false
     @State var isValidated = false
-    @State var isValidatingApiHost = false
-    @State var isValidatedApiHost = false
-    @State var apiHostError: AFError?
-    @State var showApiHostAlert = false
     @State var toast: Toast?
 
     var body: some View {
@@ -29,6 +25,7 @@ struct OpenAISettingsView: View {
                     SecureField(text: $apiKey) {
                         Text("Enter API key")
                     }
+                    .textFieldStyle(.automatic)
                     if !apiKey.isEmpty {
                         Button(action: {
                             apiKey = ""
@@ -37,24 +34,6 @@ struct OpenAISettingsView: View {
                         }
                         .tint(.gray)
                         .buttonStyle(.borderless)
-                    }
-                }
-                HStack(spacing: 8) {
-                    Button("Validate and Save") {
-                        validateApiKey()
-                    }
-                    .disabled(apiKey.isEmpty)
-                    if isValidating {
-                        LoadingIndocator()
-                            .frame(width: 24, height: 14)
-                    }
-                    if error != nil {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red)
-                    }
-                    if isValidated {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
                     }
                 }
                 Button("Delete", action: {
@@ -73,11 +52,12 @@ struct OpenAISettingsView: View {
                     Text("\(error?.localizedDescription ?? "")")
                 }
             )
-            Section("API HOST") {
+            Section("API Host") {
                 HStack {
                     TextField(text: $apiHost) {
-                        Text("Enter api host")
+                        Text("Enter API host")
                     }
+                    .textFieldStyle(.automatic)
                     if !apiHost.isEmpty {
                         Button(action: {
                             apiHost = ""
@@ -88,55 +68,48 @@ struct OpenAISettingsView: View {
                         .buttonStyle(.borderless)
                     }
                 }
-                HStack(spacing: 8) {
-                    Button("Validate and Save") {
-                        validateApiHost()
-                    }
-                    .disabled(apiKey.isEmpty)
-                    if isValidatingApiHost {
-                        LoadingIndocator()
-                            .frame(width: 24, height: 14)
-                    }
-                    if apiHostError != nil {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red)
-                    }
-                    if isValidatedApiHost {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                    }
-                    Spacer()
-                }
                 Button("Reset", action: {
                     apiHost = "https://api.openai.com"
                     UserDefaults.resetApiHost()
                     toast = Toast(type: .success, message: "ApiHost reset sucessful!")
                 })
             }
-            .alert(
-                "Validate Failed!",
-                isPresented: $showApiHostAlert,
-                actions: {
-                    Button("OK", action: { showApiHostAlert = false })
-                },
-                message: {
-                    Text("\(apiHostError?.localizedDescription ?? "")")
+
+            HStack(spacing: 8) {
+                Button("Validate and Save") {
+                    validateApi()
                 }
-            )
+                .disabled(apiKey.isEmpty || apiHost.isEmpty)
+                if isValidating {
+                    LoadingIndocator()
+                        .frame(width: 24, height: 14)
+                }
+                if error != nil {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.red)
+                }
+                if isValidated {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                }
+                Spacer()
+            }
         }
+        .frame(minWidth: 350)
         .toast($toast)
 
     }
 
-    func validateApiKey() {
+    func validateApi() {
         guard !isValidating else { return }
         error = nil
         isValidating = true
         isValidated = false
         Task {
-            let result = await CatApi.validate(apiKey: apiKey)
+            let result = await CatApi.validate(apiHost: apiHost, apiKey: apiKey)
             switch result {
             case .success(_):
+                UserDefaults.apiHost = apiHost
                 UserDefaults.openApiKey = apiKey
                 isValidated = true
             case .failure(let failure):
@@ -144,26 +117,6 @@ struct OpenAISettingsView: View {
                 showApiKeyAlert = true
             }
             isValidating = false
-        }
-
-    }
-
-    func validateApiHost() {
-        guard !isValidatingApiHost else { return }
-        apiHostError = nil
-        isValidatingApiHost = true
-        isValidatedApiHost = false
-        Task {
-            let result = await CatApi.validate(apiHost: apiHost, apiKey: apiKey)
-            switch result {
-            case .success(_):
-                UserDefaults.apiHost = apiHost
-                isValidatedApiHost = true
-            case .failure(let failure):
-                apiHostError = failure
-                showApiHostAlert = true
-            }
-            isValidatingApiHost = false
         }
 
     }

@@ -28,14 +28,13 @@
 "Prompt (the prompt content helps set the behavior of the assistant. e.g. 'You are Steve Jobs, the creator of Apple' )" = "提示语（提示语内容有助于设置助手的行为。例如：'你是苹果的创始人史蒂夫·乔布斯'）";
 "Save" = "保存";
 "Add OpenAI API Key" = "添加 OpenAI API Key";
-"Enter API Key" = "输入 API Key";
-"Enter API Key" = "输入 API Key";
 "[Where to get OpenAI API key?](https://platform.openai.com/account/api-keys)" = "[在哪里获取 OpenAI API Key？](https://platform.openai.com/account/api-keys)";
 "Validate and Save" = "验证并保存";
 "API Key deleted!" = "API Key已删除！";
 "Validate Failed!" = "验证失败！";
 "OK" = "好的";
-"Enter api host" = "输入 API HOST";
+"Enter API key" = "输入api key";
+"Enter API host" = "输入api host";
 "Reset" = "重置";
 "ApiHost reset sucessfully!" = "API HOST 重置成功！";
 "support" = "支持";
@@ -52,7 +51,7 @@
 "Guitar, Bass, Ukulele tuner, Metronome Practice Tracker" = "吉他、贝斯、尤克里里调音器、节拍器, 练习记录";
 "Answers from GPT Model" = "来自ChatGPT的回答";
 "Get accurate and relevant answers directly from the GPT Model." = "直接从ChatGPT模型中获取准确和相关的答案。";
-"Higher token limit for dialogues" = "更高的字数限制";
+"Higher token limit for dialogues" = "更高的对话额度";
 "Engage in dialogues with a higer token limit" = "每月有更多的聊天限额";
 "Unlimited custom prompts" = "无限制的创建自定义会话";
 "Enjoy different conversations without any restrictions" = "无限制的创建角色, 享受不同的对话体验";
@@ -60,6 +59,7 @@
 "Be the first to access GPT4, try out new and upcoming features." = "第一时间体验GPT4和尝试新的即将推出的功能。";
 "Restore Purchases" = "恢复购买";
 "Already Premium" = "已经是高级版";
+"Subscribe for %@/month" = "立即订阅,每个月%@";
 "Auto renewal monthly, cancel at anytime" = "每月自动续订，随时取消";
 "Privacy Policy" = "隐私政策";
 "Terms of Use" = "使用条款";
