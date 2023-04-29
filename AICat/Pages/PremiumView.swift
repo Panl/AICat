@@ -21,7 +21,7 @@ struct PremuimPageReducer: ReducerProtocol {
         }
 
         var isPremium: Bool {
-            UserDefaults.openApiKey != nil || Apphud.hasPremiumAccess()
+            UserDefaults.openApiKey != nil || Apphud.hasActiveSubscription()
         }
     }
 
@@ -70,11 +70,11 @@ struct PremuimPageReducer: ReducerProtocol {
             }
         case .restore:
             guard !state.isPurchasing, state.product != nil else { return .none }
-            return .run { send in
+            return .run { [state] send in
                 await send(.setIsPurchasing(true))
                 let _ = await Apphud.restorePurchases()
                 await send(.setIsPurchasing(false))
-                if Apphud.hasPremiumAccess() {
+                if state.isPremium {
                     let toast = Toast(type: .success, message: "You get AICat Premium Now!", duration: 2)
                     await send(.setToast(toast))
                 } else {
@@ -120,7 +120,7 @@ struct PremiumPage: View {
 
                 VStack(alignment: .leading, spacing: 20) {
                     FeatureView(title: "Answers from GPT Model", description: "Get accurate and relevant answers directly from the GPT Model.")
-                    FeatureView(title: "Higher token limit", description: "Engage in dialogues with a higer token limit")
+                    FeatureView(title: "Higher token limit for dialogues", description: "Engage in dialogues with a higer token limit")
                     FeatureView(title: "Unlimited custom prompts", description: "Enjoy different conversations without any restrictions")
                     FeatureView(title: "Get GPT4 access first", description: "Be the first to access GPT4, try out new and upcoming features.")
                 }
@@ -139,7 +139,7 @@ struct PremiumPage: View {
                     viewStore.send(.subscribeNow)
                 }) {
                     ZStack {
-                        Text(viewStore.isPremium ? "Already Premium" : "Subscribe for \(viewStore.price)/month")
+                        Text(viewStore.isPremium ? "Already Premium" : String(format: NSLocalizedString("Subscribe for %@/month", comment: ""), viewStore.price))
                             .fontWeight(.bold)
                             .foregroundColor(.white)
                             .padding(.vertical, 12)
