@@ -43,8 +43,12 @@ extension UserDefaults {
             defaults.set(newValue, forKey: "AICat.apiHost")
         }
         get {
-            defaults.string(forKey: "AICat.apiHost") ?? (openApiKey != nil ? "https://api.openai.com" : proxyAPIHost)
+            openApiKey != nil ? (defaults.string(forKey: "AICat.apiHost") ?? "https://api.openai.com") : proxyAPIHost
         }
+    }
+
+    static var customApiHost: String {
+        defaults.string(forKey: "AICat.apiHost") ?? "https://api.openai.com"
     }
 
     static func resetApiHost() {

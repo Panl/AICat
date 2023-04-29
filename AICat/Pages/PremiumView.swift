@@ -120,9 +120,9 @@ struct PremiumPage: View {
 
                 VStack(alignment: .leading, spacing: 20) {
                     FeatureView(title: "Answers from GPT Model", description: "Get accurate and relevant answers directly from the GPT Model.")
-                    FeatureView(title: "No limits for Dialogues", description: "Engage in unlimited dialogues without any restrictions.")
-                    FeatureView(title: "Higher word limit", description: "Enjoy extended conversations with a higher word limit per message.")
-                    FeatureView(title: "Get new features first", description: "Be the first to access and try out new and upcoming features.")
+                    FeatureView(title: "Higher token limit", description: "Engage in dialogues with a higer token limit")
+                    FeatureView(title: "Unlimited custom prompts", description: "Enjoy different conversations without any restrictions")
+                    FeatureView(title: "Get GPT4 access first", description: "Be the first to access GPT4, try out new and upcoming features.")
                 }
                 .padding(.vertical, 20)
                 .padding(.horizontal, 40)

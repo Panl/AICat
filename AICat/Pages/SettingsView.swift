@@ -46,6 +46,11 @@ struct SettingsView: View {
                     }.tint(.primaryColor)
                 }.tint(.primaryColor)
                 Section("support") {
+                    Link(destination: URL(string: "https://apps.apple.com/app/aicat-ultimate-ai-assistant/id6446479308?action=write-review")!) {
+                        Label("Review on App Store", systemImage: "star")
+                            .labelStyle(.titleAndIcon)
+                    }
+
                     Link(destination: URL(string: "https://learnprompting.org/")!) {
                         Label("Learn Prompting", systemImage: "book")
                             .labelStyle(.titleAndIcon)
@@ -138,7 +143,7 @@ struct SettingsView: View {
 
     func buyCatFood() async {
         if SystemUtil.maybeFromTestFlight {
-            toast = Toast(type: .info, message: "😿 Please use the app store version for donations.")
+            toast = Toast(type: .info, message: "😿 Please use the App Store version for donations.")
             return
         }
         guard !isPurcahsing else { return }
