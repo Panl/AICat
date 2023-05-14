@@ -140,6 +140,28 @@ struct AICatMessageView: View {
     }
 }
 
+struct NewSessionMessageView: View {
+    var body: some View {
+        HStack {
+            RoundedRectangle(cornerRadius: 0.5)
+                .fill(
+                    LinearGradient(colors: [.clear, .primaryColor.opacity(0.4)], startPoint: .leading, endPoint: .trailing)
+                )
+                .frame(height: 1)
+            Text("NEW SESSION")
+            RoundedRectangle(cornerRadius: 0.5)
+                .fill(
+                    LinearGradient(colors: [.clear, .primaryColor.opacity(0.4)], startPoint: .trailing, endPoint: .leading)
+                )
+                .frame(height: 1)
+        }
+        .font(.manrope(size: 10, weight: .light))
+        .opacity(0.6)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 6)
+    }
+}
+
 struct MessageView: View {
     let message: ChatMessage
     var onDelete: DeleteFunction?
@@ -147,7 +169,9 @@ struct MessageView: View {
     var onShare: ShareFunction?
     var showActions: Bool = false
     var body: some View {
-        if message.role == "user" {
+        if message.isNewSession {
+            NewSessionMessageView()
+        } else if message.isFromUser {
             MineMessageView(message: message, onDelete: onDelete, onCopy: onCopy, onShare: onShare, showActions: showActions)
         } else {
             AICatMessageView(message: message, onDelete: onDelete, onCopy: onCopy, onShare: onShare, showActions: showActions)
@@ -316,6 +340,7 @@ struct MessageView_Previews: PreviewProvider {
             AICatMessageView(message: ChatMessage(role: "user", content: "you are beautiful", conversationId: ""), showActions: true)
             MineMessageView(message: ChatMessage(role: "", content: "### title ```swift```", conversationId: ""), showActions: true)
             ErrorMessageView(errorMessage: "RequestTime out", retry: {}, clear: {})
+            NewSessionMessageView()
             Spacer()
         }
         .background()

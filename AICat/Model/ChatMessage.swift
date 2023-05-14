@@ -20,3 +20,18 @@ struct ChatMessage: BlackbirdModel {
     @BlackbirdColumn var timeCreated: Int = Date.now.timeInSecond
     @BlackbirdColumn var timeRemoved: Int = 0
 }
+
+extension ChatMessage {
+
+    static func newSession(cid: String) -> ChatMessage {
+        ChatMessage(role: "new_session", content: "", conversationId: cid)
+    }
+
+    var isNewSession: Bool {
+        role == "new_session"
+    }
+
+    var isFromUser: Bool {
+        role == "user"
+    }
+}

@@ -142,7 +142,7 @@ struct SettingsView: View {
     }
 
     func buyCatFood() async {
-        if SystemUtil.maybeFromTestFlight {
+        if Apphud.isSandbox() {
             toast = Toast(type: .info, message: "😿 Please use the App Store version for donations.")
             return
         }

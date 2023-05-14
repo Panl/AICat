@@ -52,6 +52,10 @@ struct PremuimPageReducer: ReducerProtocol {
             return .none
         case .subscribeNow:
             guard !state.isPurchasing, !state.isPremium, let product = state.product else { return .none }
+            if Apphud.isSandbox() {
+                state.toast = Toast(type: .info, message: "😿 Please use the App Store build")
+                return .none
+            }
             return .run { send in
                 await send(.setIsPurchasing(true))
                 let result = await Apphud.purchase(product)

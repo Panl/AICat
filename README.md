@@ -30,8 +30,10 @@
 - [x] Custom API Host
 - [x] Share message as image
 - [x] Export messages as Markdown
-- [ ] Copy code block
+- [x] New session in Conversation when ContextMessages count more than 0
 - [ ] iCloud Sync
+- [ ] Copy code block
+
 
 > the command mode depends on chats with prompt, creating more prompts is important
 
