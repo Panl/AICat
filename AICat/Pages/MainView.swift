@@ -8,6 +8,7 @@
 import SwiftUI
 import Blackbird
 import ComposableArchitecture
+import Combine
 
 struct AppReducer: ReducerProtocol {
 
@@ -133,26 +134,29 @@ struct AppReducer: ReducerProtocol {
     }
 
     func saveConversation(_ conversation: Conversation) async {
-        await db.upsert(model: conversation)
+        await DataStore.save(conversation)
     }
 
     func deleteConversation(_ conversation: Conversation) async {
         var c = conversation
         c.timeRemoved = Date.now.timeInSecond
-        await saveConversation(c)
+        await DataStore.save(c)
     }
 
     func clearConversations(_ conversations: [Conversation]) async {
-        for var c in conversations {
+        let conversationsToDelete = conversations.map { item in
+            var c = item
             c.timeRemoved = Date.now.timeInSecond
-            await saveConversation(c)
+            return c
         }
+        await DataStore.save(items: conversationsToDelete)
     }
 }
 
 struct MainView: View {
 
     let store = Store(initialState: AppReducer.State(), reducer: AppReducer())
+    @State private var cancelable: AnyCancellable?
 
     var body: some View {
         GeometryReader { proxy in
@@ -161,6 +165,13 @@ struct MainView: View {
             } else {
                 CompactView(store: store)
             }
+        }
+        .onAppear {
+            cancelable = NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+                .sink { _ in
+                    print("App will enter forground")
+                    DataStore.sync(complete: nil)
+                }
         }
     }
 }

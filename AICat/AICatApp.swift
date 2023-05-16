@@ -28,6 +28,7 @@ struct AICatApp: App {
             ]
         )
         Apphud.start(apiKey: appHudKey)
+        DataStore.sync(complete: nil)
     }
 
     var body: some Scene {
