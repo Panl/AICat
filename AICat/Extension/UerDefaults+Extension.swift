@@ -6,10 +6,31 @@
 //
 
 import Foundation
+import CloudKit
 
 let defaults = UserDefaults.standard
 
 extension UserDefaults {
+
+    var serverChangeToken: CKServerChangeToken? {
+        get {
+            guard let data = self.value(forKey: "server_change_token") as? Data else {
+                return nil
+            }
+            guard let token = try? NSKeyedUnarchiver.unarchivedObject(ofClass: CKServerChangeToken.self, from: data) else {
+                return nil
+            }
+            return token
+        }
+        set {
+            if let token = newValue {
+                let data = try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: false)
+                set(data, forKey: "server_change_token")
+            } else {
+                removeObject(forKey: "server_change_token")
+            }
+        }
+    }
 
     static var openApiKey: String? {
         set {
@@ -53,6 +74,14 @@ extension UserDefaults {
 
     static func resetApiHost() {
         defaults.set(nil, forKey: "AICat.apiHost")
+    }
+
+    static func save(serverChangeToken: CKServerChangeToken?) {
+        defaults.serverChangeToken = serverChangeToken
+    }
+
+    static func serverChangeToken() -> CKServerChangeToken? {
+        return defaults.serverChangeToken
     }
 
 }

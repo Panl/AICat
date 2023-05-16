@@ -11,6 +11,7 @@ import ComposableArchitecture
 import Blackbird
 import Foundation
 import ApphudSDK
+import Combine
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -264,20 +265,22 @@ struct ConversationFeature: ReducerProtocol {
     }
 
     func saveMessage(_ message: ChatMessage) async {
-        await db.upsert(model: message)
+        await DataStore.save(message)
     }
 
     func deleteMessage(_ message: ChatMessage) async {
         var messageToRemove = message
         messageToRemove.timeRemoved = Date.now.timeInSecond
-        await db.upsert(model: messageToRemove)
+        await DataStore.save(messageToRemove)
     }
 
     func cleanMessages(_ messages: [ChatMessage]) async {
-        for var message in messages {
+        let messagesToDelete = messages.map { item in
+            var message = item
             message.timeRemoved = Date.now.timeInSecond
-            await db.upsert(model: message)
+            return message
         }
+        await DataStore.save(items: messagesToDelete)
     }
 
     func queryMessages(cid: String) async -> [ChatMessage] {
@@ -434,6 +437,7 @@ struct ConversationView: View {
     @State var commnadCardHeight: CGFloat = 0
     @FocusState var isFocused: Bool
     @State var size: CGSize = .zero
+    @State var subscription: AnyCancellable?
 
     let store: StoreOf<ConversationFeature>
     let onChatsClick: () -> Void
@@ -636,6 +640,9 @@ struct ConversationView: View {
             }
             .onAppear {
                 viewStore.send(.queryMessages(cid: viewStore.conversation.id))
+                subscription = DataStore.receiveDataFromiCloud.sink {
+                    viewStore.send(.queryMessages(cid: viewStore.conversation.id))
+                }
             }
             .onChange(of: viewStore.conversation.id) { newValue in
                 viewStore.send(.selectPrompt(nil))

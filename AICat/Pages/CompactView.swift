@@ -8,12 +8,14 @@
 import SwiftUI
 import Blackbird
 import ComposableArchitecture
+import Combine
 
 struct CompactView: View {
     @State var translationX: CGFloat = 0
     @State var showAddConversationSheet = false
     @State var lastTranslationX: CGFloat = 0
     @GestureState var dragOffset: CGSize = .zero
+    @State var subscription: AnyCancellable?
 
     var progress: CGFloat {
         translationX / 300
@@ -99,6 +101,9 @@ struct CompactView: View {
                 )
             }.onAppear {
                 viewStore.send(.queryConversations)
+                subscription = DataStore.receiveDataFromiCloud.sink {
+                    viewStore.send(.queryConversations)
+                }
             }
         }
     }

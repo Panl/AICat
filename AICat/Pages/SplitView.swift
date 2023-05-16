@@ -7,9 +7,11 @@
 
 import SwiftUI
 import ComposableArchitecture
+import Combine
 
 struct SplitView: View {
     @State var sideBarWidth: CGFloat = 300
+    @State var subscription: AnyCancellable?
 
     var size: CGSize = .zero
 
@@ -46,6 +48,9 @@ struct SplitView: View {
                 )
             }.onAppear {
                 viewStore.send(.queryConversations)
+                subscription = DataStore.receiveDataFromiCloud.sink {
+                    viewStore.send(.queryConversations)
+                }
             }
         }
     }

@@ -43,6 +43,9 @@
 		8E64874C29C788640029E14F /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874B29C788640029E14F /* ConversationListView.swift */; };
 		8E811E9C29F1A05E0007A386 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 8E811E9B29F1A05E0007A386 /* ComposableArchitecture */; };
 		8EC0742429F979DD00606DE9 /* OpenAISettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */; };
+		8EDB8E0D2A127D6A0088517E /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0C2A127D6A0088517E /* CloudKitService.swift */; };
+		8EDB8E0F2A1284540088517E /* PushItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0E2A1284540088517E /* PushItem.swift */; };
+		8EDB8E112A13DD8F0088517E /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E102A13DD8F0088517E /* StoreManager.swift */; };
 		8EDD4DD429DB0159009176A5 /* Credential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDD4DD329DB0159009176A5 /* Credential.swift */; };
 		8EE9264729D49B29005E6FB7 /* Bundle+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE9264629D49B29005E6FB7 /* Bundle+Extension.swift */; };
 		8EECA00629C8097E0021A6A1 /* UerDefaults+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EECA00529C8097E0021A6A1 /* UerDefaults+Extension.swift */; };
@@ -98,6 +101,9 @@
 		8E64874A29C75A1C0029E14F /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		8E64874B29C788640029E14F /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
 		8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAISettingsView.swift; sourceTree = "<group>"; };
+		8EDB8E0C2A127D6A0088517E /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
+		8EDB8E0E2A1284540088517E /* PushItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushItem.swift; sourceTree = "<group>"; };
+		8EDB8E102A13DD8F0088517E /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		8EDD4DD329DB0159009176A5 /* Credential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credential.swift; sourceTree = "<group>"; };
 		8EE9264629D49B29005E6FB7 /* Bundle+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extension.swift"; sourceTree = "<group>"; };
 		8EECA00529C8097E0021A6A1 /* UerDefaults+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UerDefaults+Extension.swift"; sourceTree = "<group>"; };
@@ -188,6 +194,7 @@
 			children = (
 				8E401DCD29DCB66200E2F403 /* AICat.entitlements */,
 				8EECA00D29C83BDB0021A6A1 /* Info.plist */,
+				8EDB8E0B2A127D310088517E /* CloudSync */,
 				8E401DCE29DE596D00E2F403 /* Utils */,
 				8E2E5BA929CC704600EE0072 /* Markdown */,
 				8E0F0ECB29CB3AD00011B4F7 /* Font */,
@@ -226,6 +233,7 @@
 			children = (
 				8E64874129C713D30029E14F /* Conversation.swift */,
 				8E64874329C715740029E14F /* ChatMessage.swift */,
+				8EDB8E0E2A1284540088517E /* PushItem.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -253,6 +261,15 @@
 				8E64874929C759970029E14F /* libsqlite3.0.tbd */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8EDB8E0B2A127D310088517E /* CloudSync */ = {
+			isa = PBXGroup;
+			children = (
+				8EDB8E0C2A127D6A0088517E /* CloudKitService.swift */,
+				8EDB8E102A13DD8F0088517E /* StoreManager.swift */,
+			);
+			path = CloudSync;
 			sourceTree = "<group>";
 		};
 		8EECA00829C82E410021A6A1 /* Pages */ = {
@@ -401,9 +418,11 @@
 				8E2E5BAD29CC707B00EE0072 /* TextOutputFormat.swift in Sources */,
 				8E64874729C719460029E14F /* Date+Extension.swift in Sources */,
 				8E2EF25D29F04D7500E25C9A /* ImageRenderer+Extension.swift in Sources */,
+				8EDB8E0D2A127D6A0088517E /* CloudKitService.swift in Sources */,
 				8E2128E329ED7E8800D50ADC /* HapticEngine.swift in Sources */,
 				8E64874229C713D30029E14F /* Conversation.swift in Sources */,
 				8EECA01129C896B20021A6A1 /* Database+Extension.swift in Sources */,
+				8EDB8E0F2A1284540088517E /* PushItem.swift in Sources */,
 				8E64873529C6E2660029E14F /* ConversationView.swift in Sources */,
 				8E2E5BB029CCC60700EE0072 /* MainView.swift in Sources */,
 				8EECA00629C8097E0021A6A1 /* UerDefaults+Extension.swift in Sources */,
@@ -418,6 +437,7 @@
 				8E401DD529E7171100E2F403 /* PremiumView.swift in Sources */,
 				8EECA01629CA07830021A6A1 /* MessageView.swift in Sources */,
 				8E401DD729EA9E9A00E2F403 /* SKProduct+Extension.swift in Sources */,
+				8EDB8E112A13DD8F0088517E /* StoreManager.swift in Sources */,
 				8EDD4DD429DB0159009176A5 /* Credential.swift in Sources */,
 				8EECA01329C8BC370021A6A1 /* SettingsView.swift in Sources */,
 			);
@@ -567,7 +587,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -609,7 +629,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
