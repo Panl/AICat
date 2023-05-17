@@ -134,13 +134,13 @@ struct AppReducer: ReducerProtocol {
     }
 
     func saveConversation(_ conversation: Conversation) async {
-        await DataStore.save(conversation)
+        await DataStore.saveAndSync(conversation)
     }
 
     func deleteConversation(_ conversation: Conversation) async {
         var c = conversation
         c.timeRemoved = Date.now.timeInSecond
-        await DataStore.save(c)
+        await DataStore.saveAndSync(c)
     }
 
     func clearConversations(_ conversations: [Conversation]) async {
@@ -149,7 +149,7 @@ struct AppReducer: ReducerProtocol {
             c.timeRemoved = Date.now.timeInSecond
             return c
         }
-        await DataStore.save(items: conversationsToDelete)
+        await DataStore.saveAndSync(items: conversationsToDelete)
     }
 }
 

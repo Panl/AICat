@@ -74,7 +74,16 @@ extension Blackbird.Database {
         do {
             let conversations = try await Conversation.read(from: self, orderBy: .ascending(\.$timeCreated))
             let messages = try await ChatMessage.read(from: self, orderBy: .ascending(\.$timeCreated))
-            return conversations.map { $0.toPushItem() } + messages.map { $0.toPushItem() }
+            var preMsg: ChatMessage?
+            let fixedTimeMessages = messages.map { message in
+                var msg = message
+                if let preMsg, preMsg.timeCreated == msg.timeCreated {
+                    msg.timeCreated += 1
+                }
+                preMsg = message
+                return msg
+            }
+            return conversations.map { $0.toPushItem() } + fixedTimeMessages.map { $0.toPushItem() }
         } catch {
             debugPrint(error)
             return []
