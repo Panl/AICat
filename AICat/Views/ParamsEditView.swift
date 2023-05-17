@@ -14,12 +14,12 @@ let contextCounts: [Int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 50, 100]
 
 struct ParamsEditView: View {
 
-    var isPremium: Bool {
-        UserDefaults.openApiKey != nil || Apphud.hasActiveSubscription()
+    var hasOwnKey: Bool {
+        UserDefaults.openApiKey != nil
     }
 
     var models: [String] {
-        if isPremium {
+        if hasOwnKey {
             return [
                 "gpt-3.5-turbo",
                 "gpt-3.5-turbo-0301",

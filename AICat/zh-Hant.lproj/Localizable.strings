@@ -91,3 +91,7 @@
 "Export your messages" = "匯出你的訊息";
 "Choose a folder and a name to store the Markdown file." = "選擇資料夾及Markdown檔案名稱";
 "Messages file name:" = "訊息檔案名稱:";
+"Not synchronized yet." = "尚未同步";
+"iCloud Sync" = "iCloud 同步";
+"NEW SESSION" = "新會話";
+"Sync all conversations and messages across different devices." = "在不同設備間同步會話和消息";
