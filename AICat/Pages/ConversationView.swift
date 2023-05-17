@@ -82,7 +82,7 @@ struct ConversationFeature: ReducerProtocol {
         case updateMessages([ChatMessage])
         case upsertMessage(ChatMessage)
         case deleteMessage(ChatMessage)
-        case saveMessage(ChatMessage)
+        case saveMessage(ChatMessage, Bool)
         case sendMessage
         case retrySend
         case setSending(Bool)
@@ -127,6 +127,7 @@ struct ConversationFeature: ReducerProtocol {
             } else {
                 state.messages.append(message)
             }
+            state.messages.sort(by: { $0.timeCreated < $1.timeCreated })
             if message.isNewSession {
                 state.currentContextCount = state.contextMessages.count
             }
@@ -157,9 +158,9 @@ struct ConversationFeature: ReducerProtocol {
                 }
             }
             return .none
-        case .saveMessage(let message):
+        case .saveMessage(let message, let sync):
             return .task {
-                await saveMessage(message)
+                await saveMessage(message, needSync: sync)
                 return .upsertMessage(message)
             }
         case .sendMessage:
@@ -264,14 +265,18 @@ struct ConversationFeature: ReducerProtocol {
         }
     }
 
-    func saveMessage(_ message: ChatMessage) async {
-        await DataStore.save(message)
+    func saveMessage(_ message: ChatMessage, needSync: Bool) async {
+        if needSync {
+            await DataStore.saveAndSync(message)
+        } else {
+            await DataStore.save(message)
+        }
     }
 
     func deleteMessage(_ message: ChatMessage) async {
         var messageToRemove = message
         messageToRemove.timeRemoved = Date.now.timeInSecond
-        await DataStore.save(messageToRemove)
+        await DataStore.saveAndSync(messageToRemove)
     }
 
     func cleanMessages(_ messages: [ChatMessage]) async {
@@ -280,7 +285,7 @@ struct ConversationFeature: ReducerProtocol {
             message.timeRemoved = Date.now.timeInSecond
             return message
         }
-        await DataStore.save(items: messagesToDelete)
+        await DataStore.saveAndSync(items: messagesToDelete)
     }
 
     func queryMessages(cid: String) async -> [ChatMessage] {
@@ -296,8 +301,7 @@ struct ConversationFeature: ReducerProtocol {
         await send(.clearInputText)
         let newMessage = Message(role: "user", content: sendText)
         let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
-        await saveMessage(chatMessage)
-        await send(.upsertMessage(chatMessage), animation: .default)
+        await send(.saveMessage(chatMessage, false), animation: .default)
         await completeMessage(newMessage: newMessage, state: state, send: send, replyToId: chatMessage.id)
     }
 
@@ -312,8 +316,8 @@ struct ConversationFeature: ReducerProtocol {
         let conversation = state.conversation
         var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         responseMessage.replyToId = replyToId
-        await saveMessage(responseMessage)
-        await send(.upsertMessage(responseMessage), animation: .default)
+        responseMessage.timeCreated += 1
+        await send(.saveMessage(responseMessage, false), animation: .default)
         do {
             let stream: AsyncThrowingStream<(String, StreamResponse.Delta), Error>
             if let selectedPrompt = state.selectedPrompt {
@@ -330,9 +334,10 @@ struct ConversationFeature: ReducerProtocol {
                     responseMessage.content += content
                 }
                 responseMessage.model = model
-                await saveMessage(responseMessage)
-                await send(.upsertMessage(responseMessage))
+                responseMessage.timeCreated = Date.now.timeInSecond
+                await send(.saveMessage(responseMessage, false))
             }
+            await send(.saveMessage(responseMessage, true))
             await send(.setSending(false))
             await send(.incrementSentMessageCount)
             await send(.updateContextCount)
@@ -515,37 +520,38 @@ struct ConversationView: View {
                             }
                             .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 6))
                             .background(Color.background)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .cornerRadius(16)
                             .shadow(color: .primaryColor.opacity(0.1), radius: 12)
                         }.padding(.horizontal, 20)
                     } else if viewStore.conversation.contextMessages > 0 {
-                        Button(action: {
-                            if let last = viewStore.messages.last {
-                                if last.isNewSession {
-                                    viewStore.send(.deleteMessage(last), animation: .default)
-                                } else {
-                                    viewStore.send(.saveMessage(ChatMessage.newSession(cid: viewStore.conversation.id)), animation: .default)
+                        HStack {
+                            Spacer(minLength: 0)
+                            Button(action: {
+                                if let last = viewStore.messages.last {
+                                    HapticEngine.trigger()
+                                    if last.isNewSession {
+                                        viewStore.send(.deleteMessage(last), animation: .default)
+                                    } else {
+                                        viewStore.send(.saveMessage(ChatMessage.newSession(cid: viewStore.conversation.id), false), animation: .default)
+                                    }
                                 }
-                            }
-                        }, label: {
-                            HStack {
-                                Spacer(minLength: 0)
+                            }, label: {
                                 HStack(spacing: 4) {
+                                    Image(systemName: "clock.arrow.circlepath")
                                     Text("\(viewStore.currentContextCount)/\(viewStore.conversation.contextMessages)")
                                         .lineLimit(1)
                                         .font(.manrope(size: 14, weight: .semibold))
                                         .foregroundColor(.blackText.opacity(0.7))
-                                    Image(systemName: "clock.arrow.circlepath")
                                 }
-                                .padding(.init(top: 4, leading: 12, bottom: 4, trailing: 6))
-                                .background(Color.background)
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
-                                .shadow(color: .primaryColor.opacity(0.1), radius: 12)
-                            }.padding(.horizontal, 20)
-                        })
-                        .disabled(viewStore.isSending)
-                        .foregroundColor(.blackText.opacity(0.7))
-                        .buttonStyle(.borderless)
+                                .padding(.init(top: 4, leading: 6, bottom: 4, trailing: 12))
+                            })
+                            .background(Color.background)
+                            .cornerRadius(16)
+                            .shadow(color: .primaryColor.opacity(0.1), radius: 12)
+                            .disabled(viewStore.isSending)
+                            .foregroundColor(.blackText.opacity(0.7))
+                            .buttonStyle(.borderless)
+                        }.padding(.horizontal, 20)
                     }
 
                     HStack(alignment: .bottom, spacing: 4) {

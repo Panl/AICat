@@ -9,10 +9,13 @@ import Foundation
 import CloudKit
 import Blackbird
 import Combine
+import SwiftUI
 
 let DataStore = StoreManager()
 
 class StoreManager {
+
+    @AppStorage("AICat.allRecords.synced") var allLocalRecrodsSynced: Bool = false
 
     let receiveDataFromiCloud = PassthroughSubject<Void, Never>()
 
@@ -30,14 +33,22 @@ class StoreManager {
 
     func save(_ obj: any PushableObject) async {
         await db.upsert(item: obj)
-        await pushAfterSave()
     }
 
-    func save(items: [any PushableObject]) async {
+    func saveAndSync(_ obj: any PushableObject) async {
+        await db.upsert(item: obj)
+        Task {
+            await pushAfterSave()
+        }
+    }
+
+    func saveAndSync(items: [any PushableObject]) async {
         for item in items {
             await db.upsert(item: item)
         }
-        await pushAfterSave()
+        Task {
+            await pushAfterSave()
+        }
     }
 
     private func pushAfterSave() async {
@@ -69,7 +80,11 @@ class StoreManager {
     func sync(complete: ((CKError?) -> Void)?) {
         Task { @MainActor in
             do {
-                try await sync()
+                if allLocalRecrodsSynced {
+                    try await sync()
+                } else {
+                    try await syncAllRecords()
+                }
                 complete?(nil)
             } catch {
                 complete?(error as? CKError)
@@ -78,13 +93,18 @@ class StoreManager {
         }
     }
 
+    private func syncAllRecords() async throws {
+        try await prepare()
+        try await pushAllRecords()
+        try await pullChangesAndSaveToDB()
+        receiveDataFromiCloud.send(())
+        allLocalRecrodsSynced = true
+    }
+
     private func sync() async throws {
         try await prepare()
-        if UserDefaults.serverChangeToken() == nil {
-            try await pushAllRecords()
-        }
-        try await pullChangesAndSaveToDB()
         try await pushChangesAndDeleteInDB()
+        try await pullChangesAndSaveToDB()
         receiveDataFromiCloud.send(())
     }
 
