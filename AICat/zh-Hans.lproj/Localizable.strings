@@ -92,3 +92,7 @@
 "Choose a folder and a name to store the Markdown file." = "选择文件夹";
 "Messages file name:" = "消息文件名:";
 "😿 Please use the App Store build" = "😿 请下载苹果商店版购买";
+"Not synchronized yet." = "尚未同步";
+"iCloud Sync" = "iCloud 同步";
+"NEW SESSION" = "新会话";
+"Sync all conversations and messages across different devices." = "在不同设备间同步会话和消息";

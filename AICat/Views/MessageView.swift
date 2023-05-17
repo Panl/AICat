@@ -155,7 +155,7 @@ struct NewSessionMessageView: View {
                 )
                 .frame(height: 1)
         }
-        .font(.manrope(size: 10, weight: .regular))
+        .font(.manrope(size: 10, weight: .medium))
         .opacity(0.6)
         .padding(.horizontal, 20)
         .padding(.vertical, 6)

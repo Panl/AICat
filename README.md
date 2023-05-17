@@ -19,6 +19,7 @@
   - [AppCenter](https://appcenter.ms/)
   - [AppHud](https://apphud.com/)
 
+<a href="https://www.buymeacoffee.com/rego" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 ### Features
 
 - [x] [Features of ChatGPT Web App](https://chat.openai.com/chat)
@@ -31,7 +32,7 @@
 - [x] Share message as image
 - [x] Export messages as Markdown
 - [x] New session in Conversation when ContextMessages count more than 0
-- [ ] iCloud Sync
+- [x] iCloud Sync
 - [ ] Copy code block
 
 

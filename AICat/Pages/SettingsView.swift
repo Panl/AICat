@@ -23,6 +23,14 @@ struct SettingsView: View {
 
     @State var isPurcahsing = false
     @State var toast: Toast?
+    @ObservedObject var store = DataStore
+
+    var syncedText: LocalizedStringKey {
+        if let syncedTime = store.lastSyncedTime {
+            return LocalizedStringKey(Date(timeIntervalSince1970: Double(syncedTime)).toFormat())
+        }
+        return LocalizedStringKey("Not synchronized yet.")
+    }
 
     var body: some View {
         NavigationView {
@@ -32,6 +40,25 @@ struct SettingsView: View {
                         Label("Custom API", systemImage: "hammer")
                             .labelStyle(.titleAndIcon)
                     }.tint(.primaryColor)
+                    HStack {
+                        Image(systemName: "arrow.clockwise.icloud")
+                        Text("iCloud Sync")
+                        Spacer()
+                        if let error = store.syncError {
+                            Button(action: {
+                                toast = .init(type: .error, message: error.localizedDescription)
+                            }, label: {
+                                Image(systemName: "exclamationmark.icloud.fill")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 16, height: 16)
+                                    .foregroundColor(.red)
+                            })
+                        }
+                        Text(syncedText)
+                            .font(.manrope(size: 10, weight: .regular))
+                            .opacity(0.4)
+                    }
                 }.tint(.primaryColor)
                 Section("Donate") {
                     Button(action: { Task { await buyCatFood() } }) {

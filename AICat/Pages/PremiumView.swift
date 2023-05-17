@@ -126,7 +126,7 @@ struct PremiumPage: View {
                     FeatureView(title: "Answers from GPT Model", description: "Get accurate and relevant answers directly from the GPT Model.")
                     FeatureView(title: "Higher token limit for dialogues", description: "Engage in dialogues with a higer token limit")
                     FeatureView(title: "Unlimited custom prompts", description: "Enjoy different conversations without any restrictions")
-                    FeatureView(title: "Get GPT4 access first", description: "Be the first to access GPT4, try out new and upcoming features.")
+                    FeatureView(title: "iCloud Sync", description: "Sync all conversations and messages across different devices.")
                 }
                 .padding(.vertical, 20)
                 .padding(.horizontal, 40)

@@ -13,9 +13,11 @@ import SwiftUI
 
 let DataStore = StoreManager()
 
-class StoreManager {
+class StoreManager: ObservableObject {
 
     @AppStorage("AICat.allRecords.synced") var allLocalRecrodsSynced: Bool = false
+    @AppStorage("AICat.lastSyncTime") var lastSyncedTime: Int?
+    @Published var syncError: CKError?
 
     let receiveDataFromiCloud = PassthroughSubject<Void, Never>()
 
@@ -75,6 +77,9 @@ class StoreManager {
         if moreComing {
             try await pullChangesAndSaveToDB()
         }
+        if records.count > 0 {
+            receiveDataFromiCloud.send(())
+        }
     }
 
     func sync(complete: ((CKError?) -> Void)?) {
@@ -85,9 +90,11 @@ class StoreManager {
                 } else {
                     try await syncAllRecords()
                 }
+                lastSyncedTime = Date.now.timeInSecond
                 complete?(nil)
             } catch {
                 complete?(error as? CKError)
+                syncError = error as? CKError
                 debugPrint("CloudKit push failed: \(error.localizedDescription)")
             }
         }
@@ -97,7 +104,6 @@ class StoreManager {
         try await prepare()
         try await pushAllRecords()
         try await pullChangesAndSaveToDB()
-        receiveDataFromiCloud.send(())
         allLocalRecrodsSynced = true
     }
 
@@ -105,7 +111,6 @@ class StoreManager {
         try await prepare()
         try await pushChangesAndDeleteInDB()
         try await pullChangesAndSaveToDB()
-        receiveDataFromiCloud.send(())
     }
 
     private func pushAllRecords() async throws {

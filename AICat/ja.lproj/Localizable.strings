@@ -91,3 +91,7 @@
 "Export your messages" = "あなたのメッセージをエクスポートする";
 "Choose a folder and a name to store the Markdown file." = "Markdownファイルを保存するフォルダと名前を選択してください。";
 "Messages file name:" = "メッセージファイル名：";
+"Not synchronized yet." = "まだ同期されていません。";
+"iCloud Sync" = "iCloud同期";
+"NEW SESSION" = "新しいセッション";
+"Sync all conversations and messages across different devices." = "異なるデバイス間で会話やメッセージをすべて同期します。";

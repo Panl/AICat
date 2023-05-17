@@ -166,12 +166,21 @@ struct MainView: View {
                 CompactView(store: store)
             }
         }
+        .tint(Color.primaryColor)
         .onAppear {
+            #if os(iOS)
             cancelable = NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
                 .sink { _ in
-                    print("App will enter forground")
+                    print("App will enter foreground")
                     DataStore.sync(complete: nil)
                 }
+            #elseif os(macOS)
+            cancelable = NotificationCenter.default.publisher(for: NSApplication.willBecomeActiveNotification)
+                .sink { _ in
+                    print("App will enter foreground")
+                    DataStore.sync(complete: nil)
+                }
+            #endif
         }
     }
 }
