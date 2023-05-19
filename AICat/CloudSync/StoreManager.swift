@@ -85,6 +85,7 @@ class StoreManager: ObservableObject {
     func sync(complete: ((CKError?) -> Void)?) {
         Task { @MainActor in
             do {
+                syncError = nil
                 if allLocalRecrodsSynced {
                     try await sync()
                 } else {
