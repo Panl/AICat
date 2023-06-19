@@ -34,6 +34,16 @@
 - [x] New session in Conversation when ContextMessages count more than 0
 - [x] iCloud Sync
 - [ ] Copy code block
+Antswing：
+- [ ] voice
+- [ ] ten thousands why
+- [ ] economy assistant
+- [ ] poem
+- [ ] chinese chengyu
+- [ ] emotion mentor
+- [ ] essay writer
+- [ ] prompt
+- [ ] share app
 
 
 > the command mode depends on chats with prompt, creating more prompts is important
