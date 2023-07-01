@@ -13,7 +13,7 @@ struct OpenAISettingsView: View {
     @State var apiKey = UserDefaults.openApiKey ?? ""
     @State var apiHost = UserDefaults.customApiHost
     @State var isValidating = false
-    @State var error: AFError?
+    @State var error: Error?
     @State var showApiKeyAlert = false
     @State var isValidated = false
     @State var toast: Toast?
@@ -106,14 +106,13 @@ struct OpenAISettingsView: View {
         isValidating = true
         isValidated = false
         Task {
-            let result = await CatApi.validate(apiHost: apiHost, apiKey: apiKey)
-            switch result {
-            case .success(_):
+            do {
+                let _ = try await CatApi.validate(apiHost: apiHost, apiKey: apiKey)
                 UserDefaults.apiHost = apiHost
                 UserDefaults.openApiKey = apiKey
                 isValidated = true
-            case .failure(let failure):
-                error = failure
+            } catch {
+                self.error = error
                 showApiKeyAlert = true
             }
             isValidating = false
