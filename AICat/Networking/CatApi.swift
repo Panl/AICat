@@ -7,6 +7,7 @@
 
 import Foundation
 import Alamofire
+import OpenAI
 
 struct StreamResponse: Codable {
     let id: String
@@ -150,6 +151,14 @@ enum CatApi {
 
     static func validate(apiHost: String, apiKey: String) async -> Result<CompleteResponse, AFError> {
         await complete(apiHost: apiHost, apiKey: apiKey, messages: [Message(role: "user", content: "say this is a test")])
+    }
+
+    static func listGPTModels() async throws -> [Model] {
+        let apiKey = UserDefaults.openApiKey ?? openAIKey
+        let apiClient = OpenAI(apiToken: apiKey)
+        let result = try await apiClient.models()
+        let gptModels = result.data.map({ $0.id }).filter({ $0.contains("gpt") })
+        return gptModels.sorted()
     }
 }
 

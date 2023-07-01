@@ -20,24 +20,24 @@ struct ParamsEditView: View {
 
     var models: [String] {
         if hasOwnKey {
-            return [
-                "gpt-3.5-turbo",
-                "gpt-3.5-turbo-0301",
-                "gpt-4",
-                "gpt-4-0314",
-                "gpt-4-32k",
-                "gpt-4-32k-0314"
-            ]
+            return gptModels
         } else {
-            return [
-                "gpt-3.5-turbo",
-                "gpt-3.5-turbo-0301"
-            ]
+            return gptModels.filter({$0.contains("3.5")})
         }
     }
 
     @State var conversation: Conversation
     @Binding var show: Bool
+    @State var gptModels: [String] = [
+        "gpt-3.5-turbo",
+        "gpt-3.5-turbo-0613",
+        "gpt-3.5-turbo-16k",
+        "gpt-4",
+        "gpt-4-0613",
+        "gpt-4-32k",
+        "gpt-4-32k-0613",
+        "gpt-4-32k-0314"
+    ]
 
     let onUpdate: (Conversation) -> Void
 
@@ -152,6 +152,14 @@ struct ParamsEditView: View {
         .foregroundColor(.blackText)
         .onChange(of: conversation) { newValue in
             onUpdate(newValue)
+        }
+        .onAppear {
+            Task {
+                do {
+                    let gptModels = try await CatApi.listGPTModels()
+                    self.gptModels = gptModels
+                } catch {}
+            }
         }
     }
 }
