@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Alamofire
 import ComposableArchitecture
 import Blackbird
 import Foundation
@@ -300,7 +299,7 @@ struct ConversationFeature: ReducerProtocol {
         await send(.setSending(true))
         let sendText = text
         await send(.clearInputText)
-        let newMessage = Message(role: "user", content: sendText)
+        let newMessage = Chat(role: .user, content: sendText)
         let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
         await send(.saveMessage(chatMessage, false), animation: .default)
         await streamChat(newMessage: newMessage, state: state, send: send, replyToId: chatMessage.id)
@@ -309,11 +308,11 @@ struct ConversationFeature: ReducerProtocol {
     func retry(message: ChatMessage, state: State, send: Send<Action>) async {
         await send(.setCompleteError(nil))
         await send(.setSending(true))
-        let newMessage = Message(role: message.role, content: message.content)
+        let newMessage = Chat(role: .init(name: message.role), content: message.content)
         await streamChat(newMessage: newMessage, state: state, send: send, replyToId: message.id, isRetry: true)
     }
 
-    func streamChat(newMessage: Message, state: State, send: Send<Action>, replyToId: String, isRetry: Bool = false) async {
+    func streamChat(newMessage: Chat, state: State, send: Send<Action>, replyToId: String, isRetry: Bool = false) async {
         let conversation = state.conversation
         var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         responseMessage.replyToId = replyToId
@@ -324,7 +323,7 @@ struct ConversationFeature: ReducerProtocol {
             if let selectedPrompt = state.selectedPrompt {
                 stream = await CatApi.streamChat(messages: [newMessage], conversation: selectedPrompt)
             } else {
-                let messagesToSend = state.contextMessages.map({ Message(role: $0.role, content: $0.content) }) + (isRetry ? [] : [newMessage])
+                let messagesToSend = state.contextMessages.map({ Chat(role: .init(name: $0.role), content: $0.content) }) + (isRetry ? [] : [newMessage])
                 stream = await CatApi.streamChat(messages: messagesToSend, conversation: conversation)
             }
             for try await result in stream {
@@ -587,7 +586,7 @@ struct ConversationView: View {
                             Button(action: {
                                 HapticEngine.trigger()
                                 //TODO: move to reducer
-                                CatApi.cancelMessageStream()
+                                CatApi.cancelStreamChat()
                             }) {
                                 Rectangle()
                                     .foregroundColor(.primaryColor)

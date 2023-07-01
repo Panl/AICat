@@ -9,29 +9,9 @@ import Foundation
 import OpenAI
 import Combine
 
-struct StreamResponse: Codable {
-    let id: String
-    let object: String
-    let created: Int
-    let model: String
-    let choices: [Choice]
-
-    struct Choice: Codable {
-        let delta: Delta
-        let finishReason: String?
-    }
-
-    struct Delta: Codable {
-        let role: String?
-        let content: String?
-    }
-}
-
 enum CatApi {
 
-    static var chatCompletionUrl: String {
-        "\(UserDefaults.apiHost)/v1/chat/completions"
-    }
+    private(set) static var currentStreamOpenAI: OpenAI?
 
     static var apiClient: OpenAI {
         let apiKey = UserDefaults.openApiKey ?? openAIKey
@@ -44,8 +24,8 @@ enum CatApi {
         return OpenAI(configuration: configratuion, session: URLSession.shared)
     }
 
-    static func cancelMessageStream() {
-        cancelTaskWithUrl(URL(string: chatCompletionUrl))
+    static func cancelStreamChat() {
+        currentStreamOpenAI?.cancelAllStreamingRequests()
     }
 
     static func cancelTaskWithUrl(_ url: URL?) {
@@ -57,19 +37,7 @@ enum CatApi {
         }
     }
 
-    static func decodeResponse(data: Data) -> StreamResponse? {
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        do {
-            let response = try decoder.decode(StreamResponse.self, from: data)
-            return response
-        } catch {
-            print("decode error: \(error) - rawJson: \(String(decoding: data, as: UTF8.self))")
-        }
-        return nil
-    }
-
-    static func complete(apiHost: String? = nil, apiKey: String? = nil, messages: [Message]) async throws -> ChatResult {
+    static func complete(apiHost: String? = nil, apiKey: String? = nil, messages: [Chat]) async throws -> ChatResult {
         let host = apiHost ?? UserDefaults.customApiHost
         let key = apiKey ?? UserDefaults.openApiKey ?? ""
         let configratuion = OpenAI.Configuration(
@@ -80,7 +48,7 @@ enum CatApi {
         let client = OpenAI(configuration: configratuion, session: URLSession.shared)
         let query = ChatQuery(
             model: "gpt-3.5-turbo",
-            messages: messages.map({ Chat(role: .init(name: $0.role), content: $0.content)}),
+            messages: messages,
             temperature: 0.7,
             topP: 1,
             presencePenalty: 0,
@@ -90,12 +58,8 @@ enum CatApi {
         return try await client.chats(query: query)
     }
 
-    static func validate(apiKey: String) async throws -> ChatResult {
-        try await complete(apiKey: apiKey, messages: [Message(role: "user", content: "say this is a test")])
-    }
-
     static func validate(apiHost: String, apiKey: String) async throws -> ChatResult {
-        try await complete(apiHost: apiHost, apiKey: apiKey, messages: [Message(role: "user", content: "say this is a test")])
+        try await complete(apiHost: apiHost, apiKey: apiKey, messages: [Chat(role: .user, content: "say this is a test")])
     }
 
     static func listGPTModels() async throws -> [Model] {
@@ -104,23 +68,24 @@ enum CatApi {
         return gptModels.sorted()
     }
 
-    static func streamChat(messages: [Message], conversation: Conversation) async -> AsyncThrowingStream<ChatStreamResult, Error> {
+    static func streamChat(messages: [Chat], conversation: Conversation) async -> AsyncThrowingStream<ChatStreamResult, Error> {
         var messageToSend = messages
         let prompt = conversation.prompt
         if !prompt.isEmpty {
-            let system = Message(role: "system", content: prompt)
+            let system = Chat(role: .system, content: prompt)
             messageToSend = [system] + messages
         }
         let query = ChatQuery(
             model: conversation.model,
-            messages: messageToSend.map({ Chat(role: .init(name: $0.role), content: $0.content)}),
+            messages: messageToSend,
             temperature: conversation.temperature,
             topP: conversation.topP,
             presencePenalty: conversation.presencePenalty,
             frequencyPenalty: conversation.frequencyPenalty,
             stream: true
         )
-        return apiClient.chatsStream(query: query)
+        currentStreamOpenAI = apiClient
+        return currentStreamOpenAI!.chatsStream(query: query)
     }
 }
 
@@ -139,9 +104,4 @@ extension Chat.Role {
             self = .system
         }
     }
-}
-
-struct Message: Codable {
-    let role: String
-    let content: String
 }

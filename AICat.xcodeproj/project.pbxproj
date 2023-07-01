@@ -34,7 +34,6 @@
 		8E64872B29C6E1B10029E14F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E64872A29C6E1B10029E14F /* Assets.xcassets */; };
 		8E64872E29C6E1B10029E14F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E64872D29C6E1B10029E14F /* Preview Assets.xcassets */; };
 		8E64873529C6E2660029E14F /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64873429C6E2660029E14F /* ConversationView.swift */; };
-		8E64873829C6FBD90029E14F /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 8E64873729C6FBD90029E14F /* Alamofire */; };
 		8E64873B29C6FF750029E14F /* CatApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64873A29C6FF750029E14F /* CatApi.swift */; };
 		8E64873F29C70FD00029E14F /* Blackbird in Frameworks */ = {isa = PBXBuildFile; productRef = 8E64873E29C70FD00029E14F /* Blackbird */; };
 		8E64874229C713D30029E14F /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874129C713D30029E14F /* Conversation.swift */; };
@@ -42,7 +41,7 @@
 		8E64874729C719460029E14F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874629C719460029E14F /* Date+Extension.swift */; };
 		8E64874C29C788640029E14F /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874B29C788640029E14F /* ConversationListView.swift */; };
 		8E811E9C29F1A05E0007A386 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 8E811E9B29F1A05E0007A386 /* ComposableArchitecture */; };
-		8E8F19CC2A4FE9760006BCBC /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E8F19CB2A4FE9760006BCBC /* OpenAI */; };
+		8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E8F19D62A5022190006BCBC /* OpenAI */; };
 		8EC0742429F979DD00606DE9 /* OpenAISettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */; };
 		8EDB8E0D2A127D6A0088517E /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0C2A127D6A0088517E /* CloudKitService.swift */; };
 		8EDB8E0F2A1284540088517E /* PushItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0E2A1284540088517E /* PushItem.swift */; };
@@ -126,12 +125,11 @@
 			files = (
 				8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */,
 				8E2EF25929F02E4900E25C9A /* ApphudSDK in Frameworks */,
+				8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */,
 				8EF5A5E329D92DBF00981A38 /* AppCenterCrashes in Frameworks */,
 				8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */,
-				8E64873829C6FBD90029E14F /* Alamofire in Frameworks */,
 				8EF5A5E129D92DBF00981A38 /* AppCenterAnalytics in Frameworks */,
 				8E811E9C29F1A05E0007A386 /* ComposableArchitecture in Frameworks */,
-				8E8F19CC2A4FE9760006BCBC /* OpenAI in Frameworks */,
 				8E64873F29C70FD00029E14F /* Blackbird in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -323,7 +321,6 @@
 			);
 			name = AICat;
 			packageProductDependencies = (
-				8E64873729C6FBD90029E14F /* Alamofire */,
 				8E64873E29C70FD00029E14F /* Blackbird */,
 				8E2E5BA229CC519D00EE0072 /* MarkdownUI */,
 				8E2E5BA729CC6FF500EE0072 /* Splash */,
@@ -331,7 +328,7 @@
 				8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */,
 				8E2EF25829F02E4900E25C9A /* ApphudSDK */,
 				8E811E9B29F1A05E0007A386 /* ComposableArchitecture */,
-				8E8F19CB2A4FE9760006BCBC /* OpenAI */,
+				8E8F19D62A5022190006BCBC /* OpenAI */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -367,14 +364,13 @@
 			);
 			mainGroup = 8E64871A29C6E1B00029E14F;
 			packageReferences = (
-				8E64873629C6FBD90029E14F /* XCRemoteSwiftPackageReference "Alamofire" */,
 				8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */,
 				8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */,
 				8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
 				8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */,
 				8E811E9A29F1A05E0007A386 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
-				8E8F19CA2A4FE9760006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */,
+				8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -714,14 +710,6 @@
 				kind = branch;
 			};
 		};
-		8E64873629C6FBD90029E14F /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
-			requirement = {
-				kind = exactVersion;
-				version = 5.6.4;
-			};
-		};
 		8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/marcoarment/Blackbird";
@@ -738,9 +726,9 @@
 				version = 0.52.0;
 			};
 		};
-		8E8F19CA2A4FE9760006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */ = {
+		8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/MacPaw/OpenAI.git";
+			repositoryURL = "https://github.com/Panl/OpenAI.git";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -772,11 +760,6 @@
 			package = 8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */;
 			productName = ApphudSDK;
 		};
-		8E64873729C6FBD90029E14F /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E64873629C6FBD90029E14F /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
-		};
 		8E64873E29C70FD00029E14F /* Blackbird */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */;
@@ -787,9 +770,9 @@
 			package = 8E811E9A29F1A05E0007A386 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
 		};
-		8E8F19CB2A4FE9760006BCBC /* OpenAI */ = {
+		8E8F19D62A5022190006BCBC /* OpenAI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8E8F19CA2A4FE9760006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */;
+			package = 8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */;
 			productName = OpenAI;
 		};
 		8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */ = {

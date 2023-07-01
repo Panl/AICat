@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Foundation
-import Alamofire
 import ApphudSDK
 
 struct SettingsView: View {
