@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		8E00BAF529FC2E9100193F6B /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E00BAF429FC2E9100193F6B /* DocumentPicker.swift */; };
 		8E00BAF729FC3CCC00193F6B /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E00BAF629FC3CCC00193F6B /* SharePickerView.swift */; };
+		8E0CD5452A58018800DAC4C0 /* Highlightr in Frameworks */ = {isa = PBXBuildFile; productRef = 8E0CD5442A58018800DAC4C0 /* Highlightr */; };
+		8E0CD5472A5803DF00DAC4C0 /* SyntaxHighlighting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0CD5462A5803DF00DAC4C0 /* SyntaxHighlighting.swift */; };
 		8E0F0ECD29CB3AF60011B4F7 /* Manrope.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */; };
 		8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */; };
 		8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ED029CB53570011B4F7 /* View+Extension.swift */; };
@@ -64,6 +66,7 @@
 /* Begin PBXFileReference section */
 		8E00BAF429FC2E9100193F6B /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		8E00BAF629FC3CCC00193F6B /* SharePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePickerView.swift; sourceTree = "<group>"; };
+		8E0CD5462A5803DF00DAC4C0 /* SyntaxHighlighting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxHighlighting.swift; sourceTree = "<group>"; };
 		8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Manrope.ttf; sourceTree = "<group>"; };
 		8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
 		8E0F0ED029CB53570011B4F7 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -130,6 +133,7 @@
 				8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */,
 				8EF5A5E129D92DBF00981A38 /* AppCenterAnalytics in Frameworks */,
 				8E811E9C29F1A05E0007A386 /* ComposableArchitecture in Frameworks */,
+				8E0CD5452A58018800DAC4C0 /* Highlightr in Frameworks */,
 				8E64873F29C70FD00029E14F /* Blackbird in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -158,6 +162,7 @@
 			children = (
 				8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */,
 				8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */,
+				8E0CD5462A5803DF00DAC4C0 /* SyntaxHighlighting.swift */,
 			);
 			path = SyntaxHighlighter;
 			sourceTree = "<group>";
@@ -329,6 +334,7 @@
 				8E2EF25829F02E4900E25C9A /* ApphudSDK */,
 				8E811E9B29F1A05E0007A386 /* ComposableArchitecture */,
 				8E8F19D62A5022190006BCBC /* OpenAI */,
+				8E0CD5442A58018800DAC4C0 /* Highlightr */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -371,6 +377,7 @@
 				8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */,
 				8E811E9A29F1A05E0007A386 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */,
+				8E0CD5432A58018800DAC4C0 /* XCRemoteSwiftPackageReference "Highlightr" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -412,6 +419,7 @@
 				8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */,
 				8E401DD029DE59A000E2F403 /* SystemUtil.swift in Sources */,
 				8E401DD929EAC9F900E2F403 /* ToastVIew.swift in Sources */,
+				8E0CD5472A5803DF00DAC4C0 /* SyntaxHighlighting.swift in Sources */,
 				8E64873B29C6FF750029E14F /* CatApi.swift in Sources */,
 				8E64872729C6E1B00029E14F /* AICatApp.swift in Sources */,
 				8E64874429C715740029E14F /* ChatMessage.swift in Sources */,
@@ -587,7 +595,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -629,7 +637,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -686,12 +694,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8E0CD5432A58018800DAC4C0 /* XCRemoteSwiftPackageReference "Highlightr" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/raspu/Highlightr";
+			requirement = {
+				kind = exactVersion;
+				version = 2.1.2;
+			};
+		};
 		8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
 			requirement = {
 				kind = exactVersion;
-				version = 2.0.2;
+				version = 2.1.0;
 			};
 		};
 		8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */ = {
@@ -745,6 +761,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8E0CD5442A58018800DAC4C0 /* Highlightr */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E0CD5432A58018800DAC4C0 /* XCRemoteSwiftPackageReference "Highlightr" */;
+			productName = Highlightr;
+		};
 		8E2E5BA229CC519D00EE0072 /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;

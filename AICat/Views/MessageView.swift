@@ -75,6 +75,8 @@ struct AICatMessageView: View {
     var onShare: ShareFunction?
     var showActions = false
 
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         if message.content.isEmpty {
             InputingMessageView()
@@ -82,8 +84,8 @@ struct AICatMessageView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Markdown(message.content.trimmingCharacters(in: .whitespacesAndNewlines))
                    .textSelection(.enabled)
-                   .markdownCodeSyntaxHighlighter(.splash(theme: .sundellsColors(withFont: .init(size: Theme.fontSize))))
-                   .markdownTheme(.gitHub.text { FontSize(Theme.fontSize) })
+                   .markdownCodeSyntaxHighlighter(ChatCodeSyntaxHighlighter(brightMode: colorScheme != .dark, fontSize: Theme.fontSize))
+                   .markdownTheme(.custom())
                    .padding(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
                 if showActions {
                     actionsView
