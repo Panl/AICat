@@ -48,9 +48,11 @@ struct SplitView: View {
                 )
             }.onAppear {
                 viewStore.send(.queryConversations)
-                subscription = DataStore.receiveDataFromiCloud.sink {
-                    viewStore.send(.queryConversations)
-                }
+                subscription = DataStore.receiveDataFromiCloud
+                    .receive(on: DispatchQueue.main)
+                    .sink {
+                        viewStore.send(.queryConversations)
+                    }
             }
         }
     }

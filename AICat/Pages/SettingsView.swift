@@ -148,6 +148,7 @@ struct SettingsView: View {
             }
             .frame(minWidth: 300)
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 #if os(iOS)
                 ToolbarItem(placement: .navigationBarTrailing) {

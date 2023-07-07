@@ -7,8 +7,8 @@
 
 import Foundation
 import Highlightr
-import Splash
 import SwiftUI
+import Splash
 #if os(iOS)
 import UIKit
 public typealias UFont = UIFont

@@ -647,9 +647,11 @@ struct ConversationView: View {
             }
             .onAppear {
                 viewStore.send(.queryMessages(cid: viewStore.conversation.id))
-                subscription = DataStore.receiveDataFromiCloud.sink {
-                    viewStore.send(.queryMessages(cid: viewStore.conversation.id))
-                }
+                subscription = DataStore.receiveDataFromiCloud
+                    .receive(on: DispatchQueue.main)
+                    .sink {
+                        viewStore.send(.queryMessages(cid: viewStore.conversation.id))
+                    }
             }
             .onChange(of: viewStore.conversation.id) { newValue in
                 viewStore.send(.selectPrompt(nil))
@@ -805,14 +807,9 @@ struct ConversationView: View {
                                 viewStore.send(.deleteMessage(message), animation: .default)
                             },
                             onCopy: {
-                                if SystemUtil.copyToPasteboard(content: message.content) {
-                                    let toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
-                                    viewStore.send(.setToast(toast))
-                                } else {
-                                    let toast = Toast(type: .error, message: "Copy content failed", duration: 1.5)
-                                    viewStore.send(.setToast(toast))
-                                }
-
+                                SystemUtil.copyToPasteboard(content: message.content)
+                                let toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
+                                viewStore.send(.setToast(toast))
                             },
                             onShare: {
                                 HapticEngine.trigger()
@@ -845,8 +842,11 @@ struct ConversationView: View {
             })
             .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
                 if old.last != newMessages.last {
-                    if old.isEmpty {
-                        proxy.scrollTo("Bottom", anchor: .bottom)
+                    if old.first?.conversationId != newMessages.first?.conversationId  {
+                        Task {
+                            try await Task.sleep(nanoseconds: 100_000_000)
+                            proxy.scrollTo("Bottom", anchor: .bottom)
+                        }
                     } else {
                         withAnimation {
                             proxy.scrollTo("Bottom", anchor: .bottom)

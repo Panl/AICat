@@ -11,9 +11,9 @@ import SwiftUI
 extension Theme {
     static var fontSize: Double {
     #if os(macOS)
-            return 14
+        return 14
     #else
-            return 16
+        return 16
     #endif
     }
 
@@ -35,14 +35,16 @@ extension Theme {
             BackgroundColor(Color.clear)
             FontSize(fontSize)
             FontFamily(.custom("Manrope"))
+            FontWeight(.regular)
         }
         .codeBlock { configuration in
           ScrollView(.horizontal) {
             configuration.label
-              .relativeLineSpacing(.em(0.225))
+                  .relativeLineSpacing(.em(0.1))
               .markdownTextStyle {
                 FontFamilyVariant(.monospaced)
-                FontSize(.em(0.85))
+                FontFamily(.custom("Manrope"))
+                FontSize(fontSize)
               }
               .padding(16)
               .padding(.top, 20)
@@ -58,11 +60,12 @@ extension Theme {
                       SystemUtil.copyToPasteboard(content: configuration.content)
                   }
               }
-              .padding(.horizontal, 16)
-              .padding(.top, 4)
+              .padding(.leading, 16)
+              .padding(.trailing, 12)
+              .padding(.top, 12)
           }
           .background(Color.secondary.opacity(0.05))
-          .clipShape(RoundedRectangle(cornerRadius: 6))
+          .clipShape(RoundedRectangle(cornerRadius: 8))
           .markdownMargin(top: 0, bottom: 16)
         }
     }
@@ -87,7 +90,7 @@ struct CopyButton: View {
             }
             copy()
             Task {
-                try await Task.sleep(nanoseconds: 1_000_000_000)
+                try await Task.sleep(nanoseconds: 2_000_000_000)
                 withAnimation(.linear(duration: 0.1)) {
                     isCopied = false
                 }
@@ -96,13 +99,12 @@ struct CopyButton: View {
             Image(systemName: isCopied ? "checkmark.circle.fill" : "doc.circle.fill")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 20, height: 20, alignment: .center)
+                .frame(width: 20, height: 20)
                 .foregroundColor(.secondary)
                 .background(
                     .regularMaterial,
                     in: RoundedRectangle(cornerRadius: 4, style: .circular)
                 )
-                .padding(4)
         }
         .buttonStyle(.borderless)
     }

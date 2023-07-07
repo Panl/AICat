@@ -11,6 +11,7 @@
 		8E00BAF729FC3CCC00193F6B /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E00BAF629FC3CCC00193F6B /* SharePickerView.swift */; };
 		8E0CD5452A58018800DAC4C0 /* Highlightr in Frameworks */ = {isa = PBXBuildFile; productRef = 8E0CD5442A58018800DAC4C0 /* Highlightr */; };
 		8E0CD5472A5803DF00DAC4C0 /* SyntaxHighlighting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0CD5462A5803DF00DAC4C0 /* SyntaxHighlighting.swift */; };
+		8E0CD54A2A5840EE00DAC4C0 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 8E0CD5492A5840EE00DAC4C0 /* Splash */; };
 		8E0F0ECD29CB3AF60011B4F7 /* Manrope.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */; };
 		8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */; };
 		8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ED029CB53570011B4F7 /* View+Extension.swift */; };
@@ -20,8 +21,6 @@
 		8E2128E629EEFB2700D50ADC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8E2128E829EEFB2700D50ADC /* Localizable.strings */; };
 		8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA229CC519D00EE0072 /* MarkdownUI */; };
 		8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */; };
-		8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2E5BA729CC6FF500EE0072 /* Splash */; };
-		8E2E5BAD29CC707B00EE0072 /* TextOutputFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */; };
 		8E2E5BAE29CC707B00EE0072 /* SplashCodeSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */; };
 		8E2E5BB029CCC60700EE0072 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAF29CCC60700EE0072 /* MainView.swift */; };
 		8E2EF25929F02E4900E25C9A /* ApphudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2EF25829F02E4900E25C9A /* ApphudSDK */; };
@@ -80,7 +79,6 @@
 		8E2128EC29EF0BB800D50ADC /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8E2128ED29EF0BCF00D50ADC /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extension.swift"; sourceTree = "<group>"; };
-		8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextOutputFormat.swift; sourceTree = "<group>"; };
 		8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashCodeSyntaxHighlighter.swift; sourceTree = "<group>"; };
 		8E2E5BAF29CCC60700EE0072 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		8E2EF25C29F04D7500E25C9A /* ImageRenderer+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageRenderer+Extension.swift"; sourceTree = "<group>"; };
@@ -128,9 +126,9 @@
 			files = (
 				8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */,
 				8E2EF25929F02E4900E25C9A /* ApphudSDK in Frameworks */,
+				8E0CD54A2A5840EE00DAC4C0 /* Splash in Frameworks */,
 				8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */,
 				8EF5A5E329D92DBF00981A38 /* AppCenterCrashes in Frameworks */,
-				8E2E5BA829CC6FF500EE0072 /* Splash in Frameworks */,
 				8EF5A5E129D92DBF00981A38 /* AppCenterAnalytics in Frameworks */,
 				8E811E9C29F1A05E0007A386 /* ComposableArchitecture in Frameworks */,
 				8E0CD5452A58018800DAC4C0 /* Highlightr in Frameworks */,
@@ -160,7 +158,6 @@
 		8E2E5BAA29CC707A00EE0072 /* SyntaxHighlighter */ = {
 			isa = PBXGroup;
 			children = (
-				8E2E5BAB29CC707A00EE0072 /* TextOutputFormat.swift */,
 				8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */,
 				8E0CD5462A5803DF00DAC4C0 /* SyntaxHighlighting.swift */,
 			);
@@ -328,13 +325,13 @@
 			packageProductDependencies = (
 				8E64873E29C70FD00029E14F /* Blackbird */,
 				8E2E5BA229CC519D00EE0072 /* MarkdownUI */,
-				8E2E5BA729CC6FF500EE0072 /* Splash */,
 				8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */,
 				8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */,
 				8E2EF25829F02E4900E25C9A /* ApphudSDK */,
 				8E811E9B29F1A05E0007A386 /* ComposableArchitecture */,
 				8E8F19D62A5022190006BCBC /* OpenAI */,
 				8E0CD5442A58018800DAC4C0 /* Highlightr */,
+				8E0CD5492A5840EE00DAC4C0 /* Splash */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -372,12 +369,12 @@
 			packageReferences = (
 				8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */,
 				8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
-				8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */,
 				8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
 				8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */,
 				8E811E9A29F1A05E0007A386 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */,
 				8E0CD5432A58018800DAC4C0 /* XCRemoteSwiftPackageReference "Highlightr" */,
+				8E0CD5482A5840EE00DAC4C0 /* XCRemoteSwiftPackageReference "Splash" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -423,7 +420,6 @@
 				8E64873B29C6FF750029E14F /* CatApi.swift in Sources */,
 				8E64872729C6E1B00029E14F /* AICatApp.swift in Sources */,
 				8E64874429C715740029E14F /* ChatMessage.swift in Sources */,
-				8E2E5BAD29CC707B00EE0072 /* TextOutputFormat.swift in Sources */,
 				8E64874729C719460029E14F /* Date+Extension.swift in Sources */,
 				8E2EF25D29F04D7500E25C9A /* ImageRenderer+Extension.swift in Sources */,
 				8EDB8E0D2A127D6A0088517E /* CloudKitService.swift in Sources */,
@@ -595,7 +591,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 48;
+				CURRENT_PROJECT_VERSION = 49;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -616,7 +612,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = app.epoch.AICat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -637,7 +633,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 48;
+				CURRENT_PROJECT_VERSION = 49;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -658,7 +654,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = app.epoch.AICat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -702,20 +698,20 @@
 				version = 2.1.2;
 			};
 		};
+		8E0CD5482A5840EE00DAC4C0 /* XCRemoteSwiftPackageReference "Splash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JohnSundell/Splash.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.16.0;
+			};
+		};
 		8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
 			requirement = {
 				kind = exactVersion;
 				version = 2.1.0;
-			};
-		};
-		8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/JohnSundell/Splash.git";
-			requirement = {
-				kind = exactVersion;
-				version = 0.16.0;
 			};
 		};
 		8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */ = {
@@ -766,15 +762,15 @@
 			package = 8E0CD5432A58018800DAC4C0 /* XCRemoteSwiftPackageReference "Highlightr" */;
 			productName = Highlightr;
 		};
+		8E0CD5492A5840EE00DAC4C0 /* Splash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E0CD5482A5840EE00DAC4C0 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = Splash;
+		};
 		8E2E5BA229CC519D00EE0072 /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
-		};
-		8E2E5BA729CC6FF500EE0072 /* Splash */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E2E5BA629CC6FF500EE0072 /* XCRemoteSwiftPackageReference "Splash" */;
-			productName = Splash;
 		};
 		8E2EF25829F02E4900E25C9A /* ApphudSDK */ = {
 			isa = XCSwiftPackageProductDependency;
