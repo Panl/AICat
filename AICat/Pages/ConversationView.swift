@@ -51,11 +51,7 @@ struct ConversationFeature: ReducerProtocol {
         }
 
         var freeMessageCount: Int64 {
-            #if DEBUG
             return 5
-            #else
-            return 20
-            #endif
         }
 
         var isPremium: Bool {
@@ -797,8 +793,6 @@ struct ConversationView: View {
         ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
                 LazyVStack(alignment: .leading, spacing: 16) {
-                    Spacer().frame(height: 4)
-                        .id("Top")
                     ForEach(viewStore.messages, id: \.id) { message in
                         MessageView(
                             message: message,
@@ -858,8 +852,10 @@ struct ConversationView: View {
                 if value {
                     Task {
                         try await Task.sleep(nanoseconds: 300_000_000)
-                        withAnimation {
-                            proxy.scrollTo("Bottom", anchor: .bottom)
+                        await MainActor.run {
+                            withAnimation {
+                                proxy.scrollTo("Bottom", anchor: .bottom)
+                            }
                         }
                     }
                 }

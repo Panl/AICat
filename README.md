@@ -33,7 +33,7 @@
 - [x] Export messages as Markdown
 - [x] New session in Conversation when ContextMessages count more than 0
 - [x] iCloud Sync
-- [ ] Copy code block
+- [x] Copy code block
 
 
 > the command mode depends on chats with prompt, creating more prompts is important
