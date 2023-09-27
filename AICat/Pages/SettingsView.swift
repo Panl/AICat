@@ -9,7 +9,18 @@ import SwiftUI
 import Foundation
 import ApphudSDK
 
-struct SettingsView: View {
+@Observable
+class SettingsViewModel {
+    var isPurcahsing = false
+    var toast: Toast?
+    var store = DataStore
+    
+    var syncedText: LocalizedStringKey {
+        if let syncedTime = store.lastSyncedTime {
+            return LocalizedStringKey(Date(timeIntervalSince1970: Double(syncedTime)).toFormat())
+        }
+        return LocalizedStringKey("Not synchronized yet.")
+    }
     var appVersion: String {
         Bundle.main.releaseVersion ?? "1.0"
     }
@@ -18,21 +29,38 @@ struct SettingsView: View {
         Bundle.main.buildNumber ?? "1"
     }
 
+    func buyCatFood() {
+        if Apphud.isSandbox() {
+            toast = Toast(type: .info, message: "😿 Please use the App Store version for donations.")
+            return
+        }
+        guard !isPurcahsing else { return }
+        isPurcahsing = true
+        Task {
+            let payWall = await Apphud.paywalls().first
+            if let catFood = payWall?.products.first(where: { $0.productId == catFoodId }) {
+                let result = await Apphud.purchase(catFood)
+                if let error = result.error {
+                    toast = Toast(type: .error, message: "Buy food failed! 😿 \(error)")
+                } else {
+                    toast = Toast(type: .success, message: "Thank you for your food 😻")
+                }
+            } else {
+                toast = Toast(type: .error, message: "Buy food failed! 😿 (nil)")
+            }
+            isPurcahsing = false
+        }
+    }
+}
+
+struct SettingsView: View {
+
     let onClose: () -> Void
 
-    @State var isPurcahsing = false
-    @State var toast: Toast?
-    @ObservedObject var store = DataStore
-
-    var syncedText: LocalizedStringKey {
-        if let syncedTime = store.lastSyncedTime {
-            return LocalizedStringKey(Date(timeIntervalSince1970: Double(syncedTime)).toFormat())
-        }
-        return LocalizedStringKey("Not synchronized yet.")
-    }
+    @State var viewModel = SettingsViewModel()
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 Section("Developer") {
                     NavigationLink(destination: OpenAISettingsView()) {
@@ -43,9 +71,9 @@ struct SettingsView: View {
                         Image(systemName: "arrow.clockwise.icloud")
                         Text("iCloud Sync")
                         Spacer()
-                        if let error = store.syncError {
+                        if let error = viewModel.store.syncError {
                             Button(action: {
-                                toast = .init(type: .error, message: error.localizedDescription)
+                                viewModel.toast = .init(type: .error, message: error.localizedDescription)
                             }, label: {
                                 Image(systemName: "exclamationmark.icloud.fill")
                                     .resizable()
@@ -54,18 +82,18 @@ struct SettingsView: View {
                                     .foregroundColor(.red)
                             })
                         }
-                        Text(syncedText)
+                        Text(viewModel.syncedText)
                             .font(.manrope(size: 10, weight: .regular))
                             .opacity(0.4)
                     }
                 }.tint(.primaryColor)
                 Section("Donate") {
-                    Button(action: { Task { await buyCatFood() } }) {
+                    Button(action: viewModel.buyCatFood) {
                         HStack {
                             Label("Buy me a can of cat food", systemImage: "fish")
                                 .labelStyle(.titleAndIcon)
                             Spacer()
-                            if isPurcahsing {
+                            if viewModel.isPurcahsing {
                                 LoadingIndocator().frame(width: 20, height: 20)
                             }
                         }
@@ -122,7 +150,7 @@ struct SettingsView: View {
                     header: Text("More App"),
                     footer: HStack {
                         Spacer()
-                        Text("AICat \(appVersion)(\(buildNumber))")
+                        Text("AICat \(viewModel.appVersion)(\(viewModel.buildNumber))")
                             .font(.manrope(size: 12, weight: .regular))
                             .padding(12)
                         Spacer()
@@ -148,7 +176,7 @@ struct SettingsView: View {
             }
             .frame(minWidth: 300)
             .navigationTitle("Settings")
-            // .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 #if os(iOS)
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -165,28 +193,7 @@ struct SettingsView: View {
         }
         .background(Color.background)
         .font(.manrope(size: 16, weight: .medium))
-        .toast($toast)
-    }
-
-    func buyCatFood() async {
-        if Apphud.isSandbox() {
-            toast = Toast(type: .info, message: "😿 Please use the App Store version for donations.")
-            return
-        }
-        guard !isPurcahsing else { return }
-        isPurcahsing = true
-        let payWall = await Apphud.paywalls().first
-        if let catFood = payWall?.products.first(where: { $0.productId == catFoodId }) {
-            let result = await Apphud.purchase(catFood)
-            if let error = result.error {
-                toast = Toast(type: .error, message: "Buy food failed! 😿 \(error)")
-            } else {
-                toast = Toast(type: .success, message: "Thank you for your food 😻")
-            }
-        } else {
-            toast = Toast(type: .error, message: "Buy food failed! 😿 (nil)")
-        }
-        isPurcahsing = false
+        .toast($viewModel.toast)
     }
 }
 
