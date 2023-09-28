@@ -32,6 +32,15 @@ extension UserDefaults {
         }
     }
 
+    static var currentChatId: String? {
+        set {
+            defaults.set(newValue, forKey: "currentChat.id")
+        }
+        get {
+            defaults.string(forKey: "currentChat.id")
+        }
+    }
+
     static var openApiKey: String? {
         set {
             defaults.set(newValue, forKey: "openApiKey")

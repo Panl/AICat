@@ -7,115 +7,92 @@
 
 import SwiftUI
 import Blackbird
-import ComposableArchitecture
 import Combine
 
-struct AppReducer: ReducerProtocol {
+@Observable
+class ChatStateViewModel {
 
-    @AppStorage("currentChat.id") var chatId: String?
+    var chatListStore = ChatListViewModel()
+    var conversationStore = ConversationViewModel()
+    var mainChat: Conversation = mainConversation
+    var conversations: [Conversation] = []
 
-    struct State: Equatable {
-        var conversationList = ConversationListReducer.State()
-        var conversationMessages = ConversationFeature.State()
-        var mainChat: Conversation = mainConversation
-        var conversations: [Conversation] = []
+    var allConversations: [Conversation] {
+        [mainChat] + conversations
+    }
 
-        var allConversations: [Conversation] {
-            [mainChat] + conversations
+    func fetchConversations() {
+        Task {
+            let (mainChat, conversations) = await queryConversations()
+            updateConversations(mainChat, conversations: conversations)
         }
     }
 
-    enum Action {
-        case queryConversations
-        case addChat(Conversation)
-        case selectChat(Conversation)
-        case updateConversations((Conversation, [Conversation]))
-        case conversationMessagesAction(ConversationFeature.Action)
-        case conversationListAction(ConversationListReducer.Action)
+    private func updateConversations(_ mainChat: Conversation, conversations: [Conversation]) {
+        let all = [mainChat] + conversations
+        self.mainChat = mainChat
+        self.conversations = conversations
+        self.chatListStore.chats = all
+        self.conversationStore.prompts = conversations
+        let selected = all.first(where: { $0.id == UserDefaults.currentChatId }) ?? mainChat
+        self.chatListStore.selectedChat = selected
+        self.conversationStore.conversation = selected
     }
 
-    var body: some ReducerProtocol<State, Action> {
-        Reduce { state, action in
-            switch action {
-            case .queryConversations:
-                return .task {
-                    let result = await queryConversations()
-                    return .updateConversations(result)
-                }
-            case .addChat(let chat):
-                state.conversations.insert(chat, at: 0)
-                state.conversationList.conversations = state.allConversations
-                state.conversationMessages.prompts = state.conversations
-                state.conversationList.selectedChat = chat
-                state.conversationMessages.conversation = chat
-                return .run { _ in
-                    chatId = chat.id
-                }
-            case .selectChat(let chat):
-                chatId = chat.id
-                state.conversationList.selectedChat = chat
-                state.conversationMessages.conversation = chat
-                return .none
-            case .updateConversations(let (mainChat, conversations)):
-                let all = [mainChat] + conversations
-                state.mainChat = mainChat
-                state.conversations = conversations
-                state.conversationList.conversations = all
-                state.conversationMessages.prompts = conversations
-                let selected = all.first(where: { $0.id == chatId }) ?? mainChat
-                state.conversationList.selectedChat = selected
-                state.conversationMessages.conversation = selected
-                return .none
-            case .conversationMessagesAction(let action):
-                switch action {
-                case .updateConversation(let chat):
-                    if chat.id == state.mainChat.id {
-                        state.mainChat = chat
-                    } else if let index = state.conversations.firstIndex(where: { $0.id == chat.id }) {
-                        state.conversations[index] = chat
-                    }
-                    state.conversationList.selectedChat = chat
-                    state.conversationList.conversations = state.allConversations
-                    state.conversationMessages.prompts = state.conversations
-                    state.conversationMessages.conversation = chat
-                    return .run { _ in
-                        await saveConversation(chat)
-                    }
-                default:
-                    return .none
-                }
-            case .conversationListAction(let action):
-                switch action {
-                case .deleteConversation(let chat):
-                    return .task { [chats = state.conversations, main = state.mainChat] in
-                        await deleteConversation(chat)
-                        let newChats = chats.filter { $0.id != chat.id }
-                        return .updateConversations((main, newChats))
-                    }
-                case .clearConversations(let chats):
-                    return .task { [conversations = state.conversations, main = state.mainChat ] in
-                        await clearConversations(chats)
-                        let removeIds = chats.map(\.id)
-                        let newChats = conversations.filter { !removeIds.contains($0.id) }
-                        return .updateConversations((main, newChats))
-                    }
-                case .saveConversation(let chat):
-                    return .run { send in
-                        await saveConversation(chat)
-                        await send(.addChat(chat))
-                        await send(.selectChat(chat))
-                    }
-                default:
-                    return .none
-                }
-            }
+    func addChat(_ chat: Conversation) {
+        UserDefaults.currentChatId = chat.id
+        self.conversations.insert(chat, at: 0)
+        self.chatListStore.chats = allConversations
+        self.conversationStore.prompts = conversations
+        self.chatListStore.selectedChat = chat
+        self.conversationStore.conversation = chat
+    }
+
+    func updateChat(_ chat: Conversation) {
+        if chat.id == mainChat.id {
+            mainChat = chat
+        } else if let index = conversations.firstIndex(where: { $0.id == chat.id }) {
+            conversations[index] = chat
         }
-        Scope(state: \.conversationList, action: /Action.conversationListAction) {
-            ConversationListReducer()
+        chatListStore.selectedChat = chat
+        chatListStore.chats = allConversations
+        conversationStore.prompts = conversations
+        conversationStore.conversation = chat
+        Task {
+            await saveConversation(chat)
         }
-        Scope(state: \.conversationMessages, action: /Action.conversationMessagesAction) {
-            ConversationFeature()
+    }
+
+    func selectChat(_ chat: Conversation) {
+        UserDefaults.currentChatId = chat.id
+        chatListStore.selectedChat = chat
+        conversationStore.conversation = chat
+    }
+
+    func saveChat(_ chat: Conversation) {
+        Task {
+            await saveConversation(chat)
+            addChat(chat)
+            selectChat(chat)
         }
+    }
+
+    func clearChats(_ chats: [Conversation]) {
+        Task {
+            await clearConversations(chats)
+            let removeIds = chats.map(\.id)
+            let newChats = conversations.filter { !removeIds.contains($0.id) }
+            updateConversations(mainChat, conversations: newChats)
+        }
+    }
+
+    func deleteChat(_ chat: Conversation) {
+        Task {
+            await deleteConversation(chat)
+            let newChats = conversations.filter { $0.id != chat.id }
+            return updateConversations(mainChat, conversations: newChats)
+        }
+
     }
 
     func queryMainConversation() async -> Conversation {
@@ -155,17 +132,18 @@ struct AppReducer: ReducerProtocol {
 
 struct MainView: View {
 
-    let store = Store(initialState: AppReducer.State(), reducer: AppReducer())
     @State private var cancelable: AnyCancellable?
+    @State var chatState = ChatStateViewModel()
 
     var body: some View {
         GeometryReader { proxy in
             if proxy.size.width > 560 {
-                SplitView(size: proxy.size, store: store)
+                SplitView(size: proxy.size)
             } else {
-                CompactView(store: store)
+                CompactView()
             }
         }
+        .environment(chatState)
         .tint(Color.primaryColor)
         .onAppear {
             #if os(iOS)
