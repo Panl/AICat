@@ -76,36 +76,53 @@ class ConversationViewModel {
         } else {
             await DataStore.save(message)
         }
+        withAnimation {
+            upsertMessage(message)
+        }
+    }
+
+    private func upsertMessage(_ message: ChatMessage) {
+        if let index = messages.firstIndex(where: { $0.id == message.id }) {
+            messages[index] = message
+        } else {
+            messages.append(message)
+        }
+        messages.sort(by: { $0.timeCreated < $1.timeCreated })
+        if message.isNewSession {
+            currentContextCount = contextMessages.count
+        }
     }
 
     func deleteMessage(_ message: ChatMessage) {
-        messages.removeAll(where: { $0.id == message.id })
-        currentContextCount = contextMessages.count
-        Task {
-            await removeMessage(message)
-        }
-        while let last = messages.last, last.isNewSession {
-            if messages.count == 1 {
-                messages.removeLast()
-                Task {
-                    await removeMessage(last)
-                }
-            } else {
-                let count = messages.count
-                let beforeLast = messages[count - 2]
-                if beforeLast.isNewSession {
+        withAnimation {
+            messages.removeAll(where: { $0.id == message.id })
+            currentContextCount = contextMessages.count
+            Task {
+                await removeMessage(message)
+            }
+            while let last = messages.last, last.isNewSession {
+                if messages.count == 1 {
                     messages.removeLast()
                     Task {
                         await removeMessage(last)
                     }
                 } else {
-                    break
+                    let count = messages.count
+                    let beforeLast = messages[count - 2]
+                    if beforeLast.isNewSession {
+                        messages.removeLast()
+                        Task {
+                            await removeMessage(last)
+                        }
+                    } else {
+                        break
+                    }
                 }
             }
         }
     }
 
-    func removeMessage(_ message: ChatMessage) async {
+    private func removeMessage(_ message: ChatMessage) async {
         var messageToRemove = message
         messageToRemove.timeRemoved = Date.now.timeInSecond
         await DataStore.saveAndSync(messageToRemove)
@@ -119,8 +136,10 @@ class ConversationViewModel {
                 return message
             }
             await DataStore.saveAndSync(items: messagesToDelete)
-            self.messages = []
-            currentContextCount = contextMessages.count
+            withAnimation {
+                self.messages = []
+                currentContextCount = contextMessages.count
+            }
         }
     }
 
@@ -128,20 +147,28 @@ class ConversationViewModel {
         messages = []
         let cid = conversation.id
         Task {
-            messages = try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated))
+            let result = try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated))
+            await MainActor.run {
+                messages = result
+                currentContextCount = contextMessages.count
+            }
         }
     }
 
     func tapMessage(_ message: ChatMessage) {
-        if tappedMessageId == message.id {
-            tappedMessageId = nil
-        } else {
-            tappedMessageId = message.id
+        withAnimation {
+            if tappedMessageId == message.id {
+                tappedMessageId = nil
+            } else {
+                tappedMessageId = message.id
+            }
         }
     }
 
     func hoverMessage(_ message: ChatMessage?) {
-        tappedMessageId = message?.id
+        withAnimation {
+            tappedMessageId = message?.id
+        }
     }
 
     func resetConversation() {
@@ -212,21 +239,26 @@ class ConversationViewModel {
                 await saveMessage(responseMessage, needSync: false)
             }
             await saveMessage(responseMessage, needSync: true)
-            isSending = false
-            incrementSentMessageCount()
-            currentContextCount = contextMessages.count
+            await MainActor.run {
+                isSending = false
+                incrementSentMessageCount()
+                currentContextCount = contextMessages.count
+            }
         } catch {
             let err = error as NSError
+            await MainActor.run {
+                isSending = false
+            }
             if err.code != -999 {
-                self.error = err
+                await MainActor.run {
+                    self.error = err
+                }
                 deleteMessage(responseMessage)
             } else {
                 if responseMessage.content.isEmpty {
                     deleteMessage(responseMessage)
                 }
             }
-            isSending = false
-            currentContextCount = contextMessages.count
         }
     }
 
@@ -470,7 +502,7 @@ struct ConversationView: View {
                     .frame(minHeight: 26)
                     .focused($isFocused)
                     .tint(.blackText.opacity(0.8))
-                    .onChange(of: viewStore.inputText) { newValue in
+                    .onChange(of: viewStore.inputText) { _, newValue in
                         if viewStore.conversation.isMain {
                             if newValue.starts(with: " ") {
                                 viewStore.showCommands = true
@@ -553,7 +585,7 @@ struct ConversationView: View {
                     viewStore.queryMessages()
                 }
         }
-        .onChange(of: viewStore.conversation.id) { newValue in
+        .onChange(of: viewStore.conversation.id) { _, newValue in
             viewStore.resetConversation()
         }.sheet(isPresented: $viewStore.showAddConversation) {
             AddConversationView(
@@ -721,7 +753,7 @@ struct ConversationView: View {
             .simultaneousGesture(DragGesture().onChanged { _ in
                 self.endEditing(force: true)
             })
-            .onChange(of: viewStore.messages) { [old = viewStore.messages] newMessages in
+            .onChange(of: viewStore.messages) { old, newMessages in
                 if old.last != newMessages.last {
                     if old.first?.conversationId != newMessages.first?.conversationId  {
                         Task {
@@ -737,14 +769,12 @@ struct ConversationView: View {
                     }
                 }
             }
-            .onChange(of: isFocused) { value in
+            .onChange(of: isFocused) { _, value in
                 if value {
                     Task {
                         try await Task.sleep(nanoseconds: 300_000_000)
-                        await MainActor.run {
-                            withAnimation {
-                                proxy.scrollTo("Bottom", anchor: .bottom)
-                            }
+                        withAnimation {
+                            proxy.scrollTo("Bottom", anchor: .bottom)
                         }
                     }
                 }

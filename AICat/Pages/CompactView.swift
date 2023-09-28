@@ -57,7 +57,7 @@ struct CompactView: View {
             }
             .scaleEffect(x: 1 - progress * 0.05, y: 1 - progress * 0.05)
             .offset(x: translationX, y: 0)
-            .onChange(of: $dragOffset.wrappedValue) { newValue in
+            .onChange(of: $dragOffset.wrappedValue) { _, newValue in
                 translationX = max(min(lastTranslationX + newValue.width, 300), 0)
             }
             .simultaneousGesture(

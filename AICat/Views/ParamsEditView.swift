@@ -150,7 +150,7 @@ struct ParamsEditView: View {
         }
         .font(.manrope(size: 16, weight: .medium))
         .foregroundColor(.blackText)
-        .onChange(of: conversation) { newValue in
+        .onChange(of: conversation) { _, newValue in
             onUpdate(newValue)
         }
         .onAppear {

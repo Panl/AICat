@@ -93,8 +93,5 @@ struct SliderView_Previews: PreviewProvider {
     static var previews: some View {
         SliderView(value: $value, sliderRange: -2...2)
             .frame(height: 20)
-            .onChange(of: value) { newValue in
-                print("---\(newValue)")
-            }
     }
 }
