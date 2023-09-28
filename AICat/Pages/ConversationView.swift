@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 import Blackbird
 import Foundation
 import ApphudSDK
@@ -19,246 +18,56 @@ import UIKit
 import AppKit
 #endif
 
-struct ConversationFeature: ReducerProtocol {
+@Observable
+class ConversationViewModel {
+    var conversation: Conversation = mainConversation
+    var messages: [ChatMessage] = []
+    var inputText: String = ""
+    var isSending = false
+    var error: NSError?
+    var showAddConversation = false
+    var showClearMessageAlert = false
+    var showParamEditSheetView = false
+    var showCommands = false
+    var toast: Toast?
+    var tappedMessageId: String?
+    var showPremiumPage = false
+    var selectedPrompt: Conversation?
+    var prompts: [Conversation] = []
+    var shareSnapshot: ImageType?
+    var saveImageToast: Toast?
+    var sentMessageCount: Int64 =  NSUbiquitousKeyValueStore.default.longLong(forKey: "AICat.sentMessageCount")
+    var currentContextCount: Int = 0
 
-    struct State: Equatable {
-        var conversation: Conversation = mainConversation
-        var messages: [ChatMessage] = []
-        var inputText: String = ""
-        var isSending = false
-        var error: NSError?
-        var showAddConversation = false
-        var showClearMessageAlert = false
-        var showParamEditSheetView = false
-        var showCommands = false
-        var toast: Toast?
-        var tappedMessageId: String?
-        var showPremiumPage = false
-        var selectedPrompt: Conversation?
-        var prompts: [Conversation] = []
-        var shareSnapshot: ImageType?
-        var saveImageToast: Toast?
-        var sentMessageCount: Int64 =  NSUbiquitousKeyValueStore.default.longLong(forKey: "AICat.sentMessageCount")
-        var currentContextCount: Int = 0
-
-        var promptText: String {
-            selectedPrompt?.prompt ?? conversation.prompt
-        }
-
-        var filterdPrompts: [Conversation] {
-            let query = inputText.lowercased().trimmingCharacters(in: .whitespaces)
-            return prompts.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
-        }
-
-        var freeMessageCount: Int64 {
-            return 5
-        }
-
-        var isPremium: Bool {
-            UserDefaults.openApiKey != nil || Apphud.hasPremiumAccess()
-        }
-
-        var needBuyPremium: Bool {
-            if !isPremium && sentMessageCount >= freeMessageCount {
-                return true
-            }
-            return false
-        }
-
-        var contextMessages: [ChatMessage] {
-            if let index = messages.lastIndex(where: { $0.isNewSession }) {
-                return Array(messages[index...].filter({ !$0.isNewSession }).suffix(conversation.contextMessages))
-            }
-            return messages.suffix(conversation.contextMessages)
-        }
+    var promptText: String {
+        selectedPrompt?.prompt ?? conversation.prompt
     }
 
-    enum Action {
-        case queryMessages(cid: String)
-        case updateMessages([ChatMessage])
-        case upsertMessage(ChatMessage)
-        case deleteMessage(ChatMessage)
-        case saveMessage(ChatMessage, Bool)
-        case sendMessage
-        case retrySend
-        case setSending(Bool)
-        case textChanged(String)
-        case clearInputText
-        case selectPrompt(Conversation?)
-        case setCompleteError(NSError?)
-        case tapMessage(ChatMessage)
-        case toggleAddConversation(Bool)
-        case toggleClearMessageAlert(Bool)
-        case toggleParamEditSheetView(Bool)
-        case toggleShowPremiumPage(Bool)
-        case hoverMessage(ChatMessage?)
-        case setToast(Toast?)
-        case cleanMessages([ChatMessage])
-        case toggleShowCommands(Bool)
-        case updateShareSnapshot(ImageType?)
-        case shareMessage((ChatMessage, CGFloat))
-        case saveToAlbum(ImageType)
-        case setSaveImageToast(Toast?)
-        case updateConversation(Conversation)
-        case incrementSentMessageCount
-        case exportToMD
-        case updateContextCount
+    var filterdPrompts: [Conversation] {
+        let query = inputText.lowercased().trimmingCharacters(in: .whitespaces)
+        return prompts.filter { !$0.prompt.isEmpty }.filter { $0.title.lowercased().contains(query) || $0.prompt.lowercased().contains(query) || query.isEmpty }
     }
 
-    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-        switch action {
-        case .queryMessages(let cid):
-            state.messages = []
-            return .task {
-                let messages = await queryMessages(cid: cid)
-                return .updateMessages(messages)
-            }
-        case .updateMessages(let messages):
-            state.messages = messages
-            state.currentContextCount = state.contextMessages.count
-            return .none
-        case .upsertMessage(let message):
-            if let index = state.messages.firstIndex(where: { $0.id == message.id }) {
-                state.messages[index] = message
-            } else {
-                state.messages.append(message)
-            }
-            state.messages.sort(by: { $0.timeCreated < $1.timeCreated })
-            if message.isNewSession {
-                state.currentContextCount = state.contextMessages.count
-            }
-            return .none
-        case .deleteMessage(let message):
-            state.messages.removeAll(where: { $0.id == message.id })
-            state.currentContextCount = state.contextMessages.count
-            Task {
-                await deleteMessage(message)
-            }
-            while let last = state.messages.last, last.isNewSession {
-                if state.messages.count == 1 {
-                    state.messages.removeLast()
-                    Task {
-                        await deleteMessage(last)
-                    }
-                } else {
-                    let count = state.messages.count
-                    let beforeLast = state.messages[count - 2]
-                    if beforeLast.isNewSession {
-                        state.messages.removeLast()
-                        Task {
-                            await deleteMessage(last)
-                        }
-                    } else {
-                        break
-                    }
-                }
-            }
-            return .none
-        case .saveMessage(let message, let sync):
-            return .task {
-                await saveMessage(message, needSync: sync)
-                return .upsertMessage(message)
-            }
-        case .sendMessage:
-            if state.needBuyPremium {
-                state.showPremiumPage = true
-                return .none
-            }
-            return .run { [state] send in
-                await complete(state: state, send: send)
-            }
-        case .retrySend:
-            if let message = state.messages.last {
-                return .run { [state] send in
-                    await retry(message: message, state: state, send: send)
-                }
-            }
-            return .none
-        case .textChanged(let text):
-            state.inputText = text
-            return .none
-        case .setSending(let isSending):
-            state.isSending = isSending
-            return .none
-        case .clearInputText:
-            state.inputText = ""
-            return .none
-        case .selectPrompt(let prompt):
-            state.selectedPrompt = prompt
-            return .none
-        case .setCompleteError(let error):
-            state.error = error
-            return .none
-        case .tapMessage(let message):
-            if state.tappedMessageId == message.id {
-                state.tappedMessageId = nil
-            } else {
-                state.tappedMessageId = message.id
-            }
-            return .none
-        case .toggleAddConversation(let show):
-            state.showAddConversation = show
-            return .none
-        case .toggleClearMessageAlert(let show):
-            state.showClearMessageAlert = show
-            return .none
-        case .toggleParamEditSheetView(let show):
-            state.showParamEditSheetView = show
-            return .none
-        case .toggleShowPremiumPage(let show):
-            state.showPremiumPage = show
-            return .none
-        case .hoverMessage(let message):
-            state.tappedMessageId = message?.id
-            return .none
-        case .setToast(let toast):
-            state.toast = toast
-            return .none
-        case .cleanMessages(let messages):
-            return .task {
-                await cleanMessages(messages)
-                return .updateMessages([])
-            }
-        case .toggleShowCommands(let show):
-            state.showCommands = show
-            return .none
-        case .updateShareSnapshot(let snapshot):
-            state.shareSnapshot = snapshot
-            return .none
-        case .shareMessage(let (message, width)):
-            return .task { [chat = state.conversation] in
-                let snapsot = await generateMessageSnapshot(message, imageWidth: width, conversation: chat)
-                return .updateShareSnapshot(snapsot)
-            }
-        case .saveToAlbum(let image):
-            do {
-                try saveImageToAlbum(image: image)
-                state.saveImageToast = Toast(type: .success, message: "Image saved!")
-            } catch {
-                state.saveImageToast = Toast(type: .error, message: "Save image falied!")
-            }
-            return .none
-        case .setSaveImageToast(let toast):
-            state.saveImageToast = toast
-            return .none
-        case .updateConversation:
-            return .none
-        case .incrementSentMessageCount:
-            state.sentMessageCount += 1
-            if state.sentMessageCount > state.freeMessageCount {
-                state.sentMessageCount = state.freeMessageCount
-            }
-            let keyValueStore = NSUbiquitousKeyValueStore.default
-            keyValueStore.set(state.sentMessageCount, forKey: "AICat.sentMessageCount")
-            keyValueStore.synchronize()
-            return .none
-        case .exportToMD:
-            exportToMD(state: state)
-            return .none
-        case .updateContextCount:
-            state.currentContextCount = state.contextMessages.count
-            return .none
+    var freeMessageCount: Int64 {
+        return 5
+    }
+
+    var isPremium: Bool {
+        UserDefaults.openApiKey != nil || Apphud.hasPremiumAccess()
+    }
+
+    var needBuyPremium: Bool {
+        if !isPremium && sentMessageCount >= freeMessageCount {
+            return true
         }
+        return false
+    }
+
+    var contextMessages: [ChatMessage] {
+        if let index = messages.lastIndex(where: { $0.isNewSession }) {
+            return Array(messages[index...].filter({ !$0.isNewSession }).suffix(conversation.contextMessages))
+        }
+        return messages.suffix(conversation.contextMessages)
     }
 
     func saveMessage(_ message: ChatMessage, needSync: Bool) async {
@@ -269,57 +78,125 @@ struct ConversationFeature: ReducerProtocol {
         }
     }
 
-    func deleteMessage(_ message: ChatMessage) async {
+    func deleteMessage(_ message: ChatMessage) {
+        messages.removeAll(where: { $0.id == message.id })
+        currentContextCount = contextMessages.count
+        Task {
+            await removeMessage(message)
+        }
+        while let last = messages.last, last.isNewSession {
+            if messages.count == 1 {
+                messages.removeLast()
+                Task {
+                    await removeMessage(last)
+                }
+            } else {
+                let count = messages.count
+                let beforeLast = messages[count - 2]
+                if beforeLast.isNewSession {
+                    messages.removeLast()
+                    Task {
+                        await removeMessage(last)
+                    }
+                } else {
+                    break
+                }
+            }
+        }
+    }
+
+    func removeMessage(_ message: ChatMessage) async {
         var messageToRemove = message
         messageToRemove.timeRemoved = Date.now.timeInSecond
         await DataStore.saveAndSync(messageToRemove)
     }
 
-    func cleanMessages(_ messages: [ChatMessage]) async {
-        let messagesToDelete = messages.map { item in
-            var message = item
-            message.timeRemoved = Date.now.timeInSecond
-            return message
+    func cleanMessages(_ messages: [ChatMessage]) {
+        Task {
+            let messagesToDelete = messages.map { item in
+                var message = item
+                message.timeRemoved = Date.now.timeInSecond
+                return message
+            }
+            await DataStore.saveAndSync(items: messagesToDelete)
+            self.messages = []
+            currentContextCount = contextMessages.count
         }
-        await DataStore.saveAndSync(items: messagesToDelete)
     }
 
-    func queryMessages(cid: String) async -> [ChatMessage] {
-        try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated))
+    func queryMessages() {
+        messages = []
+        let cid = conversation.id
+        Task {
+            messages = try! await ChatMessage.read(from: db, matching: \.$conversationId == cid && \.$timeRemoved == 0, orderBy: .ascending(\.$timeCreated))
+        }
     }
 
-    func complete(state: State, send: Send<Action>) async {
-        let text = state.inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let conversation = state.conversation
-        guard !text.isEmpty, !state.isSending else { return }
-        await send(.setSending(true))
+    func tapMessage(_ message: ChatMessage) {
+        if tappedMessageId == message.id {
+            tappedMessageId = nil
+        } else {
+            tappedMessageId = message.id
+        }
+    }
+
+    func hoverMessage(_ message: ChatMessage?) {
+        tappedMessageId = message?.id
+    }
+
+    func resetConversation() {
+        selectedPrompt = nil
+        inputText = ""
+        error = nil
+        showCommands = false
+        queryMessages()
+    }
+
+    func sendMessage() {
+        if needBuyPremium {
+            showPremiumPage = true
+            return
+        }
+        complete()
+    }
+
+    func complete() {
+        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let conversation = conversation
+        guard !text.isEmpty, !isSending else { return }
+        isSending = true
         let sendText = text
-        await send(.clearInputText)
+        inputText = ""
         let newMessage = Chat(role: .user, content: sendText)
         let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
-        await send(.saveMessage(chatMessage, false), animation: .default)
-        await streamChat(newMessage: newMessage, state: state, send: send, replyToId: chatMessage.id)
+        Task {
+            await saveMessage(chatMessage, needSync: false)
+            await streamChat(newMessage: newMessage, replyToId: chatMessage.id)
+        }
     }
 
-    func retry(message: ChatMessage, state: State, send: Send<Action>) async {
-        await send(.setCompleteError(nil))
-        await send(.setSending(true))
+    func retry() {
+        guard let message = messages.last else { return }
+        error = nil
+        isSending = true
         let newMessage = Chat(role: .init(name: message.role), content: message.content)
-        await streamChat(newMessage: newMessage, state: state, send: send, replyToId: message.id, isRetry: true)
+        Task {
+            await streamChat(newMessage: newMessage, replyToId: message.id, isRetry: true)
+        }
     }
 
-    func streamChat(newMessage: Chat, state: State, send: Send<Action>, replyToId: String, isRetry: Bool = false) async {
-        let conversation = state.conversation
+    func streamChat(newMessage: Chat, replyToId: String, isRetry: Bool = false) async {
+        let conversation = conversation
         var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         responseMessage.replyToId = replyToId
         responseMessage.timeCreated += 1
-        await send(.saveMessage(responseMessage, false), animation: .default)
+        await saveMessage(responseMessage, needSync: false)
         do {
             let stream: AsyncThrowingStream<ChatStreamResult, Error>
-            if let selectedPrompt = state.selectedPrompt {
+            if let selectedPrompt {
                 stream = await CatApi.streamChat(messages: [newMessage], conversation: selectedPrompt)
             } else {
-                let messagesToSend = state.contextMessages.map({ Chat(role: .init(name: $0.role), content: $0.content) }) + (isRetry ? [] : [newMessage])
+                let messagesToSend = contextMessages.map({ Chat(role: .init(name: $0.role), content: $0.content) }) + (isRetry ? [] : [newMessage])
                 stream = await CatApi.streamChat(messages: messagesToSend, conversation: conversation)
             }
             for try await result in stream {
@@ -332,26 +209,37 @@ struct ConversationFeature: ReducerProtocol {
                 }
                 responseMessage.model = result.model
                 responseMessage.timeCreated = Date.now.timeInSecond
-                await send(.saveMessage(responseMessage, false))
+                await saveMessage(responseMessage, needSync: false)
             }
-            await send(.saveMessage(responseMessage, true))
-            await send(.setSending(false))
-            await send(.incrementSentMessageCount)
-            await send(.updateContextCount)
+            await saveMessage(responseMessage, needSync: true)
+            isSending = false
+            incrementSentMessageCount()
+            currentContextCount = contextMessages.count
         } catch {
             let err = error as NSError
             if err.code != -999 {
-                await send(.setCompleteError(err))
-                await send(.deleteMessage(responseMessage))
+                self.error = err
+                deleteMessage(responseMessage)
             } else {
                 if responseMessage.content.isEmpty {
-                    await send(.deleteMessage(responseMessage))
+                    deleteMessage(responseMessage)
                 }
             }
-            await send(.setSending(false))
-            await send(.updateContextCount)
+            isSending = false
+            currentContextCount = contextMessages.count
         }
     }
+
+    func incrementSentMessageCount() {
+        sentMessageCount += 1
+        if sentMessageCount > freeMessageCount {
+            sentMessageCount = freeMessageCount
+        }
+        let keyValueStore = NSUbiquitousKeyValueStore.default
+        keyValueStore.set(sentMessageCount, forKey: "AICat.sentMessageCount")
+        keyValueStore.synchronize()
+    }
+
 
     func queryMessage(mid: String) async -> ChatMessage? {
         try! await ChatMessage.read(from: db, id: mid)
@@ -376,29 +264,44 @@ struct ConversationFeature: ReducerProtocol {
         return await shareMessagesView.snapshot()
     }
 
+    func shareMessage(_ message: ChatMessage, width: CGFloat) {
+        Task {
+            shareSnapshot = await generateMessageSnapshot(message, imageWidth: width, conversation: conversation)
+        }
+    }
+
+    func saveToAlbum(image: ImageType) {
+        do {
+            try saveImageToAlbum(image: image)
+            saveImageToast = Toast(type: .success, message: "Image saved!")
+        } catch {
+            saveImageToast = Toast(type: .error, message: "Save image falied!")
+        }
+    }
+
     func saveImageToAlbum(image: ImageType) throws {
-        #if os(iOS)
+#if os(iOS)
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-        #elseif os(macOS)
+#elseif os(macOS)
         if let url = showSavePanel()  {
             try savePNG(image: image, path: url)
         }
-        #endif
+#endif
     }
 
-    func exportToMD(state: State) {
-        #if os(macOS)
+    func exportToMD() {
+#if os(macOS)
         if let folder = showSaveMDPanel() {
-            _ = SystemUtil.exportToMarkDown(messages: state.messages, fileUrl: folder)
+            _ = SystemUtil.exportToMarkDown(messages: messages, fileUrl: folder)
         }
-        #elseif os(iOS)
-        if let url = SystemUtil.saveMessageAsMD(messages: state.messages, title: state.conversation.title) {
+#elseif os(iOS)
+        if let url = SystemUtil.saveMessageAsMD(messages: messages, title: conversation.title) {
             DocumentPicker.shared.export(file: url)
         }
-        #endif
+#endif
     }
 
-    #if os(macOS)
+#if os(macOS)
     func showSavePanel() -> URL? {
         let savePanel = NSSavePanel()
         savePanel.allowedContentTypes = [.png]
@@ -431,7 +334,7 @@ struct ConversationFeature: ReducerProtocol {
         let pngData = imageRepresentation?.representation(using: .png, properties: [:])
         try pngData!.write(to: path)
     }
-    #endif
+#endif
 
 }
 
@@ -440,289 +343,274 @@ struct ConversationView: View {
     @FocusState var isFocused: Bool
     @State var size: CGSize = .zero
     @State var subscription: AnyCancellable?
+    @State var viewStore: ConversationViewModel
+    @Environment(ChatStateViewModel.self) var chatState
 
-    let store: StoreOf<ConversationFeature>
     let onChatsClick: () -> Void
 
-    init(store: StoreOf<ConversationFeature>, onChatsClick: @escaping () -> Void) {
+    init(onChatsClick: @escaping () -> Void, store: ConversationViewModel) {
         self.onChatsClick = onChatsClick
-        self.store = store
+        self.viewStore = store
     }
 
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            ZStack(alignment: .bottom) {
-                VStack {
-                    toolbar(viewStore: viewStore)
-                    Spacer(minLength: 0)
-                    messageList(viewStore: viewStore)
-                }
-                VStack {
-                    if viewStore.showCommands, !viewStore.filterdPrompts.isEmpty {
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: 0) {
-                                Spacer().frame(height: 4)
-                                ForEach(viewStore.filterdPrompts) { prompt in
-                                    Button(action: {
-                                        viewStore.send(.selectPrompt(prompt))
-                                        viewStore.send(.clearInputText)
-                                    }) {
-                                        HStack {
-                                            Text(prompt.title)
-                                                .lineLimit(1)
-                                            Spacer()
-                                        }
-                                        .background(Color.background)
+        ZStack(alignment: .bottom) {
+            VStack {
+                toolbar(viewStore: viewStore)
+                Spacer(minLength: 0)
+                messageList(viewStore: viewStore)
+            }
+            VStack {
+                if viewStore.showCommands, !viewStore.filterdPrompts.isEmpty {
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 0) {
+                            Spacer().frame(height: 4)
+                            ForEach(viewStore.filterdPrompts) { prompt in
+                                Button(action: {
+                                    viewStore.selectedPrompt = prompt
+                                    viewStore.inputText = ""
+                                }) {
+                                    HStack {
+                                        Text(prompt.title)
+                                            .lineLimit(1)
+                                        Spacer()
                                     }
-                                    .buttonStyle(.borderless)
-                                    .font(.manrope(size: 14, weight: .medium))
-                                    .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                    .tint(.blackText.opacity(0.5))
-                                    if prompt != viewStore.filterdPrompts.last {
-                                        Divider().foregroundColor(.gray)
-                                    }
+                                    .background(Color.background)
                                 }
-                                Spacer().frame(height: 4)
-                            }
-                            .background {
-                                GeometryReader { proxy in
-                                    Color.clear.preference(key: SizeKey.self, value: proxy.size)
-                                }.onPreferenceChange(SizeKey.self) {
-                                    commnadCardHeight = $0.height
+                                .buttonStyle(.borderless)
+                                .font(.manrope(size: 14, weight: .medium))
+                                .padding(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                .tint(.blackText.opacity(0.5))
+                                if prompt != viewStore.filterdPrompts.last {
+                                    Divider().foregroundColor(.gray)
                                 }
                             }
-
+                            Spacer().frame(height: 4)
                         }
-                        .frame(maxHeight: min(commnadCardHeight, 180))
-                        .background(Color.background)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(color: .primaryColor.opacity(0.1), radius: 12)
-                        .padding(.horizontal, 16)
+                        .background {
+                            GeometryReader { proxy in
+                                Color.clear.preference(key: SizeKey.self, value: proxy.size)
+                            }.onPreferenceChange(SizeKey.self) {
+                                commnadCardHeight = $0.height
+                            }
+                        }
+
                     }
-                    if let selectedPrompt = viewStore.selectedPrompt {
-                        HStack {
-                            Spacer(minLength: 0)
+                    .frame(maxHeight: min(commnadCardHeight, 180))
+                    .background(Color.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .shadow(color: .primaryColor.opacity(0.1), radius: 12)
+                    .padding(.horizontal, 16)
+                }
+                if let selectedPrompt = viewStore.selectedPrompt {
+                    HStack {
+                        Spacer(minLength: 0)
+                        HStack(spacing: 4) {
+                            Text(selectedPrompt.title)
+                                .lineLimit(1)
+                                .font(.manrope(size: 14, weight: .semibold))
+                                .foregroundColor(.blackText.opacity(0.7))
+                            Button(action: {
+                                viewStore.selectedPrompt = nil
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                            }
+                            .buttonStyle(.borderless)
+                            .tint(.blackText.opacity(0.8))
+                        }
+                        .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 6))
+                        .background(Color.background)
+                        .cornerRadius(16)
+                        .shadow(color: .primaryColor.opacity(0.1), radius: 12)
+                    }.padding(.horizontal, 20)
+                } else if viewStore.conversation.contextMessages > 0 {
+                    HStack {
+                        Spacer(minLength: 0)
+                        Button(action: {
+                            if let last = viewStore.messages.last {
+                                HapticEngine.trigger()
+                                if last.isNewSession {
+                                    viewStore.deleteMessage(last)
+                                } else {
+                                    Task {
+                                        await viewStore.saveMessage(ChatMessage.newSession(cid: viewStore.conversation.id), needSync: false)
+                                    }
+                                }
+                            }
+                        }, label: {
                             HStack(spacing: 4) {
-                                Text(selectedPrompt.title)
+                                Image(systemName: "clock.arrow.circlepath")
+                                Text("\(viewStore.currentContextCount)/\(viewStore.conversation.contextMessages)")
                                     .lineLimit(1)
                                     .font(.manrope(size: 14, weight: .semibold))
                                     .foregroundColor(.blackText.opacity(0.7))
-                                Button(action: {
-                                    viewStore.send(.selectPrompt(nil))
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                }
-                                .buttonStyle(.borderless)
-                                .tint(.blackText.opacity(0.8))
                             }
-                            .padding(.init(top: 4, leading: 10, bottom: 4, trailing: 6))
-                            .background(Color.background)
-                            .cornerRadius(16)
-                            .shadow(color: .primaryColor.opacity(0.1), radius: 12)
-                        }.padding(.horizontal, 20)
-                    } else if viewStore.conversation.contextMessages > 0 {
-                        HStack {
-                            Spacer(minLength: 0)
-                            Button(action: {
-                                if let last = viewStore.messages.last {
-                                    HapticEngine.trigger()
-                                    if last.isNewSession {
-                                        viewStore.send(.deleteMessage(last), animation: .default)
-                                    } else {
-                                        viewStore.send(.saveMessage(ChatMessage.newSession(cid: viewStore.conversation.id), false), animation: .default)
-                                    }
-                                }
-                            }, label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "clock.arrow.circlepath")
-                                    Text("\(viewStore.currentContextCount)/\(viewStore.conversation.contextMessages)")
-                                        .lineLimit(1)
-                                        .font(.manrope(size: 14, weight: .semibold))
-                                        .foregroundColor(.blackText.opacity(0.7))
-                                }
-                                .padding(.init(top: 4, leading: 6, bottom: 4, trailing: 12))
-                            })
-                            .background(Color.background)
-                            .cornerRadius(16)
-                            .shadow(color: .primaryColor.opacity(0.1), radius: 12)
-                            .disabled(viewStore.isSending)
-                            .foregroundColor(.blackText.opacity(0.7))
-                            .buttonStyle(.borderless)
-                        }.padding(.horizontal, 20)
-                    }
+                            .padding(.init(top: 4, leading: 6, bottom: 4, trailing: 12))
+                        })
+                        .background(Color.background)
+                        .cornerRadius(16)
+                        .shadow(color: .primaryColor.opacity(0.1), radius: 12)
+                        .disabled(viewStore.isSending)
+                        .foregroundColor(.blackText.opacity(0.7))
+                        .buttonStyle(.borderless)
+                    }.padding(.horizontal, 20)
+                }
 
-                    HStack(alignment: .bottom, spacing: 4) {
-                        TextEditView(text: viewStore.binding(get: \.inputText, send: ConversationFeature.Action.textChanged)) {
-                            ZStack {
-                                if viewStore.conversation.isMain {
-                                    Text("Say something or enter 'space'")
-                                } else {
-                                    Text("Say something")
-                                }
-                            }
-                        }
-                        .textFieldStyle(.plain)
-                        .frame(minHeight: 26)
-                        .focused($isFocused)
-                        .tint(.blackText.opacity(0.8))
-                        .onChange(of: viewStore.inputText) { newValue in
+                HStack(alignment: .bottom, spacing: 4) {
+                    TextEditView(text: $viewStore.inputText) {
+                        ZStack {
                             if viewStore.conversation.isMain {
-                                if newValue.starts(with: " ") {
-                                    viewStore.send(.toggleShowCommands(true))
-                                } else {
-                                    viewStore.send(.toggleShowCommands(false))
-                                }
-                            }
-                        }
-                        .onSubmit {
-                            viewStore.send(.sendMessage)
-                        }
-                        .onTapGesture {}
-                        if viewStore.isSending {
-                            Button(action: {
-                                HapticEngine.trigger()
-                                //TODO: move to reducer
-                                CatApi.cancelStreamChat()
-                            }) {
-                                Rectangle()
-                                    .foregroundColor(.primaryColor)
-                                    .frame(width: 17, height: 17)
-                                    .cornerRadius(2)
-                                    .opacity(0.5)
-                            }
-                            .frame(width: 26, height: 26)
-                            .buttonStyle(.borderless)
-                        }
-                        Button(
-                            action: {
-                                viewStore.send(.sendMessage)
-                                HapticEngine.trigger()
-                            }
-                        ) {
-                            if viewStore.isSending {
-                                LoadingIndocator()
-                                    .frame(width: 20, height: 20)
+                                Text("Say something or enter 'space'")
                             } else {
-                                if #available(iOS 16.0, *) {
-                                    Image(systemName: "paperplane.circle.fill")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(width: 26, height: 26)
-                                        .tint(
-                                            LinearGradient(
-                                                colors: [.primaryColor.opacity(0.9), .primaryColor.opacity(0.6)],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing)
-                                        )
-                                } else {
-                                    Image(systemName: "paperplane.circle.fill")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(width: 26, height: 26)
-                                        .tint(
-                                            .primaryColor.opacity(0.8)
-                                        )
-                                }
+                                Text("Say something")
                             }
                         }
-                        .keyboardShortcut(KeyEquivalent.return, modifiers: [.command])
+                    }
+                    .textFieldStyle(.plain)
+                    .frame(minHeight: 26)
+                    .focused($isFocused)
+                    .tint(.blackText.opacity(0.8))
+                    .onChange(of: viewStore.inputText) { newValue in
+                        if viewStore.conversation.isMain {
+                            if newValue.starts(with: " ") {
+                                viewStore.showCommands = true
+                            } else {
+                                viewStore.showCommands = false
+                            }
+                        }
+                    }
+                    .onSubmit {
+                        viewStore.sendMessage()
+                    }
+                    .onTapGesture {}
+                    if viewStore.isSending {
+                        Button(action: {
+                            HapticEngine.trigger()
+                            CatApi.cancelStreamChat()
+                        }) {
+                            Rectangle()
+                                .foregroundColor(.primaryColor)
+                                .frame(width: 17, height: 17)
+                                .cornerRadius(2)
+                                .opacity(0.5)
+                        }
                         .frame(width: 26, height: 26)
                         .buttonStyle(.borderless)
-                        .disabled(viewStore.inputText.isEmpty)
                     }
-                    .padding(.vertical, 12)
-                    .frame(minHeight: 50)
-                    .padding(.leading, 16)
-                    .padding(.trailing, 12)
-                    .background(Color.background)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(color: .primaryColor.opacity(0.1), radius: 4)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
-                }
-            }
-            .onAppear {
-                viewStore.send(.queryMessages(cid: viewStore.conversation.id))
-                subscription = DataStore.receiveDataFromiCloud
-                    .receive(on: DispatchQueue.main)
-                    .sink {
-                        viewStore.send(.queryMessages(cid: viewStore.conversation.id))
-                    }
-            }
-            .onChange(of: viewStore.conversation.id) { newValue in
-                viewStore.send(.selectPrompt(nil))
-                viewStore.send(.clearInputText)
-                viewStore.send(.setCompleteError(nil))
-                viewStore.send(.toggleShowCommands(false))
-                viewStore.send(.queryMessages(cid: viewStore.conversation.id))
-            }.sheet(isPresented: viewStore.binding(get: \.showAddConversation, send: ConversationFeature.Action.toggleAddConversation)) {
-                AddConversationView(
-                    conversation: viewStore.conversation,
-                    onClose: {
-                        viewStore.send(.toggleAddConversation(false))
-                    },
-                    onSave: { chat in
-                        viewStore.send(.updateConversation(chat))
-                        viewStore.send(.toggleAddConversation(false))
-                    }
-                )
-            }.sheet(isPresented: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView)) {
-                if #available(iOS 16, *) {
-                    ParamsEditView(
-                        conversation: viewStore.conversation,
-                        showing: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView),
-                        onUpdate: { chat in
-                            viewStore.send(.updateConversation(chat))
+                    Button(
+                        action: {
+                            viewStore.sendMessage()
+                            HapticEngine.trigger()
                         }
-                    )
-                    .frame(minWidth: 350)
-                    .presentationDetents([.height(480)])
-                    .presentationDragIndicator(.visible)
-                } else {
-                    ParamsEditView(
-                        conversation: viewStore.conversation,
-                        showing: viewStore.binding(get: \.showParamEditSheetView, send: ConversationFeature.Action.toggleParamEditSheetView),
-                        onUpdate: { chat in
-                            viewStore.send(.updateConversation(chat))
+                    ) {
+                        if viewStore.isSending {
+                            LoadingIndocator()
+                                .frame(width: 20, height: 20)
+                        } else {
+                            if #available(iOS 16.0, *) {
+                                Image(systemName: "paperplane.circle.fill")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 26, height: 26)
+                                    .tint(
+                                        LinearGradient(
+                                            colors: [.primaryColor.opacity(0.9), .primaryColor.opacity(0.6)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing)
+                                    )
+                            } else {
+                                Image(systemName: "paperplane.circle.fill")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 26, height: 26)
+                                    .tint(
+                                        .primaryColor.opacity(0.8)
+                                    )
+                            }
                         }
-                    )
-                    .frame(minWidth: 350)
-                }
-            }
-            .background {
-                GeometryReader { proxy in
-                    Color.clear
-                        .onAppear {
-                            size = proxy.size
-                        }
-                }
-            }
-            .sheet(isPresented: viewStore.binding(get: \.showPremiumPage, send: ConversationFeature.Action.toggleShowPremiumPage)) {
-                PremiumPage(onClose: {
-                    viewStore.send(.toggleShowPremiumPage(false))
-                })
-            }
-            .font(.manrope(size: 16, weight: .regular))
-            .toast(viewStore.binding(get: \.toast, send: ConversationFeature.Action.setToast))
-            .onTapGesture {
-                endEditing(force: true)
-            }
-            .overlay {
-                ShareMessagesImageOverlay(
-                    shareMessageSnapshot: viewStore.shareSnapshot,
-                    onClose: {
-                        viewStore.send(.updateShareSnapshot(nil))
-                    },
-                    onSave: { image in
-                        viewStore.send(.saveToAlbum(image))
                     }
-                )
+                    .keyboardShortcut(KeyEquivalent.return, modifiers: [.command])
+                    .frame(width: 26, height: 26)
+                    .buttonStyle(.borderless)
+                    .disabled(viewStore.inputText.isEmpty)
+                }
+                .padding(.vertical, 12)
+                .frame(minHeight: 50)
+                .padding(.leading, 16)
+                .padding(.trailing, 12)
+                .background(Color.background)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .shadow(color: .primaryColor.opacity(0.1), radius: 4)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
-            .toast(viewStore.binding(get: \.saveImageToast, send: ConversationFeature.Action.setSaveImageToast))
         }
+        .onAppear {
+            viewStore.queryMessages()
+            subscription = DataStore.receiveDataFromiCloud
+                .receive(on: DispatchQueue.main)
+                .sink {
+                    viewStore.queryMessages()
+                }
+        }
+        .onChange(of: viewStore.conversation.id) { newValue in
+            viewStore.resetConversation()
+        }.sheet(isPresented: $viewStore.showAddConversation) {
+            AddConversationView(
+                conversation: viewStore.conversation,
+                onClose: {
+                    viewStore.showAddConversation = false
+                },
+                onSave: { chat in
+                    chatState.updateChat(chat)
+                    viewStore.showAddConversation = false
+                }
+            )
+        }.sheet(isPresented: $viewStore.showParamEditSheetView) {
+            ParamsEditView(
+                conversation: viewStore.conversation,
+                showing: $viewStore.showParamEditSheetView,
+                onUpdate: { chat in
+                    chatState.updateChat(chat)
+                }
+            )
+            .frame(minWidth: 350)
+            .presentationDetents([.height(480)])
+            .presentationDragIndicator(.visible)
+        }
+        .background {
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear {
+                        size = proxy.size
+                    }
+            }
+        }
+        .sheet(isPresented: $viewStore.showPremiumPage) {
+            PremiumPage(onClose: {
+                viewStore.showPremiumPage = false
+            })
+        }
+        .font(.manrope(size: 16, weight: .regular))
+        .toast($viewStore.toast)
+        .onTapGesture {
+            endEditing(force: true)
+        }
+        .overlay {
+            ShareMessagesImageOverlay(
+                shareMessageSnapshot: viewStore.shareSnapshot,
+                onClose: {
+                    viewStore.shareSnapshot = nil
+                },
+                onSave: { image in
+                    viewStore.saveToAlbum(image: image)
+                }
+            )
+        }
+        .toast($viewStore.saveImageToast)
     }
 
-    func toolbar(viewStore: ViewStoreOf<ConversationFeature>) -> some View {
+    func toolbar(viewStore: ConversationViewModel) -> some View {
         HStack(spacing: 18) {
             Button(action: {
                 isFocused = false
@@ -748,23 +636,23 @@ struct ConversationView: View {
             Menu(content: {
                 if !viewStore.conversation.isMain {
                     Button(action: {
-                        viewStore.send(.toggleAddConversation(true))
+                        viewStore.showAddConversation = true
                     }) {
                         Label("Edit Prompt", systemImage: "note.text")
                     }
                 }
                 Button(action: {
-                    viewStore.send(.toggleParamEditSheetView(true))
+                    viewStore.showParamEditSheetView = true
                 }) {
                     Label("Edit Model", systemImage: "rectangle.and.pencil.and.ellipsis")
                 }
                 Button(action: {
-                    viewStore.send(.exportToMD)
+                    viewStore.exportToMD()
                 }) {
                     Label("Export to Markdown", systemImage: "m.square")
                 }
                 Button(role: .destructive, action: {
-                    viewStore.send(.toggleClearMessageAlert(true))
+                    viewStore.showClearMessageAlert = true
                 }) {
                     Label("Clean Messages", systemImage: "trash")
                 }
@@ -775,12 +663,12 @@ struct ConversationView: View {
             })
             .menuStyle(.borderlessButton)
             .frame(width: 24)
-            .alert("Are you sure to clean all messages?", isPresented: viewStore.binding(get: \.showClearMessageAlert, send: ConversationFeature.Action.toggleClearMessageAlert)) {
+            .alert("Are you sure to clean all messages?", isPresented: $viewStore.showClearMessageAlert) {
                 Button("Sure", role: .destructive) {
-                    viewStore.send(.cleanMessages(viewStore.messages))
+                    viewStore.cleanMessages(viewStore.messages)
                 }
                 Button("Cancel", role: .cancel) {
-                    viewStore.send(.toggleClearMessageAlert(false))
+                    viewStore.showClearMessageAlert = false
                 }
             }
             .tint(.primaryColor)
@@ -789,7 +677,7 @@ struct ConversationView: View {
         .frame(height: 44)
     }
 
-    func messageList(viewStore: ViewStoreOf<ConversationFeature>) -> some View {
+    func messageList(viewStore: ConversationViewModel) -> some View {
         ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
                 LazyVStack(alignment: .leading, spacing: 16) {
@@ -798,33 +686,32 @@ struct ConversationView: View {
                             message: message,
                             onDelete: {
                                 HapticEngine.trigger()
-                                viewStore.send(.deleteMessage(message), animation: .default)
+                                viewStore.deleteMessage(message)
                             },
                             onCopy: {
                                 SystemUtil.copyToPasteboard(content: message.content)
-                                let toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
-                                viewStore.send(.setToast(toast))
+                                viewStore.toast = Toast(type: .info, message: "Message content copied", duration: 1.5)
                             },
                             onShare: {
                                 HapticEngine.trigger()
                                 endEditing(force: true)
-                                viewStore.send(.shareMessage((message, size.width)))
+                                viewStore.shareMessage(message, width: size.width)
                             },
                             showActions: message.id == viewStore.tappedMessageId
                         ).onTapGesture {
                             HapticEngine.trigger()
-                            viewStore.send(.tapMessage(message), animation: .default)
+                            viewStore.tapMessage(message)
                         }
                         .onHover { isHover in
-                            viewStore.send(.hoverMessage(isHover ? message : nil), animation: .default)
+                            viewStore.hoverMessage(isHover ? message : nil)
                         }
                         .id(message.id)
                     }
                     if let error = viewStore.error {
                         ErrorMessageView(errorMessage: error.localizedDescription) {
-                            viewStore.send(.retrySend)
+                            viewStore.retry()
                         } clear: {
-                            viewStore.send(.setCompleteError(nil))
+                            viewStore.error = nil
                         }
                     }
                     Spacer().frame(height: 80)
@@ -839,7 +726,9 @@ struct ConversationView: View {
                     if old.first?.conversationId != newMessages.first?.conversationId  {
                         Task {
                             try await Task.sleep(nanoseconds: 100_000_000)
-                            proxy.scrollTo("Bottom", anchor: .bottom)
+                            await MainActor.run {
+                                proxy.scrollTo("Bottom", anchor: .bottom)
+                            }
                         }
                     } else {
                         withAnimation {
@@ -870,13 +759,10 @@ struct ConversationView: View {
 }
 
 struct ConversationView_Previews: PreviewProvider {
-
-    static let store = Store(initialState: ConversationFeature.State(), reducer: ConversationFeature())
-
     static var previews: some View {
         ConversationView(
-            store: store,
-            onChatsClick: { }
+            onChatsClick: { },
+            store: ConversationViewModel()
         )
     }
 }
