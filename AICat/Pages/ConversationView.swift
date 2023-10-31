@@ -70,13 +70,17 @@ class ConversationViewModel {
         return messages.suffix(conversation.contextMessages)
     }
 
-    func saveMessage(_ message: ChatMessage, needSync: Bool) async {
+    func saveMessage(_ message: ChatMessage, needSync: Bool, animated: Bool = false) async {
         if needSync {
             await DataStore.saveAndSync(message)
         } else {
             await DataStore.save(message)
         }
-        withAnimation {
+        if animated {
+            withAnimation {
+                upsertMessage(message)
+            }
+        } else {
             upsertMessage(message)
         }
     }
@@ -197,7 +201,7 @@ class ConversationViewModel {
         let newMessage = Chat(role: .user, content: sendText)
         let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
         Task {
-            await saveMessage(chatMessage, needSync: false)
+            await saveMessage(chatMessage, needSync: false, animated: true)
             await streamChat(newMessage: newMessage, replyToId: chatMessage.id)
         }
     }
@@ -217,7 +221,7 @@ class ConversationViewModel {
         var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         responseMessage.replyToId = replyToId
         responseMessage.timeCreated += 1
-        await saveMessage(responseMessage, needSync: false)
+        await saveMessage(responseMessage, needSync: false, animated: true)
         do {
             let stream: AsyncThrowingStream<ChatStreamResult, Error>
             if let selectedPrompt {
