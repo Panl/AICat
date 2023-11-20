@@ -70,17 +70,13 @@ class ConversationViewModel {
         return messages.suffix(conversation.contextMessages)
     }
 
-    func saveMessage(_ message: ChatMessage, needSync: Bool, animated: Bool = false) async {
+    func saveMessage(_ message: ChatMessage, needSync: Bool) async {
         if needSync {
             await DataStore.saveAndSync(message)
         } else {
             await DataStore.save(message)
         }
-        if animated {
-            withAnimation {
-                upsertMessage(message)
-            }
-        } else {
+        await MainActor.run {
             upsertMessage(message)
         }
     }
@@ -201,7 +197,7 @@ class ConversationViewModel {
         let newMessage = Chat(role: .user, content: sendText)
         let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
         Task {
-            await saveMessage(chatMessage, needSync: false, animated: true)
+            await saveMessage(chatMessage, needSync: false)
             await streamChat(newMessage: newMessage, replyToId: chatMessage.id)
         }
     }
@@ -221,7 +217,7 @@ class ConversationViewModel {
         var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         responseMessage.replyToId = replyToId
         responseMessage.timeCreated += 1
-        await saveMessage(responseMessage, needSync: false, animated: true)
+        await saveMessage(responseMessage, needSync: false)
         do {
             let stream: AsyncThrowingStream<ChatStreamResult, Error>
             if let selectedPrompt {
@@ -493,7 +489,7 @@ struct ConversationView: View {
                 }
 
                 HStack(alignment: .bottom, spacing: 4) {
-                    TextEditView(text: $viewStore.inputText) {
+                    TextField(text: $viewStore.inputText, axis: .vertical) {
                         ZStack {
                             if viewStore.conversation.isMain {
                                 Text("Say something or enter 'space'")
@@ -502,6 +498,7 @@ struct ConversationView: View {
                             }
                         }
                     }
+                    .lineLimit(...8)
                     .textFieldStyle(.plain)
                     .frame(minHeight: 26)
                     .focused($isFocused)
@@ -760,23 +757,21 @@ struct ConversationView: View {
             .onChange(of: viewStore.messages) { old, newMessages in
                 if old.last != newMessages.last {
                     if old.first?.conversationId != newMessages.first?.conversationId  {
-                        Task {
-                            try await Task.sleep(nanoseconds: 100_000_000)
-                            await MainActor.run {
-                                proxy.scrollTo("Bottom", anchor: .bottom)
-                            }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            proxy.scrollTo("Bottom", anchor: .bottom)
                         }
                     } else {
-                        withAnimation {
-                            proxy.scrollTo("Bottom", anchor: .bottom)
+                        DispatchQueue.main.asyncAfter(deadline: .now()) {
+                            withAnimation {
+                                proxy.scrollTo("Bottom", anchor: .bottom)
+                            }
                         }
                     }
                 }
             }
             .onChange(of: isFocused) { _, value in
                 if value {
-                    Task {
-                        try await Task.sleep(nanoseconds: 300_000_000)
+                    DispatchQueue.main.asyncAfter(deadline: .now()) {
                         withAnimation {
                             proxy.scrollTo("Bottom", anchor: .bottom)
                         }
