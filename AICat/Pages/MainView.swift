@@ -9,6 +9,7 @@ import SwiftUI
 import Blackbird
 import Combine
 import Perception
+import ApphudSDK
 
 @Perceptible
 class ChatStateViewModel {
@@ -161,6 +162,9 @@ struct MainView: View {
                         DataStore.sync(complete: nil)
                     }
                 #endif
+            }
+            .task {
+                UserDefaults.hasPremiumAccess = Apphud.hasPremiumAccess()
             }
         }
     }

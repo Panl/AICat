@@ -38,7 +38,7 @@ class SettingsViewModel {
         guard !isPurcahsing else { return }
         isPurcahsing = true
         Task {
-            let payWall = await Apphud.paywalls().first
+            let payWall = await Apphud.placements().first?.paywall
             if let catFood = payWall?.products.first(where: { $0.productId == catFoodId }) {
                 let result = await Apphud.purchase(catFood)
                 if let error = result.error {

@@ -23,7 +23,6 @@
 		8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BA429CC53CD00EE0072 /* Theme+Extension.swift */; };
 		8E2E5BAE29CC707B00EE0072 /* SplashCodeSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAC29CC707A00EE0072 /* SplashCodeSyntaxHighlighter.swift */; };
 		8E2E5BB029CCC60700EE0072 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E5BAF29CCC60700EE0072 /* MainView.swift */; };
-		8E2EF25929F02E4900E25C9A /* ApphudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2EF25829F02E4900E25C9A /* ApphudSDK */; };
 		8E2EF25D29F04D7500E25C9A /* ImageRenderer+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2EF25C29F04D7500E25C9A /* ImageRenderer+Extension.swift */; };
 		8E3DA87D29DC6E6800327A2A /* LoadingIndocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3DA87C29DC6E6800327A2A /* LoadingIndocator.swift */; };
 		8E401DD029DE59A000E2F403 /* SystemUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E401DCF29DE59A000E2F403 /* SystemUtil.swift */; };
@@ -41,6 +40,7 @@
 		8E64874429C715740029E14F /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874329C715740029E14F /* ChatMessage.swift */; };
 		8E64874729C719460029E14F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874629C719460029E14F /* Date+Extension.swift */; };
 		8E64874C29C788640029E14F /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874B29C788640029E14F /* ConversationListView.swift */; };
+		8E74852D2B52B8D60049291E /* ApphudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8E74852C2B52B8D60049291E /* ApphudSDK */; };
 		8E8D37E92B52A6E100DC0B8A /* Perception in Frameworks */ = {isa = PBXBuildFile; productRef = 8E8D37E82B52A6E100DC0B8A /* Perception */; };
 		8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E8F19D62A5022190006BCBC /* OpenAI */; };
 		8EC0742429F979DD00606DE9 /* OpenAISettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */; };
@@ -124,8 +124,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E74852D2B52B8D60049291E /* ApphudSDK in Frameworks */,
 				8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */,
-				8E2EF25929F02E4900E25C9A /* ApphudSDK in Frameworks */,
 				8E0CD54A2A5840EE00DAC4C0 /* Splash in Frameworks */,
 				8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */,
 				8EF5A5E329D92DBF00981A38 /* AppCenterCrashes in Frameworks */,
@@ -327,11 +327,11 @@
 				8E2E5BA229CC519D00EE0072 /* MarkdownUI */,
 				8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */,
 				8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */,
-				8E2EF25829F02E4900E25C9A /* ApphudSDK */,
 				8E8F19D62A5022190006BCBC /* OpenAI */,
 				8E0CD5442A58018800DAC4C0 /* Highlightr */,
 				8E0CD5492A5840EE00DAC4C0 /* Splash */,
 				8E8D37E82B52A6E100DC0B8A /* Perception */,
+				8E74852C2B52B8D60049291E /* ApphudSDK */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -370,11 +370,11 @@
 				8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */,
 				8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
-				8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */,
 				8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */,
 				8E0CD5432A58018800DAC4C0 /* XCRemoteSwiftPackageReference "Highlightr" */,
 				8E0CD5482A5840EE00DAC4C0 /* XCRemoteSwiftPackageReference "Splash" */,
 				8E8D37E72B52A6E100DC0B8A /* XCRemoteSwiftPackageReference "swift-perception" */,
+				8E74852B2B52B8D60049291E /* XCRemoteSwiftPackageReference "ApphudSDK" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -694,32 +694,24 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/raspu/Highlightr";
 			requirement = {
-				kind = exactVersion;
-				version = 2.1.2;
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.2;
 			};
 		};
 		8E0CD5482A5840EE00DAC4C0 /* XCRemoteSwiftPackageReference "Splash" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/JohnSundell/Splash.git";
 			requirement = {
-				kind = exactVersion;
-				version = 0.16.0;
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.16.0;
 			};
 		};
 		8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
 			requirement = {
-				kind = exactVersion;
-				version = 2.1.0;
-			};
-		};
-		8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Panl/ApphudSDK.git";
-			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
 			};
 		};
 		8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */ = {
@@ -730,12 +722,20 @@
 				kind = branch;
 			};
 		};
+		8E74852B2B52B8D60049291E /* XCRemoteSwiftPackageReference "ApphudSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apphud/ApphudSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.5;
+			};
+		};
 		8E8D37E72B52A6E100DC0B8A /* XCRemoteSwiftPackageReference "swift-perception" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-perception";
 			requirement = {
-				kind = exactVersion;
-				version = 1.1.0;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
 			};
 		};
 		8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */ = {
@@ -750,8 +750,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/microsoft/appcenter-sdk-apple.git";
 			requirement = {
-				kind = exactVersion;
-				version = 5.0.2;
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -772,15 +772,15 @@
 			package = 8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
 		};
-		8E2EF25829F02E4900E25C9A /* ApphudSDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E2EF25729F02E4900E25C9A /* XCRemoteSwiftPackageReference "ApphudSDK" */;
-			productName = ApphudSDK;
-		};
 		8E64873E29C70FD00029E14F /* Blackbird */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */;
 			productName = Blackbird;
+		};
+		8E74852C2B52B8D60049291E /* ApphudSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E74852B2B52B8D60049291E /* XCRemoteSwiftPackageReference "ApphudSDK" */;
+			productName = ApphudSDK;
 		};
 		8E8D37E82B52A6E100DC0B8A /* Perception */ = {
 			isa = XCSwiftPackageProductDependency;

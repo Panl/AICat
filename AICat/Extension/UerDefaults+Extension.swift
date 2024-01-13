@@ -77,6 +77,15 @@ extension UserDefaults {
         }
     }
 
+    static var hasPremiumAccess: Bool {
+        set {
+            defaults.set(newValue, forKey: "AICat.premiumAccess")
+        }
+        get {
+            defaults.bool(forKey: "AICat.premiumAccess")
+        }
+    }
+
     static var customApiHost: String {
         defaults.string(forKey: "AICat.apiHost") ?? "https://api.openai.com"
     }
