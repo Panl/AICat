@@ -20,12 +20,12 @@ class PremiumPageViewModel {
     }
 
     var isPremium: Bool {
-        UserDefaults.openApiKey != nil || Apphud.hasActiveSubscription()
+        UserDefaults.openApiKey != nil || UserDefaults.hasPremiumAccess
     }
 
     func fetchMonthlyProduct() {
         Task {
-            let payWall = await Apphud.paywalls().first
+            let payWall = await Apphud.placements().first?.paywall
             product = payWall?.products.first(where: { $0.productId == monthlyPremiumId })
         }
     }
@@ -39,6 +39,7 @@ class PremiumPageViewModel {
         isPurchasing = true
         Task {
             let result = await Apphud.purchase(product)
+            UserDefaults.hasPremiumAccess = await Apphud.hasPremiumAccess()
             if result.success {
                 toast = Toast(type: .success, message: "You get AICat Premium Now!", duration: 2)
             }
@@ -56,6 +57,7 @@ class PremiumPageViewModel {
         isPurchasing = true
         Task {
             let _ = await Apphud.restorePurchases()
+            UserDefaults.hasPremiumAccess = await Apphud.hasPremiumAccess()
             isPurchasing = false
             if isPremium {
                 toast = Toast(type: .success, message: "You get AICat Premium Now!", duration: 2)

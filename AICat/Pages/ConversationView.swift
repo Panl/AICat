@@ -54,7 +54,7 @@ class ConversationViewModel {
     }
 
     var isPremium: Bool {
-        UserDefaults.openApiKey != nil || Apphud.hasPremiumAccess()
+        UserDefaults.openApiKey != nil || UserDefaults.hasPremiumAccess
     }
 
     var needBuyPremium: Bool {
