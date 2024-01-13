@@ -21,7 +21,7 @@ class ChatListViewModel {
 
 struct ConversationListView: View {
     let onChatChanged: (Conversation) -> Void
-    @State var viewStore: ChatListViewModel
+    @Perception.Bindable var viewStore: ChatListViewModel
     @Environment(ChatStateViewModel.self) var chatState
 
     init(onChatChanged: @escaping (Conversation) -> Void, store: ChatListViewModel) {
