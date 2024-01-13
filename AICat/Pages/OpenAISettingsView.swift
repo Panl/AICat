@@ -53,7 +53,7 @@ class OpenAISettingsViewModel {
 
 struct OpenAISettingsView: View {
     
-    @State var viewModel = OpenAISettingsViewModel()
+    @Perception.Bindable var viewModel = OpenAISettingsViewModel()
     
     var body: some View {
         WithPerceptionTracking {

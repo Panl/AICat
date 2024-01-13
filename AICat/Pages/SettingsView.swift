@@ -57,7 +57,7 @@ class SettingsViewModel {
 struct SettingsView: View {
 
     let onClose: () -> Void
-    @State var viewModel = SettingsViewModel()
+    @Perception.Bindable var viewModel = SettingsViewModel()
 
     var body: some View {
         WithPerceptionTracking {

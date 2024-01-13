@@ -376,7 +376,7 @@ struct ConversationView: View {
     @FocusState var isFocused: Bool
     @State var size: CGSize = .zero
     @State var subscription: AnyCancellable?
-    @State var viewStore: ConversationViewModel
+    @Perception.Bindable var viewStore: ConversationViewModel
     @Environment(ChatStateViewModel.self) var chatState
 
     let onChatsClick: () -> Void

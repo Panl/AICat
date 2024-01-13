@@ -13,8 +13,10 @@ import ApphudSDK
 
 @Perceptible
 class ChatStateViewModel {
-
+    
+    @PerceptionIgnored
     var chatListStore = ChatListViewModel()
+    @PerceptionIgnored
     var conversationStore = ConversationViewModel()
     var mainChat: Conversation = mainConversation
     var conversations: [Conversation] = []

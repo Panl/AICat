@@ -70,7 +70,7 @@ class PremiumPageViewModel {
 
 struct PremiumPage: View {
 
-    @State var viewModel = PremiumPageViewModel()
+    @Perception.Bindable var viewModel = PremiumPageViewModel()
     let onClose: () -> Void
 
     var body: some View {
