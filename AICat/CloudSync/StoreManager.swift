@@ -39,18 +39,14 @@ class StoreManager: ObservableObject {
 
     func saveAndSync(_ obj: any PushableObject) async {
         await db.upsert(item: obj)
-        Task {
-            await pushAfterSave()
-        }
+        await pushAfterSave()
     }
 
     func saveAndSync(items: [any PushableObject]) async {
         for item in items {
             await db.upsert(item: item)
         }
-        Task {
-            await pushAfterSave()
-        }
+        await pushAfterSave()
     }
 
     private func pushAfterSave() async {
