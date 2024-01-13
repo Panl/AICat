@@ -41,8 +41,8 @@
 		8E64874729C719460029E14F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874629C719460029E14F /* Date+Extension.swift */; };
 		8E64874C29C788640029E14F /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874B29C788640029E14F /* ConversationListView.swift */; };
 		8E74852D2B52B8D60049291E /* ApphudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8E74852C2B52B8D60049291E /* ApphudSDK */; };
+		8E7485302B530FAD0049291E /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E74852F2B530FAD0049291E /* OpenAI */; };
 		8E8D37E92B52A6E100DC0B8A /* Perception in Frameworks */ = {isa = PBXBuildFile; productRef = 8E8D37E82B52A6E100DC0B8A /* Perception */; };
-		8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E8F19D62A5022190006BCBC /* OpenAI */; };
 		8EC0742429F979DD00606DE9 /* OpenAISettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */; };
 		8EDB8E0D2A127D6A0088517E /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0C2A127D6A0088517E /* CloudKitService.swift */; };
 		8EDB8E0F2A1284540088517E /* PushItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0E2A1284540088517E /* PushItem.swift */; };
@@ -127,11 +127,11 @@
 				8E74852D2B52B8D60049291E /* ApphudSDK in Frameworks */,
 				8E2E5BA329CC519D00EE0072 /* MarkdownUI in Frameworks */,
 				8E0CD54A2A5840EE00DAC4C0 /* Splash in Frameworks */,
-				8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */,
 				8EF5A5E329D92DBF00981A38 /* AppCenterCrashes in Frameworks */,
 				8EF5A5E129D92DBF00981A38 /* AppCenterAnalytics in Frameworks */,
 				8E8D37E92B52A6E100DC0B8A /* Perception in Frameworks */,
 				8E0CD5452A58018800DAC4C0 /* Highlightr in Frameworks */,
+				8E7485302B530FAD0049291E /* OpenAI in Frameworks */,
 				8E64873F29C70FD00029E14F /* Blackbird in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -327,11 +327,11 @@
 				8E2E5BA229CC519D00EE0072 /* MarkdownUI */,
 				8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */,
 				8EF5A5E229D92DBF00981A38 /* AppCenterCrashes */,
-				8E8F19D62A5022190006BCBC /* OpenAI */,
 				8E0CD5442A58018800DAC4C0 /* Highlightr */,
 				8E0CD5492A5840EE00DAC4C0 /* Splash */,
 				8E8D37E82B52A6E100DC0B8A /* Perception */,
 				8E74852C2B52B8D60049291E /* ApphudSDK */,
+				8E74852F2B530FAD0049291E /* OpenAI */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -370,11 +370,11 @@
 				8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */,
 				8E2E5BA129CC519D00EE0072 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
-				8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */,
 				8E0CD5432A58018800DAC4C0 /* XCRemoteSwiftPackageReference "Highlightr" */,
 				8E0CD5482A5840EE00DAC4C0 /* XCRemoteSwiftPackageReference "Splash" */,
 				8E8D37E72B52A6E100DC0B8A /* XCRemoteSwiftPackageReference "swift-perception" */,
 				8E74852B2B52B8D60049291E /* XCRemoteSwiftPackageReference "ApphudSDK" */,
+				8E74852E2B530FAD0049291E /* XCRemoteSwiftPackageReference "OpenAI" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -591,7 +591,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 53;
+				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -633,7 +633,7 @@
 				CODE_SIGN_ENTITLEMENTS = AICat/AICat.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 53;
+				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_ASSET_PATHS = "\"AICat/Preview Content\"";
 				DEVELOPMENT_TEAM = BG63VCU95W;
 				ENABLE_APP_SANDBOX = NO;
@@ -730,20 +730,20 @@
 				minimumVersion = 3.2.5;
 			};
 		};
+		8E74852E2B530FAD0049291E /* XCRemoteSwiftPackageReference "OpenAI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MacPaw/OpenAI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.5;
+			};
+		};
 		8E8D37E72B52A6E100DC0B8A /* XCRemoteSwiftPackageReference "swift-perception" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-perception";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.1.0;
-			};
-		};
-		8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Panl/OpenAI.git";
-			requirement = {
-				branch = main;
-				kind = branch;
 			};
 		};
 		8EF5A5DF29D92DBF00981A38 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */ = {
@@ -782,15 +782,15 @@
 			package = 8E74852B2B52B8D60049291E /* XCRemoteSwiftPackageReference "ApphudSDK" */;
 			productName = ApphudSDK;
 		};
+		8E74852F2B530FAD0049291E /* OpenAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E74852E2B530FAD0049291E /* XCRemoteSwiftPackageReference "OpenAI" */;
+			productName = OpenAI;
+		};
 		8E8D37E82B52A6E100DC0B8A /* Perception */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E8D37E72B52A6E100DC0B8A /* XCRemoteSwiftPackageReference "swift-perception" */;
 			productName = Perception;
-		};
-		8E8F19D62A5022190006BCBC /* OpenAI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */;
-			productName = OpenAI;
 		};
 		8EF5A5E029D92DBF00981A38 /* AppCenterAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

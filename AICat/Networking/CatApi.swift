@@ -11,8 +11,6 @@ import Combine
 
 enum CatApi {
 
-    private(set) static var currentStreamOpenAI: OpenAI?
-
     static var apiClient: OpenAI {
         let apiKey = UserDefaults.openApiKey ?? openAIKey
         let apiHost = UserDefaults.apiHost.replacingOccurrences(of: "https://", with: "")
@@ -22,10 +20,6 @@ enum CatApi {
             timeoutInterval: 60
         )
         return OpenAI(configuration: configratuion, session: URLSession.shared)
-    }
-
-    static func cancelStreamChat() {
-        currentStreamOpenAI?.cancelAllStreamingRequests()
     }
 
     static func cancelTaskWithUrl(_ url: URL?) {
@@ -68,7 +62,7 @@ enum CatApi {
         return gptModels.sorted()
     }
 
-    static func streamChat(messages: [Chat], conversation: Conversation) async -> AsyncThrowingStream<ChatStreamResult, Error> {
+    static func streamChat(messages: [Chat], conversation: Conversation) -> AnyPublisher<Result<ChatStreamResult, Error>, Error> {
         var messageToSend = messages
         let prompt = conversation.prompt
         if !prompt.isEmpty {
@@ -84,8 +78,7 @@ enum CatApi {
             frequencyPenalty: conversation.frequencyPenalty,
             stream: true
         )
-        currentStreamOpenAI = apiClient
-        return currentStreamOpenAI!.chatsStream(query: query)
+        return apiClient.chatsStream(query: query)
     }
 }
 

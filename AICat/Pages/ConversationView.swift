@@ -64,6 +64,9 @@ class ConversationViewModel {
         return false
     }
 
+    @PerceptionIgnored
+    var streamChatCancelable: AnyCancellable?
+
     var contextMessages: [ChatMessage] {
         if let index = messages.lastIndex(where: { $0.isNewSession }) {
             return Array(messages[index...].filter({ !$0.isNewSession }).suffix(conversation.contextMessages))
@@ -71,14 +74,14 @@ class ConversationViewModel {
         return messages.suffix(conversation.contextMessages)
     }
 
-    func saveMessage(_ message: ChatMessage, needSync: Bool) async {
-        if needSync {
-            await DataStore.saveAndSync(message)
-        } else {
-            await DataStore.save(message)
-        }
-        await MainActor.run {
-            upsertMessage(message)
+    func saveMessage(_ message: ChatMessage, needSync: Bool) {
+        upsertMessage(message)
+        Task {
+            if needSync {
+                await DataStore.saveAndSync(message)
+            } else {
+                await DataStore.save(message)
+            }
         }
     }
 
@@ -197,9 +200,18 @@ class ConversationViewModel {
         inputText = ""
         let newMessage = Chat(role: .user, content: sendText)
         let chatMessage = ChatMessage(role: "user", content: sendText, conversationId: conversation.id, model: conversation.model)
-        Task {
-            await saveMessage(chatMessage, needSync: false)
-            await streamChat(newMessage: newMessage, replyToId: chatMessage.id)
+        saveMessage(chatMessage, needSync: false)
+        streamChatCombine(newMessage: newMessage, replyToId: chatMessage.id)
+    }
+
+    @PerceptionIgnored
+    var currentResponse: ChatMessage?
+    func cancelStream() {
+        streamChatCancelable?.cancel()
+        isSending = false
+        if let currentResponse, currentResponse.content.isEmpty {
+            deleteMessage(currentResponse)
+            self.currentResponse = nil
         }
     }
 
@@ -208,59 +220,64 @@ class ConversationViewModel {
         error = nil
         isSending = true
         let newMessage = Chat(role: .init(name: message.role), content: message.content)
-        Task {
-            await streamChat(newMessage: newMessage, replyToId: message.id, isRetry: true)
-        }
+        streamChatCombine(newMessage: newMessage, replyToId: message.id, isRetry: true)
     }
 
-    func streamChat(newMessage: Chat, replyToId: String, isRetry: Bool = false) async {
+    func streamChatCombine(newMessage: Chat, replyToId: String, isRetry: Bool = false) {
         let conversation = conversation
         var responseMessage = ChatMessage(role: "assistant", content: "", conversationId: conversation.id)
         responseMessage.replyToId = replyToId
         responseMessage.timeCreated += 1
-        await saveMessage(responseMessage, needSync: false)
-        do {
-            let stream: AsyncThrowingStream<ChatStreamResult, Error>
-            if let selectedPrompt {
-                stream = await CatApi.streamChat(messages: [newMessage], conversation: selectedPrompt)
-            } else {
-                let messagesToSend = contextMessages.map({ Chat(role: .init(name: $0.role), content: $0.content) }) + (isRetry ? [] : [newMessage])
-                stream = await CatApi.streamChat(messages: messagesToSend, conversation: conversation)
-            }
-            for try await result in stream {
-                let delta = result.choices.first?.delta
-                if let role = delta?.role?.rawValue {
-                    responseMessage.role = role
-                }
-                if let content = delta?.content {
-                    responseMessage.content += content
-                }
-                responseMessage.model = result.model
-                responseMessage.timeCreated = Date.now.timeInSecond
-                await saveMessage(responseMessage, needSync: false)
-            }
-            await saveMessage(responseMessage, needSync: true)
-            await MainActor.run {
-                isSending = false
-                incrementSentMessageCount()
-                currentContextCount = contextMessages.count
-            }
-        } catch {
-            let err = error as NSError
-            await MainActor.run {
-                isSending = false
-            }
-            if err.code != -999 {
-                await MainActor.run {
-                    self.error = err
-                }
-                deleteMessage(responseMessage)
-            } else {
-                if responseMessage.content.isEmpty {
-                    deleteMessage(responseMessage)
-                }
-            }
+        self.currentResponse = responseMessage
+        saveMessage(responseMessage, needSync: false)
+        let chatStream: AnyPublisher<Result<ChatStreamResult, Error>, Error>
+        if let selectedPrompt {
+            chatStream = CatApi.streamChat(messages: [newMessage], conversation: selectedPrompt)
+        } else {
+            let messagesToSend = contextMessages.map({ Chat(role: .init(name: $0.role), content: $0.content) }) + (isRetry ? [] : [newMessage])
+            chatStream = CatApi.streamChat(messages: messagesToSend, conversation: conversation)
         }
+        streamChatCancelable = chatStream
+            .receive(on: RunLoop.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    switch completion {
+                    case .finished:
+                        self?.saveMessage(responseMessage, needSync: true)
+                        self?.isSending = false
+                        self?.incrementSentMessageCount()
+                        self?.currentContextCount = self?.contextMessages.count ?? 0
+                    case .failure(let error):
+                        self?.handleChatStreamFailure(error: error, message: responseMessage)
+                    }
+                },
+                receiveValue: { [weak self] result in
+                    switch result {
+                    case .success(let chatResult):
+                        let delta = chatResult.choices.first?.delta
+                        if let role = delta?.role?.rawValue {
+                            responseMessage.role = role
+                        }
+                        if let content = delta?.content {
+                            responseMessage.content += content
+                        }
+                        responseMessage.model = chatResult.model
+                        responseMessage.timeCreated = Date.now.timeInSecond
+                        self?.currentResponse = responseMessage
+                        self?.upsertMessage(responseMessage)
+                    case .failure(let error):
+                        self?.handleChatStreamFailure(error: error, message: responseMessage)
+                    }
+
+                }
+            )
+    }
+
+    private func handleChatStreamFailure(error: Error, message: ChatMessage) {
+        let err = error as NSError
+        isSending = false
+        self.error = err
+        deleteMessage(message)
     }
 
     func incrementSentMessageCount() {
@@ -466,9 +483,7 @@ struct ConversationView: View {
                                     if last.isNewSession {
                                         viewStore.deleteMessage(last)
                                     } else {
-                                        Task {
-                                            await viewStore.saveMessage(ChatMessage.newSession(cid: viewStore.conversation.id), needSync: false)
-                                        }
+                                        viewStore.saveMessage(ChatMessage.newSession(cid: viewStore.conversation.id), needSync: false)
                                     }
                                 }
                             }, label: {
@@ -521,7 +536,7 @@ struct ConversationView: View {
                         if viewStore.isSending {
                             Button(action: {
                                 HapticEngine.trigger()
-                                CatApi.cancelStreamChat()
+                                viewStore.cancelStream()
                             }) {
                                 Rectangle()
                                     .foregroundColor(.primaryColor)
