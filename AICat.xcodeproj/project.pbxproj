@@ -41,6 +41,7 @@
 		8E64874429C715740029E14F /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874329C715740029E14F /* ChatMessage.swift */; };
 		8E64874729C719460029E14F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874629C719460029E14F /* Date+Extension.swift */; };
 		8E64874C29C788640029E14F /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E64874B29C788640029E14F /* ConversationListView.swift */; };
+		8E8D37E92B52A6E100DC0B8A /* Perception in Frameworks */ = {isa = PBXBuildFile; productRef = 8E8D37E82B52A6E100DC0B8A /* Perception */; };
 		8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 8E8F19D62A5022190006BCBC /* OpenAI */; };
 		8EC0742429F979DD00606DE9 /* OpenAISettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC0742329F979DD00606DE9 /* OpenAISettingsView.swift */; };
 		8EDB8E0D2A127D6A0088517E /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0C2A127D6A0088517E /* CloudKitService.swift */; };
@@ -129,6 +130,7 @@
 				8E8F19D72A5022190006BCBC /* OpenAI in Frameworks */,
 				8EF5A5E329D92DBF00981A38 /* AppCenterCrashes in Frameworks */,
 				8EF5A5E129D92DBF00981A38 /* AppCenterAnalytics in Frameworks */,
+				8E8D37E92B52A6E100DC0B8A /* Perception in Frameworks */,
 				8E0CD5452A58018800DAC4C0 /* Highlightr in Frameworks */,
 				8E64873F29C70FD00029E14F /* Blackbird in Frameworks */,
 			);
@@ -329,6 +331,7 @@
 				8E8F19D62A5022190006BCBC /* OpenAI */,
 				8E0CD5442A58018800DAC4C0 /* Highlightr */,
 				8E0CD5492A5840EE00DAC4C0 /* Splash */,
+				8E8D37E82B52A6E100DC0B8A /* Perception */,
 			);
 			productName = AICat;
 			productReference = 8E64872329C6E1B00029E14F /* AICat.app */;
@@ -371,6 +374,7 @@
 				8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */,
 				8E0CD5432A58018800DAC4C0 /* XCRemoteSwiftPackageReference "Highlightr" */,
 				8E0CD5482A5840EE00DAC4C0 /* XCRemoteSwiftPackageReference "Splash" */,
+				8E8D37E72B52A6E100DC0B8A /* XCRemoteSwiftPackageReference "swift-perception" */,
 			);
 			productRefGroup = 8E64872429C6E1B00029E14F /* Products */;
 			projectDirPath = "";
@@ -726,6 +730,14 @@
 				kind = branch;
 			};
 		};
+		8E8D37E72B52A6E100DC0B8A /* XCRemoteSwiftPackageReference "swift-perception" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-perception";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.0;
+			};
+		};
 		8E8F19D52A5022190006BCBC /* XCRemoteSwiftPackageReference "OpenAI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Panl/OpenAI.git";
@@ -769,6 +781,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */;
 			productName = Blackbird;
+		};
+		8E8D37E82B52A6E100DC0B8A /* Perception */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E8D37E72B52A6E100DC0B8A /* XCRemoteSwiftPackageReference "swift-perception" */;
+			productName = Perception;
 		};
 		8E8F19D62A5022190006BCBC /* OpenAI */ = {
 			isa = XCSwiftPackageProductDependency;
