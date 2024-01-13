@@ -6,9 +6,9 @@
 //
 
 import SwiftUI
-import Observation
+import Perception
 
-@Observable
+@Perceptible
 class OpenAISettingsViewModel {
     var apiKey: String = UserDefaults.openApiKey ?? ""
     var apiHost: String = UserDefaults.customApiHost
@@ -56,81 +56,82 @@ struct OpenAISettingsView: View {
     @State var viewModel = OpenAISettingsViewModel()
     
     var body: some View {
-        List {
-            Section("API Key") {
-                HStack {
-                    SecureField(text: $viewModel.apiKey) {
-                        Text("Enter API key")
-                    }
-                    .textFieldStyle(.automatic)
-                    if !viewModel.apiKey.isEmpty {
-                        Button(action: {
-                            viewModel.apiKey = ""
-                        }) {
-                            Image(systemName: "multiply.circle.fill")
+        WithPerceptionTracking {
+            List {
+                Section("API Key") {
+                    HStack {
+                        SecureField(text: $viewModel.apiKey) {
+                            Text("Enter API key")
                         }
-                        .tint(.gray)
-                        .buttonStyle(.borderless)
-                    }
-                }
-                Button("Delete", action: {
-                    viewModel.deleteApiKey()
-                })
-            }
-            .alert(
-                "Validate Failed!",
-                isPresented: $viewModel.showApiKeyAlert,
-                actions: {
-                    Button("OK", action: { viewModel.showApiKeyAlert = false })
-                },
-                message: {
-                    Text("\(viewModel.error?.localizedDescription ?? "")")
-                }
-            )
-            Section("API Host") {
-                HStack {
-                    TextField(text: $viewModel.apiHost) {
-                        Text("Enter API host")
-                    }
-                    .textFieldStyle(.automatic)
-                    if !viewModel.apiHost.isEmpty {
-                        Button(action: {
-                            viewModel.apiHost = ""
-                        }) {
-                            Image(systemName: "multiply.circle.fill")
+                        .textFieldStyle(.automatic)
+                        if !viewModel.apiKey.isEmpty {
+                            Button(action: {
+                                viewModel.apiKey = ""
+                            }) {
+                                Image(systemName: "multiply.circle.fill")
+                            }
+                            .tint(.gray)
+                            .buttonStyle(.borderless)
                         }
-                        .tint(.gray)
-                        .buttonStyle(.borderless)
                     }
+                    Button("Delete", action: {
+                        viewModel.deleteApiKey()
+                    })
                 }
-                Button("Reset", action: {
-                    viewModel.resetApiHost()
-                })
+                .alert(
+                    "Validate Failed!",
+                    isPresented: $viewModel.showApiKeyAlert,
+                    actions: {
+                        Button("OK", action: { viewModel.showApiKeyAlert = false })
+                    },
+                    message: {
+                        Text("\(viewModel.error?.localizedDescription ?? "")")
+                    }
+                )
+                Section("API Host") {
+                    HStack {
+                        TextField(text: $viewModel.apiHost) {
+                            Text("Enter API host")
+                        }
+                        .textFieldStyle(.automatic)
+                        if !viewModel.apiHost.isEmpty {
+                            Button(action: {
+                                viewModel.apiHost = ""
+                            }) {
+                                Image(systemName: "multiply.circle.fill")
+                            }
+                            .tint(.gray)
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                    Button("Reset", action: {
+                        viewModel.resetApiHost()
+                    })
+                }
+
+                HStack(spacing: 8) {
+                    Button("Validate and Save") {
+                        viewModel.validateApi()
+                    }
+                    .disabled(viewModel.apiKey.isEmpty || viewModel.apiHost.isEmpty)
+                    if viewModel.isValidating {
+                        LoadingIndocator()
+                            .frame(width: 24, height: 14)
+                    }
+                    if viewModel.error != nil {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.red)
+                    }
+                    if viewModel.isValidated {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                    }
+                    Spacer()
+                }
             }
-            
-            HStack(spacing: 8) {
-                Button("Validate and Save") {
-                    viewModel.validateApi()
-                }
-                .disabled(viewModel.apiKey.isEmpty || viewModel.apiHost.isEmpty)
-                if viewModel.isValidating {
-                    LoadingIndocator()
-                        .frame(width: 24, height: 14)
-                }
-                if viewModel.error != nil {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.red)
-                }
-                if viewModel.isValidated {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                }
-                Spacer()
-            }
+            .frame(minWidth: 350)
+            .toast($viewModel.toast)
         }
-        .frame(minWidth: 350)
-        .toast($viewModel.toast)
-        
     }
 }
 

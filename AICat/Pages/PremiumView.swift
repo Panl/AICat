@@ -7,9 +7,9 @@
 
 import SwiftUI
 import ApphudSDK
-import Observation
+import Perception
 
-@Observable
+@Perceptible
 class PremiumPageViewModel {
     var product: ApphudProduct?
     var isPurchasing: Bool = false
@@ -72,95 +72,97 @@ struct PremiumPage: View {
     let onClose: () -> Void
 
     var body: some View {
-        VStack {
-            HStack {
+        WithPerceptionTracking {
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        onClose()
+                    }) {
+                        Image(systemName: "xmark")
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                            .padding(16)
+                    }
+                    .tint(.primaryColor)
+                    .buttonStyle(.borderless)
+                }
+                Spacer()
+                Text("AICat Premium")
+                    .font(.manrope(size: 36, weight: .bold))
+                    .fontWeight(.bold)
+                    .padding(.top, 20)
+
+                VStack(alignment: .leading, spacing: 20) {
+                    FeatureView(title: "Answers from GPT Model", description: "Get accurate and relevant answers directly from the GPT Model.")
+                    FeatureView(title: "Higher token limit for dialogues", description: "Engage in dialogues with a higer token limit")
+                    FeatureView(title: "Unlimited custom prompts", description: "Enjoy different conversations without any restrictions")
+                    FeatureView(title: "iCloud Sync", description: "Sync all conversations and messages across different devices.")
+                }
+                .padding(.vertical, 20)
+                .padding(.horizontal, 40)
                 Spacer()
                 Button(action: {
-                    onClose()
+                    viewModel.restorePurchases()
                 }) {
-                    Image(systemName: "xmark")
-                        .resizable()
-                        .frame(width: 16, height: 16)
-                        .padding(16)
+                    Text("Restore Purchases")
+                        .underline()
+                        .foregroundColor(.blue)
                 }
-                .tint(.primaryColor)
                 .buttonStyle(.borderless)
-            }
-            Spacer()
-            Text("AICat Premium")
-                .font(.manrope(size: 36, weight: .bold))
-                .fontWeight(.bold)
-                .padding(.top, 20)
+                Button(action: {
+                    viewModel.subscribeNow()
+                }) {
+                    ZStack {
+                        Text(viewModel.isPremium ? "Already Premium" : String(format: NSLocalizedString("Subscribe for %@/month", comment: ""), viewModel.price))
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 40)
+                            .opacity((viewModel.isPurchasing) ? 0 : 1)
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                        if viewModel.isPurchasing {
+                            LoadingIndocator(themeColor: .white)
+                                .frame(width: 20, height: 20)
+                                .environment(\.colorScheme, .dark)
+                        }
+                    }
 
-            VStack(alignment: .leading, spacing: 20) {
-                FeatureView(title: "Answers from GPT Model", description: "Get accurate and relevant answers directly from the GPT Model.")
-                FeatureView(title: "Higher token limit for dialogues", description: "Engage in dialogues with a higer token limit")
-                FeatureView(title: "Unlimited custom prompts", description: "Enjoy different conversations without any restrictions")
-                FeatureView(title: "iCloud Sync", description: "Sync all conversations and messages across different devices.")
-            }
-            .padding(.vertical, 20)
-            .padding(.horizontal, 40)
-            Spacer()
-            Button(action: {
-                viewModel.restorePurchases()
-            }) {
-                Text("Restore Purchases")
-                    .underline()
-                    .foregroundColor(.blue)
-            }
-            .buttonStyle(.borderless)
-            Button(action: {
-                viewModel.subscribeNow()
-            }) {
-                ZStack {
-                    Text(viewModel.isPremium ? "Already Premium" : String(format: NSLocalizedString("Subscribe for %@/month", comment: ""), viewModel.price))
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 40)
-                        .opacity((viewModel.isPurchasing) ? 0 : 1)
-                        .background(Color.blue)
-                        .cornerRadius(8)
-                    if viewModel.isPurchasing {
-                        LoadingIndocator(themeColor: .white)
-                            .frame(width: 20, height: 20)
-                            .environment(\.colorScheme, .dark)
+                }
+                .buttonStyle(.borderless)
+                Text("Auto renewal monthly, cancel at anytime")
+                    .foregroundColor(.gray.opacity(0.6))
+                    .font(.manrope(size: 12, weight: .regular))
+                    .padding(.bottom, 10)
+
+                HStack {
+                    Link(destination: URL(string: "https://epochpro.app/aicat_privacy")!) {
+                        Text("Privacy Policy")
+                            .underline()
+                            .foregroundColor(.blue)
+                    }
+
+                    Text("|")
+                        .padding(.horizontal, 4)
+
+                    Link(destination: URL(string: "https://epochpro.app/aicat_terms_of_use")!) {
+                        Text("Terms of Use")
+                            .underline()
+                            .foregroundColor(.blue)
                     }
                 }
-
+                .font(.footnote)
+                .padding(.bottom, 20)
+                Spacer()
             }
-            .buttonStyle(.borderless)
-            Text("Auto renewal monthly, cancel at anytime")
-                .foregroundColor(.gray.opacity(0.6))
-                .font(.manrope(size: 12, weight: .regular))
-                .padding(.bottom, 10)
-
-            HStack {
-                Link(destination: URL(string: "https://epochpro.app/aicat_privacy")!) {
-                    Text("Privacy Policy")
-                        .underline()
-                        .foregroundColor(.blue)
-                }
-
-                Text("|")
-                    .padding(.horizontal, 4)
-
-                Link(destination: URL(string: "https://epochpro.app/aicat_terms_of_use")!) {
-                    Text("Terms of Use")
-                        .underline()
-                        .foregroundColor(.blue)
-                }
+            .font(.manrope(size: 16, weight: .medium))
+            .onAppear {
+                viewModel.fetchMonthlyProduct()
             }
-            .font(.footnote)
-            .padding(.bottom, 20)
-            Spacer()
+            .background(Color.background.ignoresSafeArea())
+            .toast($viewModel.toast)
         }
-        .font(.manrope(size: 16, weight: .medium))
-        .onAppear {
-            viewModel.fetchMonthlyProduct()
-        }
-        .background(Color.background.ignoresSafeArea())
-        .toast($viewModel.toast)
     }
 }
 
