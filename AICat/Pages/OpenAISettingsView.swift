@@ -6,18 +6,23 @@
 //
 
 import SwiftUI
-import Perception
 
-@Perceptible
-class OpenAISettingsViewModel {
+class OpenAISettingsViewModel: ObservableObject {
+    @Published
     var apiKey: String = UserDefaults.openApiKey ?? ""
+    @Published
     var apiHost: String = UserDefaults.customApiHost
+    @Published
     var isValidating: Bool = false
+    @Published
     var error: Error?
+    @Published
     var showApiKeyAlert: Bool = false
+    @Published
     var isValidated: Bool = false
+    @Published
     var toast: Toast?
-    
+
     func validateApi() {
         guard !isValidating else { return }
         error = nil
@@ -35,15 +40,15 @@ class OpenAISettingsViewModel {
             }
             isValidating = false
         }
-        
+
     }
-    
+
     func resetApiHost() {
         apiHost = "https://api.openai.com"
         UserDefaults.resetApiHost()
         toast = Toast(type: .success, message: "ApiHost reset sucessful!")
     }
-    
+
     func deleteApiKey() {
         apiKey = ""
         UserDefaults.openApiKey = nil
@@ -52,86 +57,84 @@ class OpenAISettingsViewModel {
 }
 
 struct OpenAISettingsView: View {
-    
-    @Perception.Bindable var viewModel = OpenAISettingsViewModel()
-    
-    var body: some View {
-        WithPerceptionTracking {
-            List {
-                Section("API Key") {
-                    HStack {
-                        SecureField(text: $viewModel.apiKey) {
-                            Text("Enter API key")
-                        }
-                        .textFieldStyle(.automatic)
-                        if !viewModel.apiKey.isEmpty {
-                            Button(action: {
-                                viewModel.apiKey = ""
-                            }) {
-                                Image(systemName: "multiply.circle.fill")
-                            }
-                            .tint(.gray)
-                            .buttonStyle(.borderless)
-                        }
-                    }
-                    Button("Delete", action: {
-                        viewModel.deleteApiKey()
-                    })
-                }
-                .alert(
-                    "Validate Failed!",
-                    isPresented: $viewModel.showApiKeyAlert,
-                    actions: {
-                        Button("OK", action: { viewModel.showApiKeyAlert = false })
-                    },
-                    message: {
-                        Text("\(viewModel.error?.localizedDescription ?? "")")
-                    }
-                )
-                Section("API Host") {
-                    HStack {
-                        TextField(text: $viewModel.apiHost) {
-                            Text("Enter API host")
-                        }
-                        .textFieldStyle(.automatic)
-                        if !viewModel.apiHost.isEmpty {
-                            Button(action: {
-                                viewModel.apiHost = ""
-                            }) {
-                                Image(systemName: "multiply.circle.fill")
-                            }
-                            .tint(.gray)
-                            .buttonStyle(.borderless)
-                        }
-                    }
-                    Button("Reset", action: {
-                        viewModel.resetApiHost()
-                    })
-                }
 
-                HStack(spacing: 8) {
-                    Button("Validate and Save") {
-                        viewModel.validateApi()
+    @ObservedObject var viewModel = OpenAISettingsViewModel()
+
+    var body: some View {
+        List {
+            Section("API Key") {
+                HStack {
+                    SecureField(text: $viewModel.apiKey) {
+                        Text("Enter API key")
                     }
-                    .disabled(viewModel.apiKey.isEmpty || viewModel.apiHost.isEmpty)
-                    if viewModel.isValidating {
-                        LoadingIndocator()
-                            .frame(width: 24, height: 14)
+                    .textFieldStyle(.automatic)
+                    if !viewModel.apiKey.isEmpty {
+                        Button(action: {
+                            viewModel.apiKey = ""
+                        }) {
+                            Image(systemName: "multiply.circle.fill")
+                        }
+                        .tint(.gray)
+                        .buttonStyle(.borderless)
                     }
-                    if viewModel.error != nil {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red)
-                    }
-                    if viewModel.isValidated {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                    }
-                    Spacer()
                 }
+                Button("Delete", action: {
+                    viewModel.deleteApiKey()
+                })
             }
-            .frame(minWidth: 350)
-            .toast($viewModel.toast)
+            .alert(
+                "Validate Failed!",
+                isPresented: $viewModel.showApiKeyAlert,
+                actions: {
+                    Button("OK", action: { viewModel.showApiKeyAlert = false })
+                },
+                message: {
+                    Text("\(viewModel.error?.localizedDescription ?? "")")
+                }
+            )
+            Section("API Host") {
+                HStack {
+                    TextField(text: $viewModel.apiHost) {
+                        Text("Enter API host")
+                    }
+                    .textFieldStyle(.automatic)
+                    if !viewModel.apiHost.isEmpty {
+                        Button(action: {
+                            viewModel.apiHost = ""
+                        }) {
+                            Image(systemName: "multiply.circle.fill")
+                        }
+                        .tint(.gray)
+                        .buttonStyle(.borderless)
+                    }
+                }
+                Button("Reset", action: {
+                    viewModel.resetApiHost()
+                })
+            }
+
+            HStack(spacing: 8) {
+                Button("Validate and Save") {
+                    viewModel.validateApi()
+                }
+                .disabled(viewModel.apiKey.isEmpty || viewModel.apiHost.isEmpty)
+                if viewModel.isValidating {
+                    LoadingIndocator()
+                        .frame(width: 24, height: 14)
+                }
+                if viewModel.error != nil {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.red)
+                }
+                if viewModel.isValidated {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                }
+                Spacer()
+            }
         }
+        .frame(minWidth: 350)
+        .toast($viewModel.toast)
     }
 }
 

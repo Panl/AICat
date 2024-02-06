@@ -51,9 +51,9 @@ extension Theme {
           }
           .overlay(alignment: .top) {
               HStack(alignment: .center) {
-                  Text((configuration.language ?? "code").uppercased())
-                      .foregroundStyle(.tertiary)
-                      .font(.callout)
+                  Text((configuration.language ?? "code"))
+                      .foregroundStyle(.secondary)
+                      .font(.footnote)
                       .lineLimit(1)
                   Spacer()
                   CopyButton {
@@ -96,15 +96,20 @@ struct CopyButton: View {
                 }
             }
         }) {
-            Image(systemName: isCopied ? "checkmark.circle.fill" : "doc.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 20, height: 20)
-                .foregroundColor(.secondary)
-                .background(
-                    .regularMaterial,
-                    in: RoundedRectangle(cornerRadius: 4, style: .circular)
-                )
+            HStack(spacing: 4) {
+                Image(systemName: isCopied ? "checkmark" : "doc")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 14, height: 14)
+                    .foregroundColor(.secondary)
+                    .background(
+                        .regularMaterial,
+                        in: RoundedRectangle(cornerRadius: 4, style: .circular)
+                    )
+                Text(isCopied ? "Copied!" : "Copy code")
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+            }
         }
         .buttonStyle(.borderless)
     }

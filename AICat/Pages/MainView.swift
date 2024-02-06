@@ -8,17 +8,16 @@
 import SwiftUI
 import Blackbird
 import Combine
-import Perception
 import ApphudSDK
 
-@Perceptible
-class ChatStateViewModel {
+class ChatStateViewModel: ObservableObject {
     
-    @PerceptionIgnored
     var chatListStore = ChatListViewModel()
-    @PerceptionIgnored
     var conversationStore = ConversationViewModel()
+
+    @Published
     var mainChat: Conversation = mainConversation
+    @Published
     var conversations: [Conversation] = []
 
     var allConversations: [Conversation] {
@@ -28,10 +27,11 @@ class ChatStateViewModel {
     func fetchConversations() {
         Task {
             let (mainChat, conversations) = await queryConversations()
-            updateConversations(mainChat, conversations: conversations)
+            await updateConversations(mainChat, conversations: conversations)
         }
     }
 
+    @MainActor
     private func updateConversations(_ mainChat: Conversation, conversations: [Conversation]) {
         let all = [mainChat] + conversations
         self.mainChat = mainChat
@@ -43,6 +43,7 @@ class ChatStateViewModel {
         self.conversationStore.conversation = selected
     }
 
+    @MainActor
     func addChat(_ chat: Conversation) {
         UserDefaults.currentChatId = chat.id
         self.conversations.insert(chat, at: 0)
@@ -52,6 +53,7 @@ class ChatStateViewModel {
         self.conversationStore.conversation = chat
     }
 
+    @MainActor
     func updateChat(_ chat: Conversation) {
         if chat.id == mainChat.id {
             mainChat = chat
@@ -67,6 +69,7 @@ class ChatStateViewModel {
         }
     }
 
+    @MainActor
     func selectChat(_ chat: Conversation) {
         UserDefaults.currentChatId = chat.id
         chatListStore.selectedChat = chat
@@ -76,8 +79,8 @@ class ChatStateViewModel {
     func saveChat(_ chat: Conversation) {
         Task {
             await saveConversation(chat)
-            addChat(chat)
-            selectChat(chat)
+            await addChat(chat)
+            await selectChat(chat)
         }
     }
 
@@ -86,7 +89,7 @@ class ChatStateViewModel {
             await clearConversations(chats)
             let removeIds = chats.map(\.id)
             let newChats = conversations.filter { !removeIds.contains($0.id) }
-            updateConversations(mainChat, conversations: newChats)
+            await updateConversations(mainChat, conversations: newChats)
         }
     }
 
@@ -94,7 +97,7 @@ class ChatStateViewModel {
         Task {
             await deleteConversation(chat)
             let newChats = conversations.filter { $0.id != chat.id }
-            return updateConversations(mainChat, conversations: newChats)
+            await updateConversations(mainChat, conversations: newChats)
         }
 
     }
@@ -137,37 +140,36 @@ class ChatStateViewModel {
 struct MainView: View {
 
     @State private var cancelable: AnyCancellable?
+    
     let chatState = ChatStateViewModel()
 
     var body: some View {
-        WithPerceptionTracking {
-            GeometryReader { proxy in
-                if proxy.size.width > 560 {
-                    SplitView(size: proxy.size)
-                } else {
-                    CompactView()
+        GeometryReader { proxy in
+            if proxy.size.width > 560 {
+                SplitView(size: proxy.size)
+            } else {
+                CompactView()
+            }
+        }
+        .environmentObject(chatState)
+        .tint(Color.primaryColor)
+        .onAppear {
+            #if os(iOS)
+            cancelable = NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+                .sink { _ in
+                    print("App will enter foreground")
+                    DataStore.sync(complete: nil)
                 }
-            }
-            .environment(chatState)
-            .tint(Color.primaryColor)
-            .onAppear {
-                #if os(iOS)
-                cancelable = NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
-                    .sink { _ in
-                        print("App will enter foreground")
-                        DataStore.sync(complete: nil)
-                    }
-                #elseif os(macOS)
-                cancelable = NotificationCenter.default.publisher(for: NSApplication.willBecomeActiveNotification)
-                    .sink { _ in
-                        print("App will enter foreground")
-                        DataStore.sync(complete: nil)
-                    }
-                #endif
-            }
-            .task {
-                UserDefaults.hasPremiumAccess = Apphud.hasPremiumAccess()
-            }
+            #elseif os(macOS)
+            cancelable = NotificationCenter.default.publisher(for: NSApplication.willBecomeActiveNotification)
+                .sink { _ in
+                    print("App will enter foreground")
+                    DataStore.sync(complete: nil)
+                }
+            #endif
+        }
+        .task {
+            UserDefaults.hasPremiumAccess = Apphud.hasPremiumAccess()
         }
     }
 }
