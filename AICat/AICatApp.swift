@@ -20,13 +20,6 @@ let db = try! Blackbird.Database(path: dbPath, options: [])
 @main
 struct AICatApp: App {
     init() {
-        AppCenter.start(
-            withAppSecret: appCenterSecretKey,
-            services: [
-                Analytics.self,
-                Crashes.self
-            ]
-        )
         Apphud.start(apiKey: appHudKey)
         DataStore.sync(complete: nil)
     }

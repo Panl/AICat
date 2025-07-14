@@ -15,6 +15,7 @@
 		8E0F0ECD29CB3AF60011B4F7 /* Manrope.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */; };
 		8E0F0ECF29CB3BA60011B4F7 /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */; };
 		8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0F0ED029CB53570011B4F7 /* View+Extension.swift */; };
+		8E12E2952E248A07002D7F0F /* Crendital.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E12E2942E2489FF002D7F0F /* Crendital.swift */; };
 		8E2128DF29EBE2CF00D50ADC /* ShareMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */; };
 		8E2128E129EC04F500D50ADC /* ShareMessagesImageOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */; };
 		8E2128E329ED7E8800D50ADC /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2128E229ED7E8800D50ADC /* HapticEngine.swift */; };
@@ -46,7 +47,6 @@
 		8EDB8E0D2A127D6A0088517E /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0C2A127D6A0088517E /* CloudKitService.swift */; };
 		8EDB8E0F2A1284540088517E /* PushItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E0E2A1284540088517E /* PushItem.swift */; };
 		8EDB8E112A13DD8F0088517E /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDB8E102A13DD8F0088517E /* StoreManager.swift */; };
-		8EDD4DD429DB0159009176A5 /* Credential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDD4DD329DB0159009176A5 /* Credential.swift */; };
 		8EE9264729D49B29005E6FB7 /* Bundle+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE9264629D49B29005E6FB7 /* Bundle+Extension.swift */; };
 		8EECA00629C8097E0021A6A1 /* UerDefaults+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EECA00529C8097E0021A6A1 /* UerDefaults+Extension.swift */; };
 		8EECA00A29C82E9D0021A6A1 /* AddConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EECA00929C82E9D0021A6A1 /* AddConversationView.swift */; };
@@ -61,6 +61,16 @@
 		8EFE2AB029E14F9C00C64B7C /* TextEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFE2AAF29E14F9C00C64B7C /* TextEditView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8E12E2A02E248AEB002D7F0F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8E64871B29C6E1B00029E14F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8E64872229C6E1B00029E14F;
+			remoteInfo = AICat;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		8E00BAF429FC2E9100193F6B /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		8E00BAF629FC3CCC00193F6B /* SharePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePickerView.swift; sourceTree = "<group>"; };
@@ -68,6 +78,8 @@
 		8E0F0ECC29CB3AF60011B4F7 /* Manrope.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Manrope.ttf; sourceTree = "<group>"; };
 		8E0F0ECE29CB3BA60011B4F7 /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
 		8E0F0ED029CB53570011B4F7 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		8E12E2942E2489FF002D7F0F /* Crendital.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crendital.swift; sourceTree = "<group>"; };
+		8E12E29A2E248AEB002D7F0F /* AICatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AICatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E2128DE29EBE2CF00D50ADC /* ShareMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareMessagesView.swift; sourceTree = "<group>"; };
 		8E2128E029EC04F500D50ADC /* ShareMessagesImageOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareMessagesImageOverlay.swift; sourceTree = "<group>"; };
 		8E2128E229ED7E8800D50ADC /* HapticEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticEngine.swift; sourceTree = "<group>"; };
@@ -104,7 +116,6 @@
 		8EDB8E0C2A127D6A0088517E /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
 		8EDB8E0E2A1284540088517E /* PushItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushItem.swift; sourceTree = "<group>"; };
 		8EDB8E102A13DD8F0088517E /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
-		8EDD4DD329DB0159009176A5 /* Credential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credential.swift; sourceTree = "<group>"; };
 		8EE9264629D49B29005E6FB7 /* Bundle+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extension.swift"; sourceTree = "<group>"; };
 		8EECA00529C8097E0021A6A1 /* UerDefaults+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UerDefaults+Extension.swift"; sourceTree = "<group>"; };
 		8EECA00929C82E9D0021A6A1 /* AddConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddConversationView.swift; sourceTree = "<group>"; };
@@ -118,7 +129,18 @@
 		8EFE2AAF29E14F9C00C64B7C /* TextEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		8E12E29B2E248AEB002D7F0F /* AICatUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AICatUITests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		8E12E2972E248AEB002D7F0F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8E64872029C6E1B00029E14F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -176,6 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				8E64872529C6E1B00029E14F /* AICat */,
+				8E12E29B2E248AEB002D7F0F /* AICatUITests */,
 				8E64872429C6E1B00029E14F /* Products */,
 				8E64874829C759970029E14F /* Frameworks */,
 			);
@@ -185,6 +208,7 @@
 			isa = PBXGroup;
 			children = (
 				8E64872329C6E1B00029E14F /* AICat.app */,
+				8E12E29A2E248AEB002D7F0F /* AICatUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -192,6 +216,7 @@
 		8E64872529C6E1B00029E14F /* AICat */ = {
 			isa = PBXGroup;
 			children = (
+				8E12E2942E2489FF002D7F0F /* Crendital.swift */,
 				8E401DCD29DCB66200E2F403 /* AICat.entitlements */,
 				8EECA00D29C83BDB0021A6A1 /* Info.plist */,
 				8EDB8E0B2A127D310088517E /* CloudSync */,
@@ -207,7 +232,6 @@
 				8E64872A29C6E1B10029E14F /* Assets.xcassets */,
 				8E2128E829EEFB2700D50ADC /* Localizable.strings */,
 				8E64872C29C6E1B10029E14F /* Preview Content */,
-				8EDD4DD329DB0159009176A5 /* Credential.swift */,
 			);
 			path = AICat;
 			sourceTree = "<group>";
@@ -307,6 +331,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		8E12E2992E248AEB002D7F0F /* AICatUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8E12E2A22E248AEB002D7F0F /* Build configuration list for PBXNativeTarget "AICatUITests" */;
+			buildPhases = (
+				8E12E2962E248AEB002D7F0F /* Sources */,
+				8E12E2972E248AEB002D7F0F /* Frameworks */,
+				8E12E2982E248AEB002D7F0F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8E12E2A12E248AEB002D7F0F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				8E12E29B2E248AEB002D7F0F /* AICatUITests */,
+			);
+			name = AICatUITests;
+			packageProductDependencies = (
+			);
+			productName = AICatUITests;
+			productReference = 8E12E29A2E248AEB002D7F0F /* AICatUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		8E64872229C6E1B00029E14F /* AICat */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8E64873129C6E1B10029E14F /* Build configuration list for PBXNativeTarget "AICat" */;
@@ -341,9 +388,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1420;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 1420;
 				TargetAttributes = {
+					8E12E2992E248AEB002D7F0F = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 8E64872229C6E1B00029E14F;
+					};
 					8E64872229C6E1B00029E14F = {
 						CreatedOnToolsVersion = 14.2;
 					};
@@ -377,11 +428,19 @@
 			projectRoot = "";
 			targets = (
 				8E64872229C6E1B00029E14F /* AICat */,
+				8E12E2992E248AEB002D7F0F /* AICatUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		8E12E2982E248AEB002D7F0F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8E64872129C6E1B00029E14F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -396,6 +455,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		8E12E2962E248AEB002D7F0F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8E64871F29C6E1B00029E14F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -408,6 +474,7 @@
 				8E3DA87D29DC6E6800327A2A /* LoadingIndocator.swift in Sources */,
 				8EECA00A29C82E9D0021A6A1 /* AddConversationView.swift in Sources */,
 				8E2E5BA529CC53CD00EE0072 /* Theme+Extension.swift in Sources */,
+				8E12E2952E248A07002D7F0F /* Crendital.swift in Sources */,
 				8E00BAF529FC2E9100193F6B /* DocumentPicker.swift in Sources */,
 				8E0F0ED129CB53570011B4F7 /* View+Extension.swift in Sources */,
 				8E401DD029DE59A000E2F403 /* SystemUtil.swift in Sources */,
@@ -438,12 +505,19 @@
 				8EECA01629CA07830021A6A1 /* MessageView.swift in Sources */,
 				8E401DD729EA9E9A00E2F403 /* SKProduct+Extension.swift in Sources */,
 				8EDB8E112A13DD8F0088517E /* StoreManager.swift in Sources */,
-				8EDD4DD429DB0159009176A5 /* Credential.swift in Sources */,
 				8EECA01329C8BC370021A6A1 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8E12E2A12E248AEB002D7F0F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8E64872229C6E1B00029E14F /* AICat */;
+			targetProxy = 8E12E2A02E248AEB002D7F0F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		8E2128E829EEFB2700D50ADC /* Localizable.strings */ = {
@@ -462,6 +536,65 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		8E12E2A32E248AEB002D7F0F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H8FAQLAYUN;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.epoch.AICatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = AICat;
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		8E12E2A42E248AEB002D7F0F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H8FAQLAYUN;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.epoch.AICatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = AICat;
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
 		8E64872F29C6E1B10029E14F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -665,6 +798,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		8E12E2A22E248AEB002D7F0F /* Build configuration list for PBXNativeTarget "AICatUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8E12E2A32E248AEB002D7F0F /* Debug */,
+				8E12E2A42E248AEB002D7F0F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		8E64871E29C6E1B00029E14F /* Build configuration list for PBXProject "AICat" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -707,7 +849,7 @@
 			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.1.0;
+				minimumVersion = 2.4.1;
 			};
 		};
 		8E64873D29C70FD00029E14F /* XCRemoteSwiftPackageReference "Blackbird" */ = {
