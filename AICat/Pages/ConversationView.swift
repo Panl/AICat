@@ -680,6 +680,7 @@ struct ConversationView: View {
                 Image(systemName: "bubble.left.and.bubble.right")
                     .tint(.primaryColor)
                     .frame(width: 24, height: 24)
+                    .accessibilityIdentifier("chatlist-button")
             }.buttonStyle(.borderless)
             Spacer()
             VStack(spacing: 0) {

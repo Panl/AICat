@@ -39,6 +39,7 @@ struct AddConversationView: View {
             Spacer(minLength: 56)
             Text(conversation == nil ? "New Chat" : "Edit Chat")
                 .font(.manrope(size: 28, weight: .bold))
+                .accessibilityIdentifier("add-conversation-title")
             Spacer()
                 .frame(height: 40)
             TextField(text: $title) {

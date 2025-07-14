@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "274CA386-67D5-42BF-96B5-65BA664B7280",
+      "name" : "Chinese",
+      "options" : {
+
+      }
+    },
+    {
+      "id" : "85715E2F-DD04-4C8A-9151-28FD227080BC",
+      "name" : "English",
+      "options" : {
+        "language" : "en",
+        "uiTestingScreenshotsLifetime" : "keepAlways"
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "language" : "zh-Hans",
+    "locationScenario" : {
+      "identifier" : "Hong Kong, China",
+      "referenceType" : "built-in"
+    },
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:AICat.xcodeproj",
+        "identifier" : "8E12E2992E248AEB002D7F0F",
+        "name" : "AICatUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

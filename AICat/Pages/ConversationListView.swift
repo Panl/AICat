@@ -65,6 +65,7 @@ struct ConversationListView: View {
                     .buttonStyle(.borderless)
                     .padding(.horizontal, 8)
                     .tint(.blackText.opacity(0.5))
+                    .accessibilityIdentifier("list-add-conversation-button")
                     ForEach(viewStore.chats) { conversation in
                         Button(action: { onChatChanged(conversation) }) {
                             HStack {
